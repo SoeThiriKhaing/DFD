@@ -18,7 +18,7 @@ class AuthController {
     try {
       final token = await authService.login(email, password);
       if (token != null) {
-        await saveToken(token as String);
+        await saveToken(token);
         SnackbarHelper.showSnackbar(
           title: "Success",
           message: Messages.loginSuccess,
