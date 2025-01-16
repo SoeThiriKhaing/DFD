@@ -10,10 +10,9 @@ class DivisionRepository implements IDivisionRepository {
   Future<List<Division>> getDivisionById(int countryId) async{
     try{
     final String url = '${AppUrl.getDivisionById}/$countryId';
-    final response = await apiService.get(
-      url as String Function(String countryId), // Endpoint
-      method: "GET", // HTTP method
-    );
+    // Make GET request using ApiService
+    final response = await apiService.request(url, method: "GET");
+    
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       return data.map((json)=>Division.fromJson(json)).toList();

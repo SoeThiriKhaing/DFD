@@ -2,23 +2,30 @@ import 'dart:convert';
 import 'package:dailyfairdeal/config/api_messages.dart';
 import 'package:dailyfairdeal/models/user_model.dart';
 import 'package:dailyfairdeal/repositories/handle_error.dart';
-import 'package:dailyfairdeal/service/auth_api/login_res.dart';
+import 'package:dailyfairdeal/services/api_service.dart';
 import 'package:dailyfairdeal/util/snackbar_helper.dart';
 import 'package:flutter/material.dart';
 import '../interfaces/i_auth_repository.dart';
 import '../util/appurl.dart';
 
 class AuthRepository implements IAuthRepository {
+
   @override
-  Future<UserModel?> login(String email, String password) async {
+  Future<String?> login(String email, String password) async {
     try {
-      final response = await apiService.request(
-      AppUrl.loginEndpoint,method: "POST"
+      // Request body
+      final requestBody = {"email": email, "password": password};
+
+      // API call
+      final response = await ApiService().request(
+        AppUrl.loginEndpoint,
+        method: "POST",
+        body: requestBody,
       );
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        return data['access_token'];
+      if(response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        return responseData['access_token'];
       } else if (response.statusCode == 400){
         SnackbarHelper.showSnackbar(
           title: "Error",
@@ -47,7 +54,15 @@ class AuthRepository implements IAuthRepository {
   @override
   Future<UserModel?> register(String name, String email, String password) async {
     try {
-      final response = await apiService.request(AppUrl.registerEndpoint,method: "POST");
+       // Request body
+      final requestBody = {"name": name, "email": email, "password": password};
+
+      // API call
+      final response = await ApiService().request(
+        AppUrl.registerEndpoint,
+        method: "POST",
+        body: requestBody,
+      );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);

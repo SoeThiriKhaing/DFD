@@ -1,8 +1,8 @@
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:dailyfairdeal/config/api_messages.dart';
 import 'package:dailyfairdeal/services/secure_storage.dart';
 import 'package:dailyfairdeal/util/appurl.dart';
-import 'package:http/http.dart' as http;
 
 class ApiService {
   final http.Client _client;
@@ -21,14 +21,14 @@ class ApiService {
     return _instance;
   }
 
-  // Generic request method
+  /// Generic Request Method
   Future<http.Response> request(
     String endpoint, {
     String method = "GET",
     Map<String, String>? headers,
     Map<String, dynamic>? body,
   }) async {
-    final uri = Uri.parse("$_baseUrl$endpoint");
+    final uri = Uri.parse(endpoint.startsWith('http') ? endpoint : "$_baseUrl/$endpoint");
     final token = await getToken(); // Fetch token from secure storage
 
     // Default headers with token
@@ -43,6 +43,7 @@ class ApiService {
     try {
       late http.Response response;
 
+      // HTTP method handling
       switch (method.toUpperCase()) {
         case "POST":
           response = await _client.post(
@@ -66,24 +67,31 @@ class ApiService {
           response = await _client.get(uri, headers: requestHeaders);
       }
 
+      // Handle response status codes
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return response;
-      } else if (response.statusCode == 204) {
-        throw Exception(ApiMessages.noData);
-      } else if (response.statusCode == 401) {
-        throw Exception(ApiMessages.unauthorized);
-      } 
-      else if (response.statusCode == 500) {
-        throw Exception(ApiMessages.serverError);
       } else {
-        throw Exception(ApiMessages.failedToLoad);
+        return _handleError(response);
       }
     } catch (e) {
       throw Exception("Request failed: $e");
     }
-    
-    
   }
 
-  get(String Function(String countryId) getDivisionById, {required String method}) {}
+  /// Handle API Errors
+  http.Response _handleError(http.Response response) {
+    final statusCode = response.statusCode;
+
+    switch (statusCode) {
+      case 401:
+        throw Exception(ApiMessages.unauthorized);
+      case 500:
+        throw Exception(ApiMessages.serverError);
+      case 204:
+        throw Exception(ApiMessages.noData);
+      default:
+        throw Exception(
+            "${ApiMessages.failedToLoad} (Status Code: $statusCode)");
+    }
+  }
 }

@@ -10,10 +10,7 @@ class WardRepository implements IWardRepository {
   Future<List<Ward>> getWardById(int townshipId) async{
     try{
     final String url = '${AppUrl.getWardById}/$townshipId';
-    final response = await apiService.get(
-      url as String Function(String townshipId), // Endpoint
-      method: "GET", // HTTP method
-    );
+    final response = await apiService.request(url, method: "GET");
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       return data.map((json)=>Ward.fromJson(json)).toList();
