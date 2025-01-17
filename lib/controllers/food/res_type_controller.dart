@@ -1,5 +1,5 @@
-import 'package:dailyfairdeal/models/restaurant_type_model.dart';
-import 'package:dailyfairdeal/services/restaurant_type_service.dart';
+import 'package:dailyfairdeal/models/food/res_type_model.dart';
+import 'package:dailyfairdeal/services/food/res_type_service.dart';
 
 class RestaurantTypeController {
   final RestaurantTypeService service;

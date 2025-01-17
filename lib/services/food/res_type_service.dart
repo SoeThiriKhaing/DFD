@@ -1,6 +1,5 @@
-import 'package:dailyfairdeal/models/restaurant_type_model.dart';
-
-import '../repositories/restaurant_type_repository.dart';
+import 'package:dailyfairdeal/models/food/res_type_model.dart';
+import 'package:dailyfairdeal/repositories/food/get_res_type_repository.dart';
 
 class RestaurantTypeService {
   final RestaurantTypeRepository repository;

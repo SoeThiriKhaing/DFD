@@ -1,9 +1,10 @@
 import 'dart:convert';
-import 'package:dailyfairdeal/models/restaurant_type_model.dart';
+import 'package:dailyfairdeal/interfaces/food/i_res_type_repository.dart';
+import 'package:dailyfairdeal/models/food/res_type_model.dart';
 import 'package:dailyfairdeal/services/api_service.dart';
 import 'package:dailyfairdeal/services/secure_storage.dart';
-import '../interfaces/i_restaurant_type_repository.dart';
-import '../util/appurl.dart';
+import 'package:dailyfairdeal/util/appurl.dart';
+
 
 class RestaurantTypeRepository implements IRestaurantTypeRepository {
   final apiService = ApiService();

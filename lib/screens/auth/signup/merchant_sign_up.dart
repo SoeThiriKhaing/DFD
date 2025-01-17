@@ -1,10 +1,10 @@
+import 'package:dailyfairdeal/controllers/food/res_type_controller.dart';
 import 'package:dailyfairdeal/controllers/location/city_controller.dart';
 import 'package:dailyfairdeal/controllers/location/country_controller.dart';
 import 'package:dailyfairdeal/controllers/location/division_controller.dart';
 import 'package:dailyfairdeal/controllers/location/street_controller.dart';
 import 'package:dailyfairdeal/controllers/location/township_controller.dart';
 import 'package:dailyfairdeal/controllers/location/ward_controller.dart';
-import 'package:dailyfairdeal/controllers/restaurant_type_controller.dart';
 import 'package:dailyfairdeal/service/food_api/set_res.dart';
 import 'package:dailyfairdeal/screens/widgets/dropdown_field_widget.dart';
 import 'package:dailyfairdeal/screens/widgets/phone_text_field_widget.dart';
