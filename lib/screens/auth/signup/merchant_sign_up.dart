@@ -7,7 +7,6 @@ import 'package:dailyfairdeal/controllers/location/ward_controller.dart';
 import 'package:dailyfairdeal/controllers/restaurant_type_controller.dart';
 import 'package:dailyfairdeal/repositories/location/country_repository.dart';
 import 'package:dailyfairdeal/repositories/restaurant_type_repository.dart';
-import 'package:dailyfairdeal/service/food_api/set_res.dart';
 import 'package:dailyfairdeal/screens/widgets/dropdown_field_widget.dart';
 import 'package:dailyfairdeal/screens/widgets/phone_text_field_widget.dart';
 import 'package:dailyfairdeal/services/location/country_service.dart';
@@ -66,22 +65,23 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
     super.initState();
     resTypeController = RestaurantTypeController(service: RestaurantTypeService(repository: RestaurantTypeRepository()));
     countryController = CountryController(service: CountryService(repository: CountryRepository()));
+    selectedBusinessType = businessTypeList.first['name'];
     fetchAddress();
   }
 
   // Fetch the countries and update the state
   Future<void> fetchAddress() async {
     try {
-      List<Map<String, String>> countries = await countryController.loadCountryList();
       List<Map<String, String>> restaurantTypes = await resTypeController.loadRestaurantTypes();
+      List<Map<String, String>> countries = await countryController.loadCountryList();
       setState(() {
         countryList = countries;
         restaurantTypeList = restaurantTypes;
-        selectedBusinessType = businessTypeList.first['name'];
+        //selectedBusinessType = businessTypeList.first['name'];
       });
     } catch (e) {
       // ignore: avoid_print
-      print("Error fetching country: $e");
+      print("Error fetching address: $e");
       
     }
   }
@@ -127,7 +127,7 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
       },
     };
     try {
-      saveRestaurantData(data);
+      //saveRestaurantData(data);
       clear();
     } catch (e) {
       SnackbarHelper.showSnackbar(

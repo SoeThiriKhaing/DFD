@@ -1,10 +1,8 @@
 import 'package:dailyfairdeal/repositories/repo_api_call_services/handle_response.dart';
 import 'package:dailyfairdeal/repositories/repo_api_call_services/log_error.dart';
-import 'package:dailyfairdeal/repositories/repo_api_call_services/parse_list.dart';
-import 'package:dailyfairdeal/repositories/repo_api_call_services/parse_list_input.dart';
 import 'package:dailyfairdeal/repositories/repo_api_call_services/sanitize_headers.dart';
 import 'package:dailyfairdeal/repositories/repo_api_call_services/validate_endpoint.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:dailyfairdeal/services/api_service.dart';
 
 class ApiHelper {
@@ -42,30 +40,5 @@ class ApiHelper {
       throw Exception("An unexpected error occurred: $e");
     }
   }
-
-  /// Fetches a list of items from the API with caching and performance optimization.
-  static Future<List<T>> fetchList<T>({
-    required String endpoint,
-    required T Function(Map<String, dynamic>) fromJson,
-  }) async {
-    try {
-      // Fetch the response
-      final response = await request<List<dynamic>>(
-        endpoint: endpoint,
-        method: "GET",
-      );
-
-      // Prepare data for isolate
-      final input = ParseListInput<T>(
-        responseList: response,
-        fromJson: fromJson,
-      );
-
-      // Offload JSON parsing to a separate thread
-      return await compute(parseList, input);
-    } catch (e, stackTrace) {
-      LogError.logError("Error fetching list", e, stackTrace);
-      throw Exception("Failed to fetch data");
-    }
-  }
+ 
 }
