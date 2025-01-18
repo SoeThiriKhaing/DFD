@@ -5,9 +5,13 @@ import 'package:dailyfairdeal/controllers/location/division_controller.dart';
 import 'package:dailyfairdeal/controllers/location/street_controller.dart';
 import 'package:dailyfairdeal/controllers/location/township_controller.dart';
 import 'package:dailyfairdeal/controllers/location/ward_controller.dart';
+import 'package:dailyfairdeal/repositories/food/get_res_type_repository.dart';
+import 'package:dailyfairdeal/repositories/location/country_repository.dart';
 import 'package:dailyfairdeal/service/food_api/set_res.dart';
 import 'package:dailyfairdeal/screens/widgets/dropdown_field_widget.dart';
 import 'package:dailyfairdeal/screens/widgets/phone_text_field_widget.dart';
+import 'package:dailyfairdeal/services/food/res_type_service.dart';
+import 'package:dailyfairdeal/services/location/country_service.dart';
 import 'package:dailyfairdeal/widget/reusabel_button.dart';
 import 'package:dailyfairdeal/util/snackbar_helper.dart';
 import 'package:dailyfairdeal/screens/widgets/text_form_field_widget.dart';
@@ -60,6 +64,8 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
   @override
   void initState() {
     super.initState();
+    resTypeController = RestaurantTypeController(service: RestaurantTypeService(repository: RestaurantTypeRepository()));
+    countryController = CountryController(service: CountryService(repository: CountryRepository()));
     fetchAddress();
   }
 

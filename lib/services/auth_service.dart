@@ -7,11 +7,11 @@ class AuthService {
 
   AuthService({required this.authRepository});
 
-  Future<UserModel?> login(String email, String password) async {
+  Future<UserModel> login(String email, String password) async {
     return await authRepository.login(email, password);
   }
 
-  Future<UserModel?> register(String name, String email, String password) async {
+  Future<UserModel> register(String name, String email, String password) async {
     return await authRepository.register(name, email, password);
   }
 }

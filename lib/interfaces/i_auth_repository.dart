@@ -1,6 +1,6 @@
-import '../models/user_model.dart';
+import 'package:dailyfairdeal/models/user_model.dart';
 
 abstract class IAuthRepository {
-  Future<UserModel?> login(String email, String password);
-  Future<UserModel?> register(String name, String email, String password);
+  Future<UserModel> login(String email, String password);
+  Future<UserModel> register(String name, String email, String password);
 }

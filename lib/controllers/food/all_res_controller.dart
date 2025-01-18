@@ -11,7 +11,13 @@ class AllResController {
     try {
       allRestaurants = await service.fetchAllRestaurant();
       return allRestaurants
-          .map((res) => {'id': res.id ?? '', 'name': res.name})
+          .map((res) => {
+                'id': res.id,
+                'name': res.name,
+                'res_type': res.restaurantType,
+                'openTime': res.openTime,
+                'closeTime': res.closeTime
+              })
           .toList();
     } catch (e) {
       throw Exception("An unexpected error occurred: $e");

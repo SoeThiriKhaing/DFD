@@ -10,10 +10,7 @@ class TownshipRepository implements ITownshipRepository {
   Future<List<Township>> getTownshipById(int cityId) async{
     try{
     final String url = '${AppUrl.getTownshipById}/$cityId';
-    final response = await apiService.get(
-      url as String Function(String cityId), // Endpoint
-      method: "GET", // HTTP method
-    );
+    final response = await apiService.request(url, method: "GET");
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       return data.map((json)=>Township.fromJson(json)).toList();
