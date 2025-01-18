@@ -1,10 +1,7 @@
+import 'package:dailyfairdeal/common_calls/handle_error_snackbar.dart';
+import 'package:dailyfairdeal/common_calls/handle_success.dart';
 import 'package:dailyfairdeal/config/messages.dart';
-import 'package:dailyfairdeal/screens/home/main_screen.dart';
-import 'package:dailyfairdeal/services/secure_storage.dart';
-import 'package:dailyfairdeal/services/api_service.dart';
-import 'package:dailyfairdeal/util/snackbar_helper.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:dailyfairdeal/models/user_model.dart';
 import '../services/auth_service.dart';
 
 class AuthController {
@@ -12,44 +9,22 @@ class AuthController {
 
   AuthController({required this.authService});
 
-  final apiService = ApiService();
 
   Future<void> login(String email, String password) async {
     try {
-      final token = await authService.login(email, password);
-      if (token != null) {
-        await saveToken(token);
-        SnackbarHelper.showSnackbar(
-          title: "Success",
-          message: Messages.loginSuccess,
-        );
-        Get.off(() => MainScreen());
-      }
+      UserModel user = await authService.login(email, password);
+      handleSuccessAuth(user, Messages.loginSuccess);
     } catch (e) {
-       SnackbarHelper.showSnackbar(
-          title: "Error",
-          message: e.toString(),
-          backgroundColor: Colors.red,
-        );
+      handleErrorSnackbar(e.toString());
     }
   }
 
   Future<void> register(String name, String email, String password) async {
     try {
-      final token = await authService.register(name, email, password);
-      if (token != null) {
-        SnackbarHelper.showSnackbar(
-          title: "Success",
-          message: Messages.registerSuccess,
-        );
-        // Navigate to the login page or save the token
-      }
+      UserModel user = await authService.register(name, email, password);
+      handleSuccessAuth(user, Messages.registerSuccess);
     } catch (e) {
-       SnackbarHelper.showSnackbar(
-          title: "Error",
-          message: e.toString(),
-          backgroundColor: Colors.red,
-        );
+      handleErrorSnackbar(e.toString());
     }
   }
 }

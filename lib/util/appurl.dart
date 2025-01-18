@@ -1,7 +1,7 @@
 class AppUrl {
   static var baseUrl = "http://api.dailyfairdeal.com/api";
   static var loginEndpoint = '$baseUrl/login';
-  static var registerEndpoint = "$baseUrl/register";
+  static var registerEndpoint = '$baseUrl/signup';
 
   //Food Api
   static var getAllRestaurant = '$baseUrl/restaurant';
@@ -9,7 +9,7 @@ class AppUrl {
   static var getFeatRestaurant = '$baseUrl/feature-restaurants';
   static var getOrderAgain = '$baseUrl/order-it-again';
   static var getPopularFood = '$baseUrl/popular-foods';
-  static var getResTypes = '$baseUrl/restaurants-types';
+  static var getResTypes = '$baseUrl/restaurant_types';
 
   //Location Api
 

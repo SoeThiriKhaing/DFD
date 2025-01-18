@@ -9,10 +9,15 @@ class RestaurantTypeController {
 
   Future<List<Map<String, String>>> loadRestaurantTypes() async {
     try {
-      restaurantTypes = await service.fetchRestaurantTypes();
-      return restaurantTypes
-          .map((type) => {'id': type.id ?? '', 'name': type.name })
-          .toList();
+      List<RestaurantType> resTypes = await service.getRestaurantTypes();
+
+      return resTypes.map((resType) {
+        return {
+          'id': resType.id.toString(), // Convert id to String
+          'name': resType.name,       // Assuming name is already a String
+        };
+      }).toList();
+      
     } catch (e) {
       throw Exception("An unexpected error occurred: $e");
     }

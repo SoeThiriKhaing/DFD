@@ -7,7 +7,8 @@ class RestaurantTypeService {
 
   RestaurantTypeService({required this.repository});
 
-  Future<List<RestaurantType>> fetchRestaurantTypes() async {
-    return await repository.getRestaurantType();
+  Future<List<RestaurantType>> getRestaurantTypes() async {
+    return await repository.fetchRestaurantTypes();
   }
 }
+

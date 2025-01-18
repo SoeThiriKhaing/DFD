@@ -1,87 +1,18 @@
-import 'dart:convert';
-import 'package:dailyfairdeal/config/api_messages.dart';
+import 'package:dailyfairdeal/common_calls/handle_request.dart';
+import 'package:dailyfairdeal/interfaces/i_auth_repository.dart';
 import 'package:dailyfairdeal/models/user_model.dart';
-import 'package:dailyfairdeal/repositories/handle_error.dart';
-import 'package:dailyfairdeal/services/api_service.dart';
-import 'package:dailyfairdeal/util/snackbar_helper.dart';
-import 'package:flutter/material.dart';
-import '../interfaces/i_auth_repository.dart';
-import '../util/appurl.dart';
+import 'package:dailyfairdeal/util/appurl.dart';
 
 class AuthRepository implements IAuthRepository {
-
   @override
-  Future<String?> login(String email, String password) async {
-    try {
-      // Request body
-      final requestBody = {"email": email, "password": password};
-
-      // API call
-      final response = await ApiService().request(
-        AppUrl.loginEndpoint,
-        method: "POST",
-        body: requestBody,
-      );
-
-      if(response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        return responseData['access_token'];
-      } else if (response.statusCode == 400){
-        SnackbarHelper.showSnackbar(
-          title: "Error",
-          message: ApiMessages.invalidLogin,
-          backgroundColor: Colors.red);
-      }else{
-        var errorMessage= handleError(response.statusCode);
-        SnackbarHelper.showSnackbar(
-          title: "Error",
-          message: errorMessage!,
-          backgroundColor: Colors.red);
-      }
-    } catch (e, stackTrace) {
-      // Log the error and stack trace for debugging
-      debugPrint("Error during login: $e");
-      debugPrint(stackTrace.toString());
-      SnackbarHelper.showSnackbar(
-        title: "Error",
-        message: ApiMessages.unexpectedError,
-        backgroundColor: Colors.red,
-      );
-    }
-    return null;
+  Future<UserModel> login(String email, String password) async {
+    final requestBody = {"email": email, "password": password};
+    return await handleRequestAuth(AppUrl.loginEndpoint, requestBody);
   }
 
   @override
-  Future<UserModel?> register(String name, String email, String password) async {
-    try {
-       // Request body
-      final requestBody = {"name": name, "email": email, "password": password};
-
-      // API call
-      final response = await ApiService().request(
-        AppUrl.registerEndpoint,
-        method: "POST",
-        body: requestBody,
-      );
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        return data['access_token'];
-      }  else if (response.statusCode == 400){
-        SnackbarHelper.showSnackbar(
-          title: "Error",
-          message: ApiMessages.invalidEmail,
-          backgroundColor: Colors.red);
-      }else{
-        var errorMessage= handleError(response.statusCode);
-        SnackbarHelper.showSnackbar(
-          title: "Error",
-          message: errorMessage!,
-          backgroundColor: Colors.red);
-      }
-    } catch (e) {
-      throw Exception("An unexpected error occurred: $e");
-    }
-    return null;
+  Future<UserModel> register(String name, String email, String password) async {
+    final requestBody = {"name": name, "email": email, "password": password};
+    return await handleRequestAuth(AppUrl.registerEndpoint, requestBody);
   }
 }
