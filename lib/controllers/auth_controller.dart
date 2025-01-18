@@ -1,5 +1,4 @@
 import 'package:dailyfairdeal/config/messages.dart';
-import 'package:dailyfairdeal/models/user_model.dart';
 import 'package:dailyfairdeal/screens/home/main_screen.dart';
 import 'package:dailyfairdeal/services/secure_storage.dart';
 import 'package:dailyfairdeal/services/api_service.dart';
@@ -27,11 +26,11 @@ class AuthController {
         Get.off(() => MainScreen());
       }
     } catch (e) {
-       SnackbarHelper.showSnackbar(
-          title: "Error",
-          message: e.toString(),
-          backgroundColor: Colors.red,
-        );
+      SnackbarHelper.showSnackbar(
+        title: "Error",
+        message: e.toString(),
+        backgroundColor: Colors.red,
+      );
     }
   }
 
@@ -46,11 +45,11 @@ class AuthController {
         // Navigate to the login page or save the token
       }
     } catch (e) {
-       SnackbarHelper.showSnackbar(
-          title: "Error",
-          message: e.toString(),
-          backgroundColor: Colors.red,
-        );
+      SnackbarHelper.showSnackbar(
+        title: "Error",
+        message: e.toString(),
+        backgroundColor: Colors.red,
+      );
     }
   }
 }
