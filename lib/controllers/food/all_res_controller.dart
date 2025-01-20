@@ -1,26 +1,25 @@
-import 'package:dailyfairdeal/models/food/all_res_model.dart';
 import 'package:dailyfairdeal/services/food/all_res_service.dart';
 
 class AllResController {
   final AllResService service;
-  List<AllRestaurant> allRestaurants = [];
 
   AllResController({required this.service});
 
-  Future<List<Map<String, Object>>> loadAllRestaurant() async {
+  Future<List<Map<String, String>>> loadAllRestaurant() async {
     try {
-      allRestaurants = await service.fetchAllRestaurant();
-      return allRestaurants
-          .map((res) => {
-                'id': res.id,
-                'name': res.name,
-                'res_type': res.restaurantType,
-                'openTime': res.openTime,
-                'closeTime': res.closeTime
-              })
-          .toList();
+      final allRestaurants = await service.fetchAllRestaurant();
+      return allRestaurants.map((res) {
+        return {
+          'id': res.id.toString(),
+          'name': res.name,
+          'res_type': res.restaurantType,
+          'openTime': res.openTime,
+          'closeTime': res.closeTime,
+        };
+      }).toList();
     } catch (e) {
-      throw Exception("An unexpected error occurred: $e");
+      print("Error in AllResController: $e");
+      throw Exception("Failed to load restaurants");
     }
   }
 }

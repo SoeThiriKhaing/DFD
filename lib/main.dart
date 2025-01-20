@@ -9,7 +9,7 @@ import 'package:dailyfairdeal/screens/dashboard/dashboard.dart';
 import 'package:dailyfairdeal/screens/dashboard/restaurant/restaurant_owner_dashboard.dart';
 import 'package:dailyfairdeal/screens/dashboard/restaurant/restaurant_setting/change_restaurant_image.dart';
 import 'package:dailyfairdeal/screens/dashboard/restaurant/restaurant_setting/profile_setting.dart';
-import 'package:dailyfairdeal/screens/food/food_category/food_page.dart';
+import 'package:dailyfairdeal/screens/food/foodpage/food_page.dart';
 import 'package:dailyfairdeal/screens/home/main_screen.dart';
 import 'package:dailyfairdeal/screens/payment/add_card_screen.dart';
 import 'package:dailyfairdeal/screens/profile/profile.dart';

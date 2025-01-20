@@ -12,6 +12,7 @@ class RestaurantTypeRepository implements IRestaurantTypeRepository {
     return await ApiHelper.fetchList<RestaurantType>(
       endpoint: AppUrl.getResTypes,
       fromJson: (data) => RestaurantType.fromJson(data),
+
     );
   }
 }
