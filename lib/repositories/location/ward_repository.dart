@@ -6,20 +6,13 @@ import 'package:dailyfairdeal/util/appurl.dart';
 class WardRepository implements IWardRepository {
   @override
   Future<List<Ward>> getWardById(int townshipId) async {
-    try {
-      final String endpoint = '${AppUrl.getWardById}/$townshipId';
-      final response = await ApiHelper.fetchList<Ward>(
-        endpoint: endpoint,
-        fromJson: (data) => Ward.fromJson(data),
-      );
+    return await ApiHelper.fetchList<Ward>(
+        endpoint: '${AppUrl.getWardById}/$townshipId',
+        fromJson: (data) {
+          print("Raw data from API:$data");
+          return Ward.fromJson(data);
+        });
 
-      // Log the response
-      print("API Response: ${response.toString()}");
-
-      return response;
-    } catch (e) {
-      print("Error in getWardById: $e");
-      throw Exception("Failed to fetch wards for township ID $townshipId");
-    }
+    // Log the response
   }
 }

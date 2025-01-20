@@ -7,8 +7,7 @@ class ApiService {
   final http.Client _client;
 
   // Private constructor
-  ApiService._internal()
-      : _client = http.Client();
+  ApiService._internal() : _client = http.Client();
 
   // Singleton instance
   static final ApiService _instance = ApiService._internal();
@@ -36,25 +35,38 @@ class ApiService {
     final requestHeaders = {...defaultHeaders, ...?headers};
 
     try {
+      http.Response response;
       switch (method.toUpperCase()) {
         case "GET":
-          debugPrint("GET request to $uri");
-          return await _client.get(uri, headers: requestHeaders);
-
+          response = await _client.get(uri, headers: requestHeaders);
+          break;
         case "POST":
+          response = await _client.post(
+            uri,
+            headers: requestHeaders,
+            body: jsonEncode(body),
+          );
+          break;
         case "PUT":
+          response = await _client.put(
+            uri,
+            headers: requestHeaders,
+            body: jsonEncode(body),
+          );
+          break;
         case "DELETE":
-          debugPrint("Request Method: $method");
-          debugPrint("Request Body: ${jsonEncode(body)}");
-          if (body == null) {
-            throw Exception("Body is required for $method request.");
-          }
-          return method == "POST"
-              ? await _client.post(uri, headers: requestHeaders, body: jsonEncode(body))
-              : await _client.put(uri, headers: requestHeaders, body: jsonEncode(body));
-
+          response = await _client.delete(uri, headers: requestHeaders);
+          break;
         default:
           throw Exception("Unsupported HTTP method: $method");
+      }
+
+      debugPrint("Response (${response.statusCode}): ${response.body}");
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return response;
+      } else {
+        throw Exception("Request failed with status: ${response.statusCode}");
       }
     } catch (e, stackTrace) {
       debugPrint("Error during request: $e");

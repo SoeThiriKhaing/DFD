@@ -7,19 +7,14 @@ class CountryRepository implements ICountryRepository {
   /// Fetch a list of countries from the API
   @override
   Future<List<Country>> getCountries() async {
-    try {
-      final response = await ApiHelper.fetchList<Country>(
-        endpoint: AppUrl.getCountry,
-        fromJson: (data) => Country.fromJson(data),
-      );
+    return await ApiHelper.fetchList<Country>(
+      endpoint: AppUrl.getCountry,
+      fromJson: (data) {
+        print('Raw data from API: $data'); // Debug print to log the data
+        return Country.fromJson(data);
+      },
+    );
 
-      // Log the response for debugging
-      print("API Response: ${response.toString()}");
-
-      return response;
-    } catch (e) {
-      print("Error in getCountries: $e");
-      throw Exception("Failed to fetch country list");
-    }
+    // Log the response for debugging
   }
 }

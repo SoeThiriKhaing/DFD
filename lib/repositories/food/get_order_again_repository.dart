@@ -7,9 +7,11 @@ class GetOrderAgainRepository implements IOrderAgain {
   @override
   Future<List<OrderAgain>> getOrderAgain() async {
     return await ApiHelper.fetchList<OrderAgain>(
-      endpoint: AppUrl.getOrderAgain,
-      fromJson: (data) => OrderAgain.fromJson(data),
-    );
+        endpoint: AppUrl.getOrderAgain,
+        fromJson: (data) {
+          print("Raw data from API:$data");
+         return OrderAgain.fromJson(data);
+        });
 
     // Log the response
   }

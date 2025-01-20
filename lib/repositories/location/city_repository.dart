@@ -6,20 +6,14 @@ import 'package:dailyfairdeal/util/appurl.dart';
 class CityRepository implements ICityRepository {
   @override
   Future<List<City>> getCityById(int divisionId) async {
-    try {
-      final String endpoint = '${AppUrl.getCitiesById}/$divisionId';
-      final response = await ApiHelper.fetchList<City>(
-        endpoint: endpoint,
-        fromJson: (data) => City.fromJson(data),
-      );
+    return await ApiHelper.fetchList<City>(
+      endpoint: '${AppUrl.getCitiesById}/$divisionId',
+      fromJson: (data) {
+        print('Raw data from API: $data');
+        return City.fromJson(data);
+      },
+    );
 
-      // Log the response
-      print("API Response: ${response.toString()}");
-
-      return response;
-    } catch (e) {
-      print("Error in getCityById: $e");
-      throw Exception("Failed to fetch cities for division ID $divisionId");
-    }
+    // Log the response
   }
 }

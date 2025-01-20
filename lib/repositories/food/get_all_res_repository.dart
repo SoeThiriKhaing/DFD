@@ -7,9 +7,11 @@ class GetAllResRepository implements IAllResRepository {
   @override
   Future<List<AllRestaurant>> getAllRestaurant() async {
     return await ApiHelper.fetchList<AllRestaurant>(
-      endpoint: AppUrl.getAllRestaurant,
-      fromJson: (data) => AllRestaurant.fromJson(data),
-    );
+        endpoint: AppUrl.getAllRestaurant,
+        fromJson: (data) {
+          print("Raw data from API:$data");
+          return AllRestaurant.fromJson(data);
+        });
 
     // Log the response
   }

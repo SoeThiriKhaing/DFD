@@ -7,9 +7,10 @@ class GetFeatResRepository implements IFeatureResRepository {
   @override
   Future<List<AllRestaurant>> getFeatureRestaurant() async {
     return await ApiHelper.fetchList<AllRestaurant>(
-      endpoint: AppUrl.getAllRestaurant,
-      fromJson: (data) => AllRestaurant.fromJson(data),
-    );
-
+        endpoint: AppUrl.getAllRestaurant,
+        fromJson: (data) {
+            print("Raw data from API:$data");
+         return AllRestaurant.fromJson(data);
+        });
   }
 }

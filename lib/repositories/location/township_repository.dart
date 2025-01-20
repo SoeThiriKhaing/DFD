@@ -6,20 +6,13 @@ import 'package:dailyfairdeal/util/appurl.dart';
 class TownshipRepository implements ITownshipRepository {
   @override
   Future<List<Township>> getTownshipById(int cityId) async {
-    try {
-      final String endpoint = '${AppUrl.getTownshipById}/$cityId';
-      final response = await ApiHelper.fetchList<Township>(
-        endpoint: endpoint,
-        fromJson: (data) => Township.fromJson(data),
-      );
+    return await ApiHelper.fetchList<Township>(
+        endpoint: '${AppUrl.getTownshipById}/$cityId',
+        fromJson: (data) {
+          print("Raw data from API:$data");
+          return Township.fromJson(data);
+        });
 
-      // Log the response
-      print("API Response: ${response.toString()}");
-
-      return response;
-    } catch (e) {
-      print("Error in getTownshipById: $e");
-      throw Exception("Failed to fetch townships for city ID $cityId");
-    }
+    // Log the response
   }
 }
