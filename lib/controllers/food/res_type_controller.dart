@@ -14,10 +14,9 @@ class RestaurantTypeController {
       return resTypes.map((resType) {
         return {
           'id': resType.id.toString(), // Convert id to String
-          'name': resType.name,       // Assuming name is already a String
+          'name': resType.name, // Assuming name is already a String
         };
       }).toList();
-      
     } catch (e) {
       throw Exception("An unexpected error occurred: $e");
     }

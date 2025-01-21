@@ -52,14 +52,14 @@ class ApiHelper {
   }) async {
     try {
       // Fetch the response
-      final response = await request<List<dynamic>>(
+      final response = await request<Map<String, dynamic>>(
         endpoint: endpoint,
         method: "GET",
       );
 
       // Prepare data for isolate
       final input = ParseListInput<T>(
-        responseList: response,
+        responseMap: response,
         fromJson: fromJson,
       );
 
