@@ -10,4 +10,3 @@ class RestaurantTypeService {
     return await repository.fetchRestaurantTypes();
   }
 }
-

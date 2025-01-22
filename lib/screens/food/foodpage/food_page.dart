@@ -23,7 +23,6 @@ class _FoodPageState extends State<FoodPage> {
     allResController = AllResController(
       service: AllResService(
         repository: GetAllResRepository(),
-
       ),
     );
   }
@@ -44,7 +43,7 @@ class _FoodPageState extends State<FoodPage> {
           // Category Buttons
           _buildCategoryButtons(),
           // Dynamic Content: Restaurant List
-          RestaurantList(controller: allResController),
+          //RestaurantList(controller: allResController),
         ],
       ),
     );
