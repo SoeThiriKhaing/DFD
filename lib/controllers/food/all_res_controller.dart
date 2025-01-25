@@ -6,7 +6,7 @@ class AllResController extends BaseController<AllRestaurant> {
   AllResController({required AllResService service})
       : super(fetchItems: service.fetchAllRestaurant);
 
-  Future<List<Map<String, Object>>> loadAllRestaurant() {
+  Future<List> loadAllRestaurant() {
     return loadItems((res) => {
           'id': res.id.toString(),
           'name': res.name,

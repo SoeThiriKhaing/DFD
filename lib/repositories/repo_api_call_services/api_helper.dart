@@ -16,7 +16,7 @@ class ApiHelper {
     required String endpoint,
     required String method,
     T Function(Map<String, dynamic>)? fromJson,
-    Map<String, dynamic>? body,
+    Map<String, Object>? body,
     Map<String, String>? headers,
   }) async {
     try {

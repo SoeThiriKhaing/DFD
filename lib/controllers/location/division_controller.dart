@@ -6,7 +6,7 @@ class DivisionController extends BaseController<Division> {
   DivisionController({required DivisionService service, required int countryId})
       : super(fetchItems: () => service.getDivisionById(countryId));
 
-  Future<List<Map<String, Object>>> loadDivisionById() {
+  Future<List> loadDivisionById(int i) {
     return loadItems((division) => {
           'id': division.id.toString(),
           'name': division.name,

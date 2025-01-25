@@ -6,7 +6,7 @@ class TownshipController extends BaseController<Township> {
   TownshipController({required TownshipService service, required int cityId})
       : super(fetchItems: () => service.getTownshipById(cityId));
 
-  Future<List<Map<String, Object>>> loadTownshipById(int i) {
+  Future<List> loadTownshipById(int i) {
     return loadItems((township) => {
           'id': township.id.toString(),
           'name': township.name,

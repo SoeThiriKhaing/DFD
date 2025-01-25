@@ -10,7 +10,7 @@ class CityController extends BaseController<City> {
     required this.divisionId,
   }) : super(fetchItems: () => service.getCityById(divisionId));
 
-  Future<List<Map<String, Object>>> loadCityById(int i) {
+  Future<List> loadCityById(int i) {
     return loadItems((city) => {
           'id': city.id.toString(), // Convert id to String
           'name': city.name,

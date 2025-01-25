@@ -9,7 +9,7 @@ class OrderAgainCategory extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: FutureBuilder<List<Map<String, Object>>>(
+      child: FutureBuilder<List>(
         // Changed the type here to Map<String, Object>
         future: controller.loadOrderAgain(),
         builder: (context, snapshot) {

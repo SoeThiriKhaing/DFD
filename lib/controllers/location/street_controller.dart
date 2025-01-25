@@ -6,7 +6,7 @@ class StreetController extends BaseController<Street> {
   StreetController({required StreetService service, required int wardId})
       : super(fetchItems: () => service.getStreetById(wardId));
 
-  Future<List<Map<String, Object>>> loadStreetById(int i) {
+  Future<List> loadStreetById(int i) {
     return loadItems((street) => {
           'id': street.id.toString(),
           'name': street.name,

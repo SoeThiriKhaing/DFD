@@ -6,7 +6,7 @@ class FeatureResController extends BaseController<AllRestaurant> {
   FeatureResController({required FeatResService service})
       : super(fetchItems: service.fetchFeatureRes);
 
-  Future<List<Map<String, Object>>> loadFeatRestaurant() {
+  Future<List> loadFeatRestaurant() {
     return loadItems((featRes) => {
           'id': featRes.id.toString(),
           'name': featRes.name,

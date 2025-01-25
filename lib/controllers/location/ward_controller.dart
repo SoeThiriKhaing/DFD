@@ -6,7 +6,7 @@ class WardController extends BaseController<Ward> {
   WardController({required WardService service, required int townshipId})
       : super(fetchItems: () => service.getWardById(townshipId));
 
-  Future<List<Map<String, Object>>> loadWardById(int i) {
+  Future<List> loadWardById(int i) {
     return loadItems((ward) => {
           'id': ward.id.toString(),
           'name': ward.name,

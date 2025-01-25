@@ -22,7 +22,7 @@ class ApiService {
     String endpoint, {
     String method = "GET",
     Map<String, String>? headers,
-    Map<String, dynamic>? body,
+    Map<String, Object>? body,
   }) async {
     final uri = Uri.parse(endpoint);
     final token = await getToken();
