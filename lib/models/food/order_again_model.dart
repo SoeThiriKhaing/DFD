@@ -20,18 +20,18 @@ class OrderAgain extends AllRestaurant {
 
   factory OrderAgain.fromJson(Map<String, dynamic> json) {
     return OrderAgain(
-      id: json['id'],
-      name: json['name'],
-      restaurantType: json['restaurantType'],
-      openTime: json['openTime'],
-      closeTime: json['closeTime'],
-      phNumber: json['phNumber'],
-      userName: json['userName'],
-      streetName: json['streetName'],
-      wardName: json['wardName'],
-      townshipName: json['townshipName'],
-      cityName: json['cityName'],
-      orderDetail: json['orderDetail'],
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      restaurantType: json['restaurantType'] ?? '',
+      openTime: json['openTime'] ?? '',
+      closeTime: json['closeTime'] ?? '',
+      phNumber: json['phNumber'] ?? '',
+      userName: json['userName'] ?? '',
+      streetName: json['streetName'] ?? '',
+      wardName: json['wardName'] ?? '',
+      townshipName: json['townshipName'] ?? '',
+      cityName: json['cityName'] ?? '',
+      orderDetail: json['orderDetail'] ?? '',
     );
   }
 

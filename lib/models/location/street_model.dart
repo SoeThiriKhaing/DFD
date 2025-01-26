@@ -7,9 +7,9 @@ class Street {
 
   factory Street.fromJson(Map<String, dynamic> json) {
     return Street(
-      id: json['id'],
-      name: json['name'],
-      wardId: json['ward_id'],
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      wardId: json['ward_id'] ?? '',
     );
   }
 

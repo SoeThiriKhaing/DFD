@@ -6,10 +6,12 @@ class CountryController extends BaseController<Country> {
   CountryController({required CountryService service})
       : super(fetchItems: service.getCountries);
 
-  Future<List> loadCountryList() {
-    return loadItems((country) => {
+  Future<List<Map<String, String>>> loadCountryList() async {
+    final countryList = await loadItems((country) => {
           'id': country.id.toString(),
           'name': country.name,
         });
+    print('Transformed country list: $countryList'); // Debug transformed list
+    return countryList;
   }
 }

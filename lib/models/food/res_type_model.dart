@@ -12,12 +12,12 @@ class RestaurantType {
   });
 
   // Factory constructor to create an instance from a Map
-  factory RestaurantType.fromJson(Map<String, dynamic> map) {
+  factory RestaurantType.fromJson(Map<String, dynamic> json) {
     return RestaurantType(
-      id: map['id'],
-      name: map['name'],
-      createdAt: map['created_at'],
-      updatedAt: map['updated_at'],
+      id: json['id'],
+      name: json['name'],
+      createdAt: json['created_at'],
+      updatedAt: json['updated_at'],
     );
   }
 

@@ -6,13 +6,17 @@ class AllResController extends BaseController<AllRestaurant> {
   AllResController({required AllResService service})
       : super(fetchItems: service.fetchAllRestaurant);
 
-  Future<List> loadAllRestaurant() {
-    return loadItems((res) => {
-          'id': res.id.toString(),
-          'name': res.name,
-          'res_type': res.restaurantType,
-          'openTime': res.openTime,
-          'closeTime': res.closeTime,
+  Future<List<Map<String, String>>> loadRestaurantList() async {
+    final restaurantLists = await loadItems((allres) => {
+          'id': allres.id.toString(),
+          'name': allres.name,
+          'restaurant_type': allres.restaurantType,
+          'open_time': allres.openTime,
+          'close_time': allres.closeTime,
+          'City_Name': allres.cityName,
         });
+    print(
+        'Transformed restaurant list: $restaurantLists'); // Debug transformed list
+    return restaurantLists;
   }
 }

@@ -1,5 +1,5 @@
 import 'package:dailyfairdeal/screens/auth/login/login_screen.dart';
-import 'package:dailyfairdeal/screens/auth/signup/merchant_sign_up.dart';
+import 'package:dailyfairdeal/screens/auth/signup/merchant/merchant_sign_up.dart';
 import 'package:dailyfairdeal/screens/auth/signup/registerscreen.dart';
 import 'package:dailyfairdeal/screens/auth/signup/rider_sign_up.dart';
 import 'package:dailyfairdeal/screens/auth/signup/taxi_driver_sign_up.dart';

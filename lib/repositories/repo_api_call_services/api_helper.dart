@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dailyfairdeal/repositories/repo_api_call_services/handle_response.dart';
 import 'package:dailyfairdeal/repositories/repo_api_call_services/log_error.dart';
 import 'package:dailyfairdeal/repositories/repo_api_call_services/parse_list.dart';
@@ -16,7 +17,7 @@ class ApiHelper {
     required String endpoint,
     required String method,
     T Function(Map<String, dynamic>)? fromJson,
-    Map<String, Object>? body,
+    Map<String, String>? body,
     Map<String, String>? headers,
   }) async {
     try {
@@ -35,10 +36,18 @@ class ApiHelper {
           .timeout(_timeoutDuration, onTimeout: () {
         throw Exception("Request timed out after $_timeoutDuration seconds.");
       });
+      if (T == List<dynamic>) {
+        return jsonDecode(response.body) as T;
+      } else if (T == Map<String, dynamic>) {
+        return jsonDecode(response.body) as T;
+      } else if (fromJson != null) {
+        // Use fromJson for custom parsing
+        return fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+      } else {
+        throw Exception("Unsupported response type: $T");
+      }
 
       // Handle and parse response
-      return HandleResponse.handleResponse<T>(
-          response.body, response.statusCode, fromJson);
     } catch (e, stackTrace) {
       LogError.logError("API Request Error", e, stackTrace);
       throw Exception("An unexpected error occurred: $e");

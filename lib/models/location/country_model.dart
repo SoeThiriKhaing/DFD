@@ -6,8 +6,8 @@ class Country {
 
   factory Country.fromJson(Map<String, dynamic> json) {
     return Country(
-      id: json['id'] as int,
-      name: json['name'] as String,
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
     );
   }
 

@@ -6,11 +6,13 @@ class DivisionController extends BaseController<Division> {
   DivisionController({required DivisionService service, required int countryId})
       : super(fetchItems: () => service.getDivisionById(countryId));
 
-  Future<List> loadDivisionById(int i) {
-    return loadItems((division) => {
+  Future<List<Map<String, String>>> loadDivisionList(int i) async {
+    final divisionList = await loadItems((division) => {
           'id': division.id.toString(),
           'name': division.name,
           'country_id': division.countryId.toString(),
         });
+    print('Transformed division list: $divisionList'); // Debug transformed list
+    return divisionList;
   }
 }

@@ -7,9 +7,9 @@ class Division {
 
   factory Division.fromJson(Map<String, dynamic> json) {
     return Division(
-      id: json['id'],
-      name: json['name'],
-      countryId: json['country_id'],
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      countryId: json['country_id'] ?? '',
     );
   }
 

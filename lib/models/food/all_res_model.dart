@@ -24,17 +24,17 @@ class AllRestaurant {
       required this.wardName});
   factory AllRestaurant.fromJson(Map<String, dynamic> json) {
     return AllRestaurant(
-      id: json['id'],
-      name: json['name'],
-      restaurantType: json['restaurantType'],
-      openTime: json['openTime'],
-      closeTime: json['closeTime'],
-      phNumber: json['phNumber'],
-      userName: json['userName'],
-      streetName: json['streetName'],
-      wardName: json['wardName'],
-      townshipName: json['townshipName'],
-      cityName: json['cityName'],
+      id: json['id'] ?? '',
+      name: json['name'] ?? 'Bubble Shop',
+      restaurantType: json['restaurantType'] ?? 'Chinese',
+      openTime: json['openTime'] ?? '',
+      closeTime: json['closeTime'] ?? '',
+      phNumber: json['phNumber'] ?? '',
+      userName: json['userName'] ?? '',
+      streetName: json['streetName'] ?? '',
+      wardName: json['wardName'] ?? '',
+      townshipName: json['townshipName'] ?? '',
+      cityName: json['cityName'] ?? '',
     );
   }
   Map<String, dynamic> toJson() {

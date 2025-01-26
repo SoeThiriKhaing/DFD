@@ -12,6 +12,8 @@ import 'package:dailyfairdeal/repositories/location/division_repository.dart';
 import 'package:dailyfairdeal/repositories/location/street_repository.dart';
 import 'package:dailyfairdeal/repositories/location/township_repository.dart';
 import 'package:dailyfairdeal/repositories/location/ward_repository.dart';
+import 'package:dailyfairdeal/screens/auth/signup/merchant/selector_list.dart';
+import 'package:dailyfairdeal/screens/auth/signup/merchant/selector_map.dart';
 import 'package:dailyfairdeal/service/food_api/set_res.dart';
 import 'package:dailyfairdeal/screens/widgets/dropdown_field_widget.dart';
 import 'package:dailyfairdeal/screens/widgets/phone_text_field_widget.dart';
@@ -106,10 +108,21 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
   Future<void> fetchAddress() async {
     try {
       final countries = await countryController.loadCountryList();
+      final divisions =
+          await divisionController.loadDivisionList(selectedCountryId!);
+      final cities = await cityController.loadCityById(selectedDivisionId!);
+      final townships =
+          await townshipController.loadTownshipById(selectedCityId!);
+      final wards = await wardController.loadWardById(selectedTownshipId!);
+      final streets = await streetController.loadStreetById(selectedWardId!);
       final restaurantTypes = await resTypeController.loadRestaurantTypes();
 
       setState(() {
         countryList = countries
+            .map(
+                (e) => {'id': e['id'].toString(), 'name': e['name'].toString()})
+            .toList();
+        divisionList = divisions
             .map(
                 (e) => {'id': e['id'].toString(), 'name': e['name'].toString()})
             .toList();
@@ -211,9 +224,10 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                 buildTextFormField('Restaurant/Shop Name', shopNameController,
                     keyboardType: TextInputType.text),
                 const SizedBox(height: 10),
-                const Text("Choose Business Type",
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const Text(
+                  "Choose Business Type",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 10),
                 ...businessTypeList.map((business) {
                   return Row(
@@ -235,17 +249,41 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                   );
                 }),
                 const SizedBox(height: 10),
-                if (selectedBusinessType == 'Restaurant')
-                  buildDropdownField('Select Restaurant Type', restaurantType,
-                      restaurantTypeList, (value) async {
+                SelectorMap(
+                  label: 'country',
+                  selectedValue: selectedCountryId?.toString(),
+                  loadItems: countryController.loadCountryList,
+                  onChanged: (value) {
                     setState(() {
-                      restaurantType = value;
-                      selectedRestaurantTypeId = int.tryParse(
-                              restaurantTypeList.firstWhere(
-                                  (item) => item['name'] == value)['id']!) ??
-                          0;
+                      selectedCountryId = int.tryParse(value ?? '');
+                      selectedDivisionId = null; // Reset division
                     });
-                  }),
+                  },
+                ),
+                if (selectedCountryId != null)
+                  SelectorList(
+                    label: 'division',
+                    selectedValue: selectedDivisionId?.toString(),
+                    loadItems: () =>
+                        divisionController.loadDivisionList(selectedCountryId!),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedDivisionId = int.tryParse(value ?? '');
+                      });
+                    },
+                  ),
+                if (selectedDivisionId != null)
+                  SelectorList(
+                    label: 'cities',
+                    selectedValue: selectedCityId?.toString(),
+                    loadItems: () =>
+                        cityController.loadCityById(selectedDivisionId!),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedCityId = int.tryParse(value ?? '');
+                      });
+                    },
+                  ),
                 const SizedBox(height: 10),
                 buildTextFormField('Owner Name', ownerNameController,
                     keyboardType: TextInputType.text),
@@ -275,173 +313,14 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
-                const Text("Restaurant/Shop Address",
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 10),
-                buildAddressFields(),
-                const SizedBox(height: 10),
-                buildTextFormField('Block', blockController,
-                    keyboardType: TextInputType.text),
-                const SizedBox(height: 10),
-                buildTextFormField('Floor', floorController,
-                    keyboardType: TextInputType.text),
-                const SizedBox(height: 10),
-                buildTextFormField('Description', descriptionController,
-                    keyboardType: TextInputType.text, maxLines: 3),
                 const SizedBox(height: 20),
+                // Call the buildSubmitButton method here
                 buildSubmitButton(),
-                const SizedBox(height: 15),
               ],
             ),
           ),
         ),
       ),
-    );
-  }
-
-  Widget buildAddressFields() {
-    return Column(
-      children: [
-        // First row: Country and Division
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Flexible(
-              flex: 1,
-              child: buildDropdownField(
-                'Country',
-                country,
-                countryList,
-                (value) async {
-                  setState(() {
-                    country = value;
-                    division = city = township = ward = street = null;
-                    selectedCountryId = int.tryParse(countryList.firstWhere(
-                            (item) => item['name'] == value)['id']!) ??
-                        0;
-                  });
-                  if (selectedCountryId != null && selectedCountryId != 0) {
-                    selectedDivisionId = int.tryParse(divisionList.firstWhere(
-                            (item) => item['name'] == value)['id']!) ??
-                        0;
-                    city = null;
-                    setState(() {}); // Refresh dropdown
-                  }
-                },
-              ),
-            ),
-            const SizedBox(width: 10),
-            Flexible(
-              flex: 1,
-              child: buildDropdownField('Division', division, divisionList,
-                  (value) async {
-                setState(() {
-                  division = value;
-                  city = township = ward = street = null;
-                  selectedDivisionId = int.tryParse(divisionList
-                      .firstWhere((item) => item['name'] == value)['id']!);
-                });
-                if (selectedDivisionId != null) {
-                  setState(() {});
-                }
-              }),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-
-        // Second row: City and Township
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Flexible(
-              flex: 1,
-              child: buildDropdownField(
-                'City',
-                city,
-                cityList,
-                (value) async {
-                  setState(() {
-                    city = value;
-                    township = ward = street = null;
-                    selectedCityId = int.tryParse(cityList
-                        .firstWhere((item) => item['name'] == value)['id']!);
-                  });
-                  if (selectedCityId != null) {
-                    setState(() {});
-                  }
-                },
-              ),
-            ),
-            const SizedBox(width: 10),
-            Flexible(
-              flex: 1,
-              child: buildDropdownField(
-                'Township',
-                township,
-                townshipList,
-                (value) async {
-                  setState(() {
-                    township = value;
-                    selectedTownshipId = int.tryParse(townshipList.firstWhere(
-                            (item) => item['name'] == value)['id']!) ??
-                        0;
-                    ward = null;
-                    street = null;
-                  });
-
-                  setState(() {});
-                },
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-
-        // Third row: Ward and Street
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Flexible(
-              flex: 1,
-              child: buildDropdownField(
-                'Ward',
-                ward,
-                wardList,
-                (value) async {
-                  setState(() {
-                    ward = value;
-                    street = null;
-                    selectedWardId = int.tryParse(wardList
-                        .firstWhere((item) => item['name'] == value)['id']!);
-                  });
-                  if (selectedWardId != null) {
-                    setState(() {});
-                  }
-                },
-              ),
-            ),
-            const SizedBox(width: 10),
-            Flexible(
-              flex: 1,
-              child: buildDropdownField(
-                'Street',
-                street,
-                streetList,
-                (value) async {
-                  setState(() {
-                    street = value;
-                    selectedStreetId = int.tryParse(streetList
-                        .firstWhere((item) => item['name'] == value)['id']!);
-                  });
-                },
-              ),
-            ),
-          ],
-        ),
-      ],
     );
   }
 
@@ -454,14 +333,5 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
         }
       },
     );
-  }
-
-  @override
-  void dispose() {
-    shopNameController.dispose();
-    ownerNameController.dispose();
-    phoneController.dispose();
-    descriptionController.dispose();
-    super.dispose();
   }
 }
