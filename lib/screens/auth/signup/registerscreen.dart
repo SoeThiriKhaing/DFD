@@ -3,7 +3,7 @@ import 'package:dailyfairdeal/repositories/auth_repository.dart';
 import 'package:dailyfairdeal/services/auth_service.dart';
 import 'package:dailyfairdeal/widget/app_color.dart';
 import 'package:dailyfairdeal/widget/formfield.dart';
-import 'package:dailyfairdeal/screens/widgets/logo_widget.dart';
+import 'package:dailyfairdeal/widget/logo_widget.dart';
 import 'package:dailyfairdeal/widget/reusabel_button.dart';
 import 'package:dailyfairdeal/widget/support_widget.dart';
 import 'package:dailyfairdeal/widget/validation.dart';

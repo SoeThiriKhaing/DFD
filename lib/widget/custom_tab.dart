@@ -1,3 +1,4 @@
+import 'package:dailyfairdeal/widget/app_color.dart';
 import 'package:flutter/material.dart';
 
 class CustomTabScreen extends StatelessWidget {
@@ -12,7 +13,7 @@ class CustomTabScreen extends StatelessWidget {
     required this.title,
     required this.tabs,
     required this.views,
-    this.appBarColor = Colors.blue,
+    this.appBarColor = AppColor.primaryColor,
     this.titleStyle,
   });
 
@@ -24,7 +25,9 @@ class CustomTabScreen extends StatelessWidget {
         appBar: AppBar(
           automaticallyImplyLeading: false,
           backgroundColor: appBarColor,
-          title: Text(title, style: titleStyle ?? const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          title: Text(title,
+              style: titleStyle ??
+                  const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           centerTitle: true,
           bottom: TabBar(
             indicatorColor: Colors.white,

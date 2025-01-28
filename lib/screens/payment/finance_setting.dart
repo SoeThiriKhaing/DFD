@@ -1,5 +1,5 @@
 import 'package:dailyfairdeal/screens/payment/all_payment_methods.dart';
-import 'package:dailyfairdeal/screens/widgets/build_section_widget.dart';
+import 'package:dailyfairdeal/widget/build_section_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

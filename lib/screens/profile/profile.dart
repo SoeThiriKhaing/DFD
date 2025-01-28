@@ -1,6 +1,6 @@
 import 'package:dailyfairdeal/screens/profile/business.dart';
 import 'package:dailyfairdeal/widget/app_color.dart';
-import 'package:dailyfairdeal/screens/widgets/build_list_tile_widget.dart';
+import 'package:dailyfairdeal/widget/build_list_tile_widget.dart';
 import 'package:dailyfairdeal/widget/support_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
