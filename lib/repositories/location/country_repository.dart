@@ -10,7 +10,6 @@ class CountryRepository implements ICountryRepository {
   Future<List<Country>> getCountries() async {
     return await ApiHelper.fetchList<Country>(
       endpoint: AppUrl.getCountry,
-      
       fromJson: (data) {
         debugPrint('Raw data from API: $data'); // Debug print to log the data
         return Country.fromJson(data);

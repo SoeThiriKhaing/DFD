@@ -6,7 +6,7 @@ class RestaurantTypeController extends BaseController<RestaurantType> {
   RestaurantTypeController({required RestaurantTypeService service})
       : super(fetchItems: service.getRestaurantTypes);
 
-  Future<List<dynamic>> loadRestaurantTypes() {
+  Future<List<Map<String, String>>> loadRestaurantTypes() {
     return loadItems((resType) => {
           'id': resType.id.toString(), // Convert id to String
           'name': resType.name, // Assuming name is already a String

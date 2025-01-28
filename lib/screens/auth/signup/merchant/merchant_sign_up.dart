@@ -100,64 +100,11 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
     streetController = StreetController(
         service: StreetService(repository: StreetRepository()),
         wardId: selectedWardId ?? 1);
-    fetchAddress();
+    
   }
 
-  // Fetch the countries and update the state
-  Future<void> fetchAddress() async {
-    try {
-      final countries = await countryController.loadCountryList();
-      final divisions =
-          await divisionController.loadDivisionList(selectedCountryId!);
-      final cities = await cityController.loadCityList(selectedDivisionId!);
-      final townships =
-          await townshipController.loadTownshipList(selectedCityId!);
-      final wards = await wardController.loadWardList(selectedTownshipId!);
-      final streets = await streetController.loadStreetList(selectedWardId!);
-      final restaurantTypes = await resTypeController.loadRestaurantTypes();
-
-      setState(() {
-        countryList = countries
-            .map(
-                (e) => {'id': e['id'].toString(), 'name': e['name'].toString()})
-            .toList();
-        divisionList = divisions
-            .map(
-                (e) => {'id': e['id'].toString(), 'name': e['name'].toString()})
-            .toList();
-        cityList = cities
-            .map(
-                (e) => {'id': e['id'].toString(), 'name': e['name'].toString()})
-            .toList();
-        townshipList = townships
-            .map(
-                (e) => {'id': e['id'].toString(), 'name': e['name'].toString()})
-            .toList();
-        wardList = wards
-            .map(
-                (e) => {'id': e['id'].toString(), 'name': e['name'].toString()})
-            .toList();
-        streetList = streets
-            .map(
-                (e) => {'id': e['id'].toString(), 'name': e['name'].toString()})
-            .toList();
-        restaurantTypeList = restaurantTypes
-            .map(
-                (e) => {'id': e['id'].toString(), 'name': e['name'].toString()})
-            .toList();
-        selectedBusinessType = businessTypeList.first['name'];
-      });
-    } catch (e) {
-      SnackbarHelper.showSnackbar(
-        title: 'Error',
-        message: 'Failed to load data. Please try again later.',
-        backgroundColor: Colors.red,
-      );
-    }
-  }
-
-  Future<void> selectTime(
-      BuildContext context, TextEditingController controller) async {
+  
+  Future<void> selectTime(BuildContext context, TextEditingController controller) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -276,7 +223,7 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                   },
                 ),
                 if (selectedCountryId != null)
-                  SelectorList(
+                  SelectorMap(
                     label: 'division',
                     selectedValue: selectedDivisionId?.toString(),
                     loadItems: () =>
@@ -289,7 +236,7 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                     },
                   ),
                 if (selectedDivisionId != null)
-                  SelectorList(
+                  SelectorMap(
                     label: 'cities',
                     selectedValue: selectedCityId?.toString(),
                     loadItems: () =>

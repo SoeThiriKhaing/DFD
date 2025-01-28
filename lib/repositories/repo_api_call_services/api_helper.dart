@@ -16,7 +16,7 @@ class ApiHelper {
   static Future<T> request<T>({
     required String endpoint,
     required String method,
-    T Function(Map<String, dynamic>)? fromJson,
+    T Function(dynamic)? fromJson,
     Map<String, String>? body,
     Map<String, String>? headers,
   }) async {
@@ -79,4 +79,5 @@ class ApiHelper {
       throw Exception("Failed to fetch data");
     }
   }
+
 }
