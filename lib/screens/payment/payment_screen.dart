@@ -1,6 +1,5 @@
 import 'package:dailyfairdeal/screens/payment/all_transactions_screen.dart';
 import 'package:dailyfairdeal/screens/payment/finance_setting.dart';
-import 'package:dailyfairdeal/widget/app_color.dart';
 import 'package:dailyfairdeal/widget/build_card_widget.dart';
 import 'package:dailyfairdeal/widget/support_widget.dart';
 import 'package:flutter/material.dart';

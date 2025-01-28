@@ -6,12 +6,12 @@ import 'package:dailyfairdeal/controllers/location/street_controller.dart';
 import 'package:dailyfairdeal/controllers/location/township_controller.dart';
 import 'package:dailyfairdeal/controllers/location/ward_controller.dart';
 import 'package:dailyfairdeal/repositories/location/country_repository.dart';
-import 'package:dailyfairdeal/screens/widgets/dropdown_field_widget.dart';
-import 'package:dailyfairdeal/screens/widgets/phone_text_field_widget.dart';
 import 'package:dailyfairdeal/services/location/country_service.dart';
+import 'package:dailyfairdeal/widget/dropdown_field_widget.dart';
+import 'package:dailyfairdeal/widget/phone_text_field_widget.dart';
 import 'package:dailyfairdeal/widget/reusabel_button.dart';
 import 'package:dailyfairdeal/util/snackbar_helper.dart';
-import 'package:dailyfairdeal/screens/widgets/text_form_field_widget.dart';
+import 'package:dailyfairdeal/widget/text_form_field_widget.dart';
 import 'package:flutter/material.dart';
 
 class MerchantSignUp extends StatefulWidget {
