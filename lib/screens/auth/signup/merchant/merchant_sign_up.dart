@@ -14,7 +14,7 @@ import 'package:dailyfairdeal/repositories/location/township_repository.dart';
 import 'package:dailyfairdeal/repositories/location/ward_repository.dart';
 import 'package:dailyfairdeal/screens/auth/signup/merchant/selector_list.dart';
 import 'package:dailyfairdeal/screens/auth/signup/merchant/selector_map.dart';
-import 'package:dailyfairdeal/service/food_api/set_res.dart';
+import 'package:dailyfairdeal/screens/food/save_res.dart';
 import 'package:dailyfairdeal/screens/widgets/phone_text_field_widget.dart';
 import 'package:dailyfairdeal/services/food/res_type_service.dart';
 import 'package:dailyfairdeal/services/location/city_service.dart';
