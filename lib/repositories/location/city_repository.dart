@@ -2,6 +2,7 @@ import 'package:dailyfairdeal/interfaces/location/i_city_repository.dart';
 import 'package:dailyfairdeal/models/location/city_model.dart';
 import 'package:dailyfairdeal/repositories/repo_api_call_services/api_helper.dart';
 import 'package:dailyfairdeal/util/appurl.dart';
+import 'package:flutter/material.dart';
 
 class CityRepository implements ICityRepository {
   @override
@@ -9,7 +10,7 @@ class CityRepository implements ICityRepository {
     return await ApiHelper.fetchList<City>(
       endpoint: '${AppUrl.getCitiesById}/$divisionId',
       fromJson: (data) {
-        print('Raw data from API: $data');
+        debugPrint('Raw data from API: $data');
         return City.fromJson(data);
       },
     );

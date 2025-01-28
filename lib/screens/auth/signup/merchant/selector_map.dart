@@ -7,12 +7,12 @@ class SelectorMap extends StatelessWidget {
   final ValueChanged<String?> onChanged;
 
   const SelectorMap({
-    Key? key,
+    super.key,
     required this.label,
     required this.selectedValue,
     required this.loadItems,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

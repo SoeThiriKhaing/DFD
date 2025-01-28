@@ -1,6 +1,7 @@
 import 'package:dailyfairdeal/controllers/base_controller.dart';
 import 'package:dailyfairdeal/models/location/township_model.dart';
 import 'package:dailyfairdeal/services/location/township_service.dart';
+import 'package:flutter/material.dart';
 
 class TownshipController extends BaseController<Township> {
   TownshipController({required TownshipService service, required int cityId})
@@ -12,7 +13,7 @@ class TownshipController extends BaseController<Township> {
           'name': township.name,
           'city_id': township.cityId.toString(),
         });
-    print('Transformed township list: $townshipList'); // Debug transformed list
+    debugPrint('Transformed township list: $townshipList'); // Debug transformed list
     return townshipList;
   }
 }

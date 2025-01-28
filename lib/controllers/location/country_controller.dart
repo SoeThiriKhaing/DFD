@@ -1,6 +1,7 @@
 import 'package:dailyfairdeal/controllers/base_controller.dart';
 import 'package:dailyfairdeal/models/location/country_model.dart';
 import 'package:dailyfairdeal/services/location/country_service.dart';
+import 'package:flutter/material.dart';
 
 class CountryController extends BaseController<Country> {
   CountryController({required CountryService service})
@@ -11,7 +12,7 @@ class CountryController extends BaseController<Country> {
           'id': country.id.toString(),
           'name': country.name,
         });
-    print('Transformed country list: $countryList'); // Debug transformed list
+    debugPrint('Transformed country list: $countryList'); // Debug transformed list
     return countryList;
   }
 }

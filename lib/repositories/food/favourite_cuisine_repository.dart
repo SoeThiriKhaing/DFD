@@ -3,6 +3,7 @@ import 'package:dailyfairdeal/interfaces/food/i_favourite_cusine_repository.dart
 import 'package:dailyfairdeal/models/food/fav_cuisine_model.dart';
 import 'package:dailyfairdeal/services/api_service.dart';
 import 'package:dailyfairdeal/util/appurl.dart';
+import 'package:flutter/material.dart';
 
 class FavouriteCuisineRepository implements IFavouriteCusineRepository {
   final apiService = ApiService();
@@ -26,7 +27,7 @@ class FavouriteCuisineRepository implements IFavouriteCusineRepository {
       }
     } catch (e) {
       // Log and rethrow the error
-      print('Error in getFavouriteCuisine: $e');
+      debugPrint('Error in getFavouriteCuisine: $e');
       throw Exception('Error fetching fav cuisine');
     }
   }

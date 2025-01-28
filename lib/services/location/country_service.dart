@@ -1,5 +1,6 @@
 import 'package:dailyfairdeal/models/location/country_model.dart';
 import 'package:dailyfairdeal/repositories/location/country_repository.dart';
+import 'package:flutter/material.dart';
 
 class CountryService {
   final CountryRepository repository;
@@ -8,7 +9,7 @@ class CountryService {
 
   Future<List<Country>> getCountries() async {
     final countries = await repository.getCountries();
-    print('Countries in CountryService: $countries'); // Debug print
+    debugPrint('Countries in CountryService: $countries'); // Debug print
     return countries;
   }
 }

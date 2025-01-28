@@ -1,6 +1,7 @@
 import 'package:dailyfairdeal/controllers/base_controller.dart';
 import 'package:dailyfairdeal/models/location/city_model.dart';
 import 'package:dailyfairdeal/services/location/city_service.dart';
+import 'package:flutter/material.dart';
 
 class CityController extends BaseController<City> {
   CityController({required CityService service, required int divisionId})
@@ -12,7 +13,7 @@ class CityController extends BaseController<City> {
           'name': city.name,
           'division_id': city.divisionId.toString(),
         });
-    print('Transformed city list: $cityList'); // Debug transformed list
+    debugPrint('Transformed city list: $cityList'); // Debug transformed list
     return cityList;
   }
 }

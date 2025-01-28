@@ -5,10 +5,10 @@ class RestaurantList extends StatelessWidget {
   final String categoryType;
 
   const RestaurantList({
-    Key? key,
+    super.key,
     required this.listFuture,
     required this.categoryType,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

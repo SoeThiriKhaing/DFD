@@ -11,14 +11,14 @@ class FetchData{
   }) async {
     try {
       // Fetch the response
-      final response = await ApiHelper.request<List<dynamic>>(
+      final response = await ApiHelper.request<dynamic>(
         endpoint: endpoint,
         method: "GET",
       );
 
       // Prepare data for isolate
       final input = ParseListInput<T>(
-        responseList: response,
+        responseMap: response,
         fromJson: fromJson,
       );
 

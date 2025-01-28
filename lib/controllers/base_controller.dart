@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class BaseController<T> {
   final Future<List<T>> Function() fetchItems;
 
@@ -8,10 +10,10 @@ class BaseController<T> {
   ) async {
     try {
       final items = await fetchItems();
-      print('Fetched items in BaseController: $items'); // Debug print
+      debugPrint('Fetched items in BaseController: $items'); // Debug print
       return items.map(transform).toList();
     } catch (e) {
-      print("Error in BaseController: $e");
+      debugPrint("Error in BaseController: $e");
       throw Exception("Failed to load items");
     }
   }

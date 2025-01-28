@@ -2,6 +2,7 @@ import 'package:dailyfairdeal/interfaces/location/i_street_repository.dart';
 import 'package:dailyfairdeal/models/location/street_model.dart';
 import 'package:dailyfairdeal/repositories/repo_api_call_services/api_helper.dart';
 import 'package:dailyfairdeal/util/appurl.dart';
+import 'package:flutter/material.dart';
 
 class StreetRepository implements IStreetRepository {
   @override
@@ -9,7 +10,7 @@ class StreetRepository implements IStreetRepository {
     return await ApiHelper.fetchList<Street>(
         endpoint: '${AppUrl.getStreetById}/$wardId',
         fromJson: (data) {
-          print("Raw data from API:$data");
+          debugPrint("Raw data from API:$data");
           return Street.fromJson(data);
         });
 
