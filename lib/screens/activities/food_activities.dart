@@ -1,4 +1,4 @@
-import 'package:dailyfairdeal/screens/widgets/activity_list.dart';
+import 'package:dailyfairdeal/widget/activity_list.dart';
 import 'package:flutter/material.dart';
 
 class FoodActivities extends StatelessWidget {

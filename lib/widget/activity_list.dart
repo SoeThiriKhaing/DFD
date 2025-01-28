@@ -1,5 +1,6 @@
+import 'package:dailyfairdeal/widget/activity_card.dart';
 import 'package:flutter/material.dart';
-import 'activity_card.dart'; // Import the reusable ActivityCard
+
 
 class ActivityList extends StatelessWidget {
   final List<Map<String, dynamic>> activities;

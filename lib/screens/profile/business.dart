@@ -1,4 +1,4 @@
-import 'package:dailyfairdeal/screens/widgets/build_card_widget.dart';
+import 'package:dailyfairdeal/widget/build_card_widget.dart';
 import 'package:dailyfairdeal/widget/support_widget.dart';
 import 'package:flutter/material.dart';
 

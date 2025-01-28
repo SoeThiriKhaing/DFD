@@ -1,7 +1,7 @@
-import 'package:dailyfairdeal/screens/widgets/phone_text_field_widget.dart';
+import 'package:dailyfairdeal/widget/phone_text_field_widget.dart';
 import 'package:dailyfairdeal/widget/reusabel_button.dart';
 import 'package:dailyfairdeal/util/snackbar_helper.dart';
-import 'package:dailyfairdeal/screens/widgets/text_form_field_widget.dart';
+import 'package:dailyfairdeal/widget/text_form_field_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';

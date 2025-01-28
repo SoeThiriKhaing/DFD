@@ -1,4 +1,4 @@
-import 'package:dailyfairdeal/screens/widgets/text_form_field_widget.dart';
+import 'package:dailyfairdeal/widget/text_form_field_widget.dart';
 import 'package:flutter/material.dart';
 
 Widget buildPhoneField(TextEditingController phoneController) {

@@ -15,7 +15,7 @@ import 'package:dailyfairdeal/repositories/location/ward_repository.dart';
 import 'package:dailyfairdeal/screens/auth/signup/merchant/selector_list.dart';
 import 'package:dailyfairdeal/screens/auth/signup/merchant/selector_map.dart';
 import 'package:dailyfairdeal/screens/food/save_res.dart';
-import 'package:dailyfairdeal/screens/widgets/phone_text_field_widget.dart';
+import 'package:dailyfairdeal/widget/phone_text_field_widget.dart';
 import 'package:dailyfairdeal/services/food/res_type_service.dart';
 import 'package:dailyfairdeal/services/location/city_service.dart';
 import 'package:dailyfairdeal/services/location/country_service.dart';
@@ -25,7 +25,7 @@ import 'package:dailyfairdeal/services/location/township_service.dart';
 import 'package:dailyfairdeal/services/location/ward_service.dart';
 import 'package:dailyfairdeal/widget/reusabel_button.dart';
 import 'package:dailyfairdeal/util/snackbar_helper.dart';
-import 'package:dailyfairdeal/screens/widgets/text_form_field_widget.dart';
+import 'package:dailyfairdeal/widget/text_form_field_widget.dart';
 import 'package:flutter/material.dart';
 
 class MerchantSignUp extends StatefulWidget {

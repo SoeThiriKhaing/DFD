@@ -4,7 +4,7 @@ import 'package:dailyfairdeal/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dailyfairdeal/widget/app_color.dart';
-import 'package:dailyfairdeal/screens/widgets/logo_widget.dart';
+import 'package:dailyfairdeal/widget/logo_widget.dart';
 import 'package:dailyfairdeal/widget/validation.dart';
 
 
