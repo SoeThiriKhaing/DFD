@@ -27,7 +27,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              Get.to(()=> const FinanceSetting());
+              Get.to(() => const FinanceSetting());
             },
           ),
         ],
@@ -39,7 +39,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           children: [
             buildCard(
               'Add a card',
-              AppColor.primaryColor,
+              Colors.white,
               Icons.credit_card,
               "/addcardscreen",
             ),
@@ -55,44 +55,43 @@ class _PaymentScreenState extends State<PaymentScreen> {
             const SizedBox(height: 10),
             Expanded(
               child: recentTransactions.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.receipt_long,
-                          size: 100,
-                          color: Colors.grey[400],
-                        ),
-                        const SizedBox(height: 10),
-                        const Text(
-                          "There's no recent activity to show here.",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 16, color: Colors.grey),
-                        ),
-                        const SizedBox(height: 5),
-                        
-                        TextButton(
-                          onPressed: () {
-                            Get.to(() => const AllTransactionsScreen());
-                          },
-                          child: const Text('See past transactions'),
-                        ),
-                      ],
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.receipt_long,
+                            size: 100,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 10),
+                          const Text(
+                            "There's no recent activity to show here.",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 16, color: Colors.grey),
+                          ),
+                          const SizedBox(height: 5),
+                          TextButton(
+                            onPressed: () {
+                              Get.to(() => const AllTransactionsScreen());
+                            },
+                            child: const Text('See past transactions'),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: recentTransactions.length,
+                      itemBuilder: (context, index) {
+                        final transaction = recentTransactions[index];
+                        return ListTile(
+                          leading: const Icon(Icons.payment),
+                          title: Text(transaction['title']!),
+                          subtitle: Text(transaction['date']!),
+                          trailing: Text(transaction['amount']!),
+                        );
+                      },
                     ),
-                  )
-                : ListView.builder(
-                    itemCount: recentTransactions.length,
-                    itemBuilder: (context, index) {
-                      final transaction = recentTransactions[index];
-                      return ListTile(
-                        leading: const Icon(Icons.payment),
-                        title: Text(transaction['title']!),
-                        subtitle: Text(transaction['date']!),
-                        trailing: Text(transaction['amount']!),
-                      );
-                    },
-                  ),
             ),
           ],
         ),

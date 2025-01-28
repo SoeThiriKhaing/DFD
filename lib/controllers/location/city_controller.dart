@@ -3,18 +3,16 @@ import 'package:dailyfairdeal/models/location/city_model.dart';
 import 'package:dailyfairdeal/services/location/city_service.dart';
 
 class CityController extends BaseController<City> {
-  final int divisionId;
+  CityController({required CityService service, required int divisionId})
+      : super(fetchItems: () => service.getCityById(divisionId));
 
-  CityController({
-    required CityService service,
-    required this.divisionId,
-  }) : super(fetchItems: () => service.getCityById(divisionId));
-
-  Future<List> loadCityById(int i) {
-    return loadItems((city) => {
-          'id': city.id.toString(), // Convert id to String
+  Future<List<Map<String, String>>> loadCityList(int i) async {
+    final cityList = await loadItems((city) => {
+          'id': city.id.toString(),
           'name': city.name,
           'division_id': city.divisionId.toString(),
         });
+    print('Transformed city list: $cityList'); // Debug transformed list
+    return cityList;
   }
 }

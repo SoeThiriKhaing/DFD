@@ -15,7 +15,6 @@ import 'package:dailyfairdeal/repositories/location/ward_repository.dart';
 import 'package:dailyfairdeal/screens/auth/signup/merchant/selector_list.dart';
 import 'package:dailyfairdeal/screens/auth/signup/merchant/selector_map.dart';
 import 'package:dailyfairdeal/service/food_api/set_res.dart';
-import 'package:dailyfairdeal/screens/widgets/dropdown_field_widget.dart';
 import 'package:dailyfairdeal/screens/widgets/phone_text_field_widget.dart';
 import 'package:dailyfairdeal/services/food/res_type_service.dart';
 import 'package:dailyfairdeal/services/location/city_service.dart';
@@ -110,11 +109,11 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
       final countries = await countryController.loadCountryList();
       final divisions =
           await divisionController.loadDivisionList(selectedCountryId!);
-      final cities = await cityController.loadCityById(selectedDivisionId!);
+      final cities = await cityController.loadCityList(selectedDivisionId!);
       final townships =
-          await townshipController.loadTownshipById(selectedCityId!);
-      final wards = await wardController.loadWardById(selectedTownshipId!);
-      final streets = await streetController.loadStreetById(selectedWardId!);
+          await townshipController.loadTownshipList(selectedCityId!);
+      final wards = await wardController.loadWardList(selectedTownshipId!);
+      final streets = await streetController.loadStreetList(selectedWardId!);
       final restaurantTypes = await resTypeController.loadRestaurantTypes();
 
       setState(() {
@@ -123,6 +122,22 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                 (e) => {'id': e['id'].toString(), 'name': e['name'].toString()})
             .toList();
         divisionList = divisions
+            .map(
+                (e) => {'id': e['id'].toString(), 'name': e['name'].toString()})
+            .toList();
+        cityList = cities
+            .map(
+                (e) => {'id': e['id'].toString(), 'name': e['name'].toString()})
+            .toList();
+        townshipList = townships
+            .map(
+                (e) => {'id': e['id'].toString(), 'name': e['name'].toString()})
+            .toList();
+        wardList = wards
+            .map(
+                (e) => {'id': e['id'].toString(), 'name': e['name'].toString()})
+            .toList();
+        streetList = streets
             .map(
                 (e) => {'id': e['id'].toString(), 'name': e['name'].toString()})
             .toList();
@@ -269,6 +284,7 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                     onChanged: (value) {
                       setState(() {
                         selectedDivisionId = int.tryParse(value ?? '');
+                        selectedCityId = null;
                       });
                     },
                   ),
@@ -277,10 +293,52 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                     label: 'cities',
                     selectedValue: selectedCityId?.toString(),
                     loadItems: () =>
-                        cityController.loadCityById(selectedDivisionId!),
+                        cityController.loadCityList(selectedDivisionId!),
                     onChanged: (value) {
                       setState(() {
                         selectedCityId = int.tryParse(value ?? '');
+                        selectedTownshipId = null;
+                      });
+                    },
+                  ),
+                const SizedBox(height: 10),
+                if (selectedCityId != null)
+                  SelectorList(
+                    label: 'townships',
+                    selectedValue: selectedTownshipId?.toString(),
+                    loadItems: () =>
+                        townshipController.loadTownshipList(selectedCityId!),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedTownshipId = int.tryParse(value ?? '');
+                        selectedWardId = null;
+                      });
+                    },
+                  ),
+                const SizedBox(height: 10),
+                if (selectedTownshipId != null)
+                  SelectorList(
+                    label: 'wards',
+                    selectedValue: selectedWardId?.toString(),
+                    loadItems: () =>
+                        wardController.loadWardList(selectedTownshipId!),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedWardId = int.tryParse(value ?? '');
+                        selectedStreetId = null;
+                      });
+                    },
+                  ),
+                const SizedBox(height: 10),
+                if (selectedWardId != null)
+                  SelectorList(
+                    label: 'streets',
+                    selectedValue: selectedStreetId?.toString(),
+                    loadItems: () =>
+                        streetController.loadStreetList(selectedWardId!),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedStreetId = int.tryParse(value ?? '');
                       });
                     },
                   ),

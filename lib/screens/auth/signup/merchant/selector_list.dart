@@ -9,17 +9,18 @@ class SelectorList extends StatelessWidget {
   final String Function(dynamic)? valueExtractor;
 
   const SelectorList({
-    Key? key,
+    super.key,
     required this.label,
     required this.selectedValue,
     required this.loadItems,
     required this.onChanged,
     this.itemToString = defaultItemToString,
     this.valueExtractor = defaultValueExtractor,
-  }) : super(key: key);
+  });
 
   // Default function to convert the item to a string (you can customize it)
-  static String defaultItemToString(dynamic item) {
+  static String defaultItemToString(dynamic item
+  ) {
     return item.toString();
   }
 

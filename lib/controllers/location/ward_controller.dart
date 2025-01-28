@@ -6,11 +6,13 @@ class WardController extends BaseController<Ward> {
   WardController({required WardService service, required int townshipId})
       : super(fetchItems: () => service.getWardById(townshipId));
 
-  Future<List> loadWardById(int i) {
-    return loadItems((ward) => {
+  Future<List<Map<String, String>>> loadWardList(int i) async {
+    final wardList = await loadItems((ward) => {
           'id': ward.id.toString(),
           'name': ward.name,
           'township_id': ward.townshipId.toString(),
         });
+    print('Transformed ward list: $wardList'); // Debug transformed list
+    return wardList;
   }
 }
