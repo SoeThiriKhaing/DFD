@@ -417,3 +417,4 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
     super.dispose();
   }
 }
+

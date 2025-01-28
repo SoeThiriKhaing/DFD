@@ -7,9 +7,9 @@ class Township {
 
   factory Township.fromJson(Map<String, dynamic> json) {
     return Township(
-      id: json['id'],
+      id: json['id'] ?? '',
       name: json['name'],
-      cityId: json['city_id'],
+      cityId: json['city_id'] ?? '',
     );
   }
 

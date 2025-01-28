@@ -14,3 +14,4 @@ class RestaurantTypeRepository implements IRestaurantTypeRepository {
     );
   }
 }
+

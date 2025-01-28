@@ -7,6 +7,8 @@ class CountryService {
   CountryService({required this.repository});
 
   Future<List<Country>> getCountries() async {
-    return await repository.getCountries();
+    final countries = await repository.getCountries();
+    print('Countries in CountryService: $countries'); // Debug print
+    return countries;
   }
 }

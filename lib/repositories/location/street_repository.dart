@@ -1,25 +1,18 @@
-import 'dart:convert';
 import 'package:dailyfairdeal/interfaces/location/i_street_repository.dart';
 import 'package:dailyfairdeal/models/location/street_model.dart';
-import 'package:dailyfairdeal/services/api_service.dart';
+import 'package:dailyfairdeal/repositories/repo_api_call_services/api_helper.dart';
 import 'package:dailyfairdeal/util/appurl.dart';
 
 class StreetRepository implements IStreetRepository {
-  final apiService = ApiService();
   @override
-  Future<List<Street>> getStreetById(int wardId) async{
-    try{
-    final String url = '${AppUrl.getStreetById}/$wardId';
-    final response = await apiService.request(url, method: "GET");
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      return data.map((json)=>Street.fromJson(json)).toList();
-    }else{
-      throw Exception("Fail to load Street: ${response.statusCode}");
-    }
-    }catch(e){
-      throw Exception("An unexpected error occurred: $e");
-    }
+  Future<List<Street>> getStreetById(int wardId) async {
+    return await ApiHelper.fetchList<Street>(
+        endpoint: '${AppUrl.getStreetById}/$wardId',
+        fromJson: (data) {
+          print("Raw data from API:$data");
+          return Street.fromJson(data);
+        });
+
+    // Log the response
   }
-  
 }

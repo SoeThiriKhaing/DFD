@@ -1,26 +1,17 @@
+import 'package:dailyfairdeal/controllers/base_controller.dart';
 import 'package:dailyfairdeal/models/location/country_model.dart';
 import 'package:dailyfairdeal/services/location/country_service.dart';
 
-class CountryController {
-  final CountryService service;
-
-  CountryController({required this.service});
+class CountryController extends BaseController<Country> {
+  CountryController({required CountryService service})
+      : super(fetchItems: service.getCountries);
 
   Future<List<Map<String, String>>> loadCountryList() async {
-  try {
-    List<Country> countries = await service.getCountries();
-
-    // Convert List<Country> to List<Map<String, String>>
-    return countries.map((country) {
-      return {
-        'id': country.id.toString(), // Convert id to String
-        'name': country.name,       // Assuming name is already a String
-      };
-    }).toList();
-  } catch (e) {
-    throw Exception("An unexpected error occurred: $e");
+    final countryList = await loadItems((country) => {
+          'id': country.id.toString(),
+          'name': country.name,
+        });
+    print('Transformed country list: $countryList'); // Debug transformed list
+    return countryList;
   }
-}
-
-
 }

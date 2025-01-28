@@ -1,27 +1,18 @@
+import 'package:dailyfairdeal/controllers/base_controller.dart';
 import 'package:dailyfairdeal/models/location/city_model.dart';
 import 'package:dailyfairdeal/services/location/city_service.dart';
 
-class CityController {
-  final CityService service;
+class CityController extends BaseController<City> {
+  CityController({required CityService service, required int divisionId})
+      : super(fetchItems: () => service.getCityById(divisionId));
 
-  CityController({required this.service});
-
-  Future<List<Map<String, String>>> loadCityById(int divisionId) async {
-    try {
-      List<City> cities = await service.getCityById(divisionId);
-
-      // Convert List<Country> to List<Map<String, String>>
-      return cities.map((city) {
-        return {
-          'id': city.id.toString(), // Convert id to String
+  Future<List<Map<String, String>>> loadCityList(int i) async {
+    final cityList = await loadItems((city) => {
+          'id': city.id.toString(),
           'name': city.name,
-          'division_id': city.divisionId.toString(),      // Assuming name is already a String
-        };
-      }).toList();
-    } catch (e) {
-      throw Exception("An unexpected error occurred: $e");
-    }
+          'division_id': city.divisionId.toString(),
+        });
+    print('Transformed city list: $cityList'); // Debug transformed list
+    return cityList;
   }
-
-
 }

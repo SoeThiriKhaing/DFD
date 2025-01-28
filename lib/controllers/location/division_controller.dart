@@ -1,27 +1,18 @@
+import 'package:dailyfairdeal/controllers/base_controller.dart';
 import 'package:dailyfairdeal/models/location/division_model.dart';
 import 'package:dailyfairdeal/services/location/division_service.dart';
 
-class DivisionController {
-  final DivisionService service;
+class DivisionController extends BaseController<Division> {
+  DivisionController({required DivisionService service, required int countryId})
+      : super(fetchItems: () => service.getDivisionById(countryId));
 
-  DivisionController({required this.service});
-
-  Future<List<Map<String, String>>> loadDivisionById(int countryId) async {
-    try {
-      List<Division> divisions = await service.getDivisionById(countryId);
-
-      // Convert List<Country> to List<Map<String, String>>
-      return divisions.map((division) {
-        return {
-          'id': division.id.toString(), // Convert id to String
+  Future<List<Map<String, String>>> loadDivisionList(int i) async {
+    final divisionList = await loadItems((division) => {
+          'id': division.id.toString(),
           'name': division.name,
-          'country_id': division.countryId.toString(),      // Assuming name is already a String
-        };
-      }).toList();
-    } catch (e) {
-      throw Exception("An unexpected error occurred: $e");
-    }
+          'country_id': division.countryId.toString(),
+        });
+    print('Transformed division list: $divisionList'); // Debug transformed list
+    return divisionList;
   }
-
-
 }

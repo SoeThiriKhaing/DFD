@@ -1,27 +1,20 @@
+import 'package:dailyfairdeal/controllers/base_controller.dart';
 import 'package:dailyfairdeal/models/location/street_model.dart';
+import 'package:dailyfairdeal/models/location/township_model.dart';
 import 'package:dailyfairdeal/services/location/street_service.dart';
+import 'package:dailyfairdeal/services/location/township_service.dart';
 
-class StreetController {
-  final StreetService service;
+class StreetController extends BaseController<Street> {
+  StreetController({required StreetService service, required int wardId})
+      : super(fetchItems: () => service.getStreetById(wardId));
 
-  StreetController({required this.service});
-
-  Future<List<Map<String, String>>> loadStreetById(int wardId) async {
-    try {
-      List<Street> streets = await service.getStreetById(wardId);
-
-      // Convert List<Country> to List<Map<String, String>>
-      return streets.map((street) {
-        return {
-          'id': street.id.toString(), // Convert id to String
+  Future<List<Map<String, String>>> loadStreetList(int i) async {
+    final streetList = await loadItems((street) => {
+          'id': street.id.toString(),
           'name': street.name,
           'ward_id': street.wardId.toString(),
-        };
-      }).toList();
-    } catch (e) {
-      throw Exception("An unexpected error occurred: $e");
-    }
+        });
+    print('Transformed street list: $streetList'); // Debug transformed list
+    return streetList;
   }
-
-
 }

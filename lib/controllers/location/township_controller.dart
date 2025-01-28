@@ -1,26 +1,18 @@
+import 'package:dailyfairdeal/controllers/base_controller.dart';
 import 'package:dailyfairdeal/models/location/township_model.dart';
 import 'package:dailyfairdeal/services/location/township_service.dart';
 
-class TownshipController {
-  final TownshipService service;
+class TownshipController extends BaseController<Township> {
+  TownshipController({required TownshipService service, required int cityId})
+      : super(fetchItems: () => service.getTownshipById(cityId));
 
-  TownshipController({required this.service});
-
-  Future<List<Map<String, String>>> loadTownshipById(int cityId) async {
-    try {
-      List<Township> townships = await service.getTownshipById(cityId);
-
-      return townships.map((township) {
-        return {
-          'id': township.id.toString(), // Convert id to String
+  Future<List<Map<String, String>>> loadTownshipList(int i) async {
+    final townshipList = await loadItems((township) => {
+          'id': township.id.toString(),
           'name': township.name,
           'city_id': township.cityId.toString(),
-        };
-      }).toList();
-    } catch (e) {
-      throw Exception("An unexpected error occurred: $e");
-    }
+        });
+    print('Transformed township list: $townshipList'); // Debug transformed list
+    return townshipList;
   }
-
-
 }
