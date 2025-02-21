@@ -294,30 +294,30 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                     keyboardType: TextInputType.text),
                 const SizedBox(height: 10),
                 buildPhoneField(phoneController),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => selectTime(context, openTimeController),
-                        child: AbsorbPointer(
-                          child: buildTextFormField(
-                              'Open Time', openTimeController),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => selectTime(context, closeTimeController),
-                        child: AbsorbPointer(
-                          child: buildTextFormField(
-                              'Close Time', closeTimeController),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                // const SizedBox(height: 10),
+                // Row(
+                //   children: [
+                //     Expanded(
+                //       child: GestureDetector(
+                //         onTap: () => selectTime(context, openTimeController),
+                //         child: AbsorbPointer(
+                //           child: buildTextFormField(
+                //               'Open Time', openTimeController),
+                //         ),
+                //       ),
+                //     ),
+                //     const SizedBox(width: 10),
+                //     Expanded(
+                //       child: GestureDetector(
+                //         onTap: () => selectTime(context, closeTimeController),
+                //         child: AbsorbPointer(
+                //           child: buildTextFormField(
+                //               'Close Time', closeTimeController),
+                //         ),
+                //       ),
+                //     ),
+                //   ],
+                // ),
                 const SizedBox(height: 20),
                 // Call the buildSubmitButton method here
                 buildSubmitButton(),
