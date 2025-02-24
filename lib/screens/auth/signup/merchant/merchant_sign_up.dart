@@ -217,6 +217,7 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                   loadItems: countryController.loadCountryList,
                   onChanged: (value) {
                     setState(() {
+                      debugPrint("Select Country Id is $value");
                       selectedCountryId = int.tryParse(value ?? '');
                       selectedDivisionId = null; // Reset division
                     });
@@ -225,7 +226,7 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                 if (selectedCountryId != null)
                   SelectorMap(
                     label: 'division',
-                    selectedValue: selectedDivisionId?.toString(),
+                    selectedValue: selectedCountryId?.toString(),
                     loadItems: () =>
                         divisionController.loadDivisionList(selectedCountryId!),
                     onChanged: (value) {
@@ -238,7 +239,7 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                 if (selectedDivisionId != null)
                   SelectorMap(
                     label: 'cities',
-                    selectedValue: selectedCityId?.toString(),
+                    selectedValue: selectedDivisionId?.toString(),
                     loadItems: () =>
                         cityController.loadCityList(selectedDivisionId!),
                     onChanged: (value) {
@@ -252,7 +253,7 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                 if (selectedCityId != null)
                   SelectorList(
                     label: 'townships',
-                    selectedValue: selectedTownshipId?.toString(),
+                    selectedValue: selectedCityId?.toString(),
                     loadItems: () =>
                         townshipController.loadTownshipList(selectedCityId!),
                     onChanged: (value) {
@@ -266,7 +267,7 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                 if (selectedTownshipId != null)
                   SelectorList(
                     label: 'wards',
-                    selectedValue: selectedWardId?.toString(),
+                    selectedValue: selectedTownshipId?.toString(),
                     loadItems: () =>
                         wardController.loadWardList(selectedTownshipId!),
                     onChanged: (value) {
@@ -280,7 +281,7 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                 if (selectedWardId != null)
                   SelectorList(
                     label: 'streets',
-                    selectedValue: selectedStreetId?.toString(),
+                    selectedValue: selectedWardId?.toString(),
                     loadItems: () =>
                         streetController.loadStreetList(selectedWardId!),
                     onChanged: (value) {
