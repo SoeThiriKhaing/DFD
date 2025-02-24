@@ -12,11 +12,16 @@ class AppUrl {
   static var getResTypes = '$baseUrl/restaurant_types';
 
   //Location Api
-
   static String getCountry = "$baseUrl/country";
-  static String getDivisionById(String countryId) => '$baseUrl/state/$countryId';
-  static String getCitiesById(String divisionId) => '$baseUrl/city/$divisionId';
-  static String getTownshipById(String cityId) => '$baseUrl/township/$cityId';
-  static String getWardById(String townshipId) => '$baseUrl/ward/$townshipId';
-  static String getStreetById(String wardId) => '$baseUrl/street/$wardId';
+  static String getDivisionById = "$baseUrl/state";
+  static String getCitiesById = "$baseUrl/city";
+  static String getTownshipById = "$baseUrl/township";
+  static String getWardById = "$baseUrl/ward";
+  static String getStreetById = "$baseUrl/street";
+  
+  //static String getDivisionById(String countryId) => '$baseUrl/state/$countryId';
+  //static String getCitiesById(String divisionId) => '$baseUrl/city/$divisionId';
+  //static String getTownshipById(String cityId) => '$baseUrl/township/$cityId';
+  //static String getWardById(String townshipId) => '$baseUrl/ward/$townshipId';
+  //static String getStreetById(String wardId) => '$baseUrl/street/$wardId';
 }

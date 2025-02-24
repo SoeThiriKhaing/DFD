@@ -13,7 +13,7 @@ class DivisionController extends BaseController<Division> {
           'name': division.name,
           'country_id': division.countryId.toString(),
         });
-    debugPrint('Transformed division list: $divisionList'); // Debug transformed list
+    debugPrint('Transformed division list: $divisionList');
     return divisionList;
   }
 }

@@ -17,14 +17,8 @@ class SelectorMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Map<String, String>>>(
-      future: loadItems(),
+      future: loadItems(),//
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        }
 
         final items = snapshot.data ?? [];
         if (items.isEmpty) {

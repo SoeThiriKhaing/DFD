@@ -12,7 +12,6 @@ import 'package:dailyfairdeal/repositories/location/division_repository.dart';
 import 'package:dailyfairdeal/repositories/location/street_repository.dart';
 import 'package:dailyfairdeal/repositories/location/township_repository.dart';
 import 'package:dailyfairdeal/repositories/location/ward_repository.dart';
-import 'package:dailyfairdeal/screens/auth/signup/merchant/selector_list.dart';
 import 'package:dailyfairdeal/screens/auth/signup/merchant/selector_map.dart';
 import 'package:dailyfairdeal/screens/food/save_res.dart';
 import 'package:dailyfairdeal/widget/phone_text_field_widget.dart';
@@ -212,61 +211,60 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                 }),
                 const SizedBox(height: 10),
                 SelectorMap(
-                  label: 'country',
+                  label: 'Country',
                   selectedValue: selectedCountryId?.toString(),
                   loadItems: countryController.loadCountryList,
                   onChanged: (value) {
                     setState(() {
-                      debugPrint("Select Country Id is $value");
                       selectedCountryId = int.tryParse(value ?? '');
-                      selectedDivisionId = null; // Reset division
+                      selectedDivisionId=selectedCityId=selectedTownshipId=selectedWardId=selectedStreetId=null;
                     });
                   },
                 ),
-                if (selectedCountryId != null)
+               if (selectedCountryId != null)
                   SelectorMap(
-                    label: 'division',
+                    label: 'Division/State',
                     selectedValue: selectedCountryId?.toString(),
                     loadItems: () =>
                         divisionController.loadDivisionList(selectedCountryId!),
                     onChanged: (value) {
                       setState(() {
                         selectedDivisionId = int.tryParse(value ?? '');
-                        selectedCityId = null;
+                        selectedCityId=selectedTownshipId=selectedWardId=selectedStreetId=null; 
                       });
                     },
                   ),
                 if (selectedDivisionId != null)
                   SelectorMap(
-                    label: 'cities',
+                    label: 'City',
                     selectedValue: selectedDivisionId?.toString(),
                     loadItems: () =>
                         cityController.loadCityList(selectedDivisionId!),
                     onChanged: (value) {
                       setState(() {
                         selectedCityId = int.tryParse(value ?? '');
-                        selectedTownshipId = null;
+                        selectedTownshipId=selectedWardId=selectedStreetId=null;
                       });
                     },
                   ),
                 const SizedBox(height: 10),
                 if (selectedCityId != null)
-                  SelectorList(
-                    label: 'townships',
+                  SelectorMap(
+                    label: 'Township',
                     selectedValue: selectedCityId?.toString(),
                     loadItems: () =>
                         townshipController.loadTownshipList(selectedCityId!),
                     onChanged: (value) {
                       setState(() {
                         selectedTownshipId = int.tryParse(value ?? '');
-                        selectedWardId = null;
+                        selectedWardId = selectedStreetId = null;
                       });
                     },
                   ),
                 const SizedBox(height: 10),
                 if (selectedTownshipId != null)
-                  SelectorList(
-                    label: 'wards',
+                  SelectorMap(
+                    label: 'Ward',
                     selectedValue: selectedTownshipId?.toString(),
                     loadItems: () =>
                         wardController.loadWardList(selectedTownshipId!),
@@ -279,8 +277,8 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                   ),
                 const SizedBox(height: 10),
                 if (selectedWardId != null)
-                  SelectorList(
-                    label: 'streets',
+                  SelectorMap(
+                    label: 'Street',
                     selectedValue: selectedWardId?.toString(),
                     loadItems: () =>
                         streetController.loadStreetList(selectedWardId!),

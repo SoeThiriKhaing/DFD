@@ -4,7 +4,7 @@ import 'package:dailyfairdeal/config/messages.dart';
 import 'package:dailyfairdeal/models/user_model.dart';
 import '../services/auth_service.dart';
 
-class AuthController {
+class AuthController{
   final AuthService authService;
 
   AuthController({required this.authService});

@@ -8,12 +8,11 @@ class DivisionRepository implements IDivisionRepository {
   @override
   Future<List<Division>> getDivisionById(int countryId) async {
     return await ApiHelper.fetchList<Division>(
-        endpoint: '${AppUrl.getDivisionById}/$countryId',
-        fromJson: (data) {
-           debugPrint('Raw data from API: $data'); 
-         return Division.fromJson(data);
-        });
-
-    // Log the response
+      endpoint: '${AppUrl.getDivisionById}/$countryId',
+      fromJson: (data) {
+        debugPrint('Raw data from API: $data');
+        return Division.fromJson(data);
+      },
+    );
   }
 }

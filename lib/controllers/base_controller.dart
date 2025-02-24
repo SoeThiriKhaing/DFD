@@ -10,7 +10,7 @@ class BaseController<T> {
   ) async {
     try {
       final items = await fetchItems();
-      debugPrint('Fetched items in BaseController: $items'); // Debug print
+      debugPrint('Fetched items in BaseController: $items');
       return items.map(transform).toList();
     } catch (e) {
       debugPrint("Error in BaseController: $e");

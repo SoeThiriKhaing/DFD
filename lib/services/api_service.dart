@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:dailyfairdeal/services/secure_storage.dart';
+import 'package:dailyfairdeal/repositories/repo_api_call_services/validate_endpoint.dart';
 
 class ApiService {
   final http.Client _client;
@@ -24,6 +25,7 @@ class ApiService {
     Map<String, String>? headers,
     Map<String, dynamic>? body,
   }) async {
+    ValidateEndPoint.validateEndpoint(endpoint); // Validate endpoint
     final uri = Uri.parse(endpoint);
     final token = await getToken();
 
