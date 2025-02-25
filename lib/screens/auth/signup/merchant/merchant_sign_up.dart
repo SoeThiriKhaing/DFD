@@ -216,9 +216,9 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                       debugPrint("Selected Country ID: $selectedCountryId");
                     });
                   },
-                ),
-                const SizedBox(height: 10),
+                ),  
                 if (selectedCountryId != null)
+                  const SizedBox(height: 10),
                   SelectorMap(
                     label: 'Division/State',
                     selectedValue: selectedDivisionId?.toString(),
@@ -237,9 +237,9 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                         debugPrint("Selected Division ID: $selectedDivisionId");
                       });
                     },
-                  ),
-                const SizedBox(height: 10),
+                  ),              
                 if (selectedDivisionId != null)
+                  const SizedBox(height: 10),
                   SelectorMap(
                     label: 'City',
                     selectedValue: selectedCityId?.toString(),
@@ -258,9 +258,9 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                         debugPrint("Selected City ID: $selectedCityId");
                       });
                     },
-                  ),
-                const SizedBox(height: 10),
+                  ),                
                 if (selectedCityId != null)
+                  const SizedBox(height: 10),
                   SelectorMap(
                     label: 'Township',
                     selectedValue: selectedTownshipId?.toString(),
@@ -278,8 +278,8 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                       });
                     },
                   ),
-                const SizedBox(height: 10),
                 if (selectedTownshipId != null)
+                  const SizedBox(height: 10),
                   SelectorMap(
                     label: 'Ward',
                     selectedValue: selectedWardId?.toString(),
@@ -298,8 +298,8 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                       });
                     },
                   ),
-                const SizedBox(height: 10),
                 if (selectedWardId != null)
+                  const SizedBox(height: 10),
                   SelectorMap(
                     label: 'Street',
                     selectedValue: selectedStreetId?.toString(),
