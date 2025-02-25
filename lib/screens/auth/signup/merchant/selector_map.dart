@@ -17,16 +17,23 @@ class SelectorMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Map<String, String>>>(
-      future: loadItems(),//
+      future: loadItems(),
       builder: (context, snapshot) {
-
         final items = snapshot.data ?? [];
         if (items.isEmpty) {
           return Text('No $label available');
         }
 
+        // Ensure selectedValue exists in the items list
+        final selectedItem = items.firstWhere(
+          (item) => item['id'] == selectedValue,
+          orElse: () => {'id': ''},
+        );
+
+        final selectedValueExists = items.any((item) => item['id'] == selectedValue);
+
         return DropdownButtonFormField<String>(
-          value: selectedValue,
+          value: selectedValueExists ? selectedItem['id'] : null,
           hint: Text('Select a $label'),
           decoration: const InputDecoration(
             border: OutlineInputBorder(),

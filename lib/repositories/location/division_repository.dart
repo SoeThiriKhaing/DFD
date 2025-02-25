@@ -11,6 +11,7 @@ class DivisionRepository implements IDivisionRepository {
       endpoint: '${AppUrl.getDivisionById}/$countryId',
       fromJson: (data) {
         debugPrint('Raw data from API: $data');
+        debugPrint('Endpoint is: ${AppUrl.getDivisionById}/$countryId');
         return Division.fromJson(data);
       },
     );

@@ -84,26 +84,10 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
         service: RestaurantTypeService(repository: RestaurantTypeRepository()));
     countryController = CountryController(
         service: CountryService(repository: CountryRepository()));
-    divisionController = DivisionController(
-        service: DivisionService(repository: DivisionRepository()),
-        countryId: selectedCountryId ?? 1);
-    cityController = CityController(
-        service: CityService(repository: CityRepository()),
-        divisionId: selectedDivisionId ?? 1);
-    townshipController = TownshipController(
-        service: TownshipService(repository: TownshipRepository()),
-        cityId: selectedCityId ?? 1);
-    wardController = WardController(
-        service: WardService(repository: WardRepository()),
-        townshipId: selectedTownshipId ?? 1);
-    streetController = StreetController(
-        service: StreetService(repository: StreetRepository()),
-        wardId: selectedWardId ?? 1);
-    
   }
 
-  
-  Future<void> selectTime(BuildContext context, TextEditingController controller) async {
+  Future<void> selectTime(
+      BuildContext context, TextEditingController controller) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -210,6 +194,11 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                   );
                 }),
                 const SizedBox(height: 10),
+                const Text(
+                  "Address",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
                 SelectorMap(
                   label: 'Country',
                   selectedValue: selectedCountryId?.toString(),
@@ -217,33 +206,56 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                   onChanged: (value) {
                     setState(() {
                       selectedCountryId = int.tryParse(value ?? '');
-                      selectedDivisionId=selectedCityId=selectedTownshipId=selectedWardId=selectedStreetId=null;
+                      selectedDivisionId = selectedCityId = selectedTownshipId =
+                          selectedWardId = selectedStreetId = null;
+                      divisionController = DivisionController(
+                          service:
+                              DivisionService(repository: DivisionRepository()),
+                          countryId: selectedCountryId!);
+                      divisionController.loadDivisionList(selectedCountryId!);
+                      debugPrint("Selected Country ID: $selectedCountryId");
                     });
                   },
                 ),
-               if (selectedCountryId != null)
+                const SizedBox(height: 10),
+                if (selectedCountryId != null)
                   SelectorMap(
                     label: 'Division/State',
-                    selectedValue: selectedCountryId?.toString(),
+                    selectedValue: selectedDivisionId?.toString(),
                     loadItems: () =>
                         divisionController.loadDivisionList(selectedCountryId!),
                     onChanged: (value) {
                       setState(() {
                         selectedDivisionId = int.tryParse(value ?? '');
-                        selectedCityId=selectedTownshipId=selectedWardId=selectedStreetId=null; 
+                        selectedCityId = selectedTownshipId =
+                            selectedWardId = selectedStreetId = null;
+                        
+                        cityController = CityController(
+                          service: CityService(repository: CityRepository()),
+                          divisionId: selectedDivisionId!);
+                        //cityController.loadCityList(selectedDivisionId!);
+                        debugPrint("Selected Division ID: $selectedDivisionId");
                       });
                     },
                   ),
+                const SizedBox(height: 10),
                 if (selectedDivisionId != null)
                   SelectorMap(
                     label: 'City',
-                    selectedValue: selectedDivisionId?.toString(),
+                    selectedValue: selectedCityId?.toString(),
                     loadItems: () =>
                         cityController.loadCityList(selectedDivisionId!),
                     onChanged: (value) {
                       setState(() {
                         selectedCityId = int.tryParse(value ?? '');
-                        selectedTownshipId=selectedWardId=selectedStreetId=null;
+                        selectedTownshipId =
+                            selectedWardId = selectedStreetId = null;
+                        townshipController = TownshipController(
+                          service:
+                              TownshipService(repository: TownshipRepository()),
+                          cityId: selectedCityId!);
+                        //townshipController.loadTownshipList(selectedCityId!);
+                        debugPrint("Selected City ID: $selectedCityId");
                       });
                     },
                   ),
@@ -251,13 +263,18 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                 if (selectedCityId != null)
                   SelectorMap(
                     label: 'Township',
-                    selectedValue: selectedCityId?.toString(),
+                    selectedValue: selectedTownshipId?.toString(),
                     loadItems: () =>
                         townshipController.loadTownshipList(selectedCityId!),
                     onChanged: (value) {
                       setState(() {
                         selectedTownshipId = int.tryParse(value ?? '');
                         selectedWardId = selectedStreetId = null;
+                        wardController = WardController(
+                          service: WardService(repository: WardRepository()),
+                          townshipId: selectedTownshipId!);
+                        //wardController.loadWardList(selectedTownshipId!);
+                        debugPrint("Selected Township ID: $selectedTownshipId");
                       });
                     },
                   ),
@@ -265,13 +282,19 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                 if (selectedTownshipId != null)
                   SelectorMap(
                     label: 'Ward',
-                    selectedValue: selectedTownshipId?.toString(),
+                    selectedValue: selectedWardId?.toString(),
                     loadItems: () =>
                         wardController.loadWardList(selectedTownshipId!),
                     onChanged: (value) {
                       setState(() {
                         selectedWardId = int.tryParse(value ?? '');
                         selectedStreetId = null;
+                        streetController = StreetController(
+                          service:
+                              StreetService(repository: StreetRepository()),
+                          wardId: selectedWardId!);
+                        //streetController.loadStreetList(selectedWardId!);
+                        debugPrint("Selected Ward ID: $selectedWardId");
                       });
                     },
                   ),
@@ -279,7 +302,7 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                 if (selectedWardId != null)
                   SelectorMap(
                     label: 'Street',
-                    selectedValue: selectedWardId?.toString(),
+                    selectedValue: selectedStreetId?.toString(),
                     loadItems: () =>
                         streetController.loadStreetList(selectedWardId!),
                     onChanged: (value) {
