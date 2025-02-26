@@ -13,7 +13,28 @@ class StreetRepository implements IStreetRepository {
           debugPrint("Raw data from API:$data");
           return Street.fromJson(data);
         });
+  }
 
-    // Log the response
+  Future<void> addStreet(Street street) async {
+    await ApiHelper.request(
+      endpoint: AppUrl.addStreet,
+      method:"POST",
+      body: street.toJson().map((key, value) => MapEntry(key, value.toString())),
+    );
+  }
+
+  Future<void> updateStreet(Street street) async {
+    await ApiHelper.request(
+      endpoint: '${AppUrl.updateStreet}/${street.id}',
+      method: "PUT",
+      body: street.toJson().map((key, value) => MapEntry(key, value.toString())),
+    );
+  }
+
+  Future<void> deleteStreet(int streetId) async {
+    await ApiHelper.request(
+      endpoint: '${AppUrl.deleteStreet}/$streetId',
+      method: "DELETE",
+    );
   }
 }

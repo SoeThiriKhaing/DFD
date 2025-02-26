@@ -76,4 +76,5 @@ class ApiHelper {
       throw Exception("Failed to fetch data");
     }
   }
+
 }

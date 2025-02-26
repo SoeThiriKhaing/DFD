@@ -9,4 +9,16 @@ class DivisionService {
   Future<List<Division>> getDivisionById(int countryId) async {
     return await repository.getDivisionById(countryId);
   }
+
+  Future<void> addDivision(Division division) async {
+    await repository.addDivision(division);
+  }
+
+  Future<void> updateDivision(Division division) async {
+    await repository.updateDivision(division);
+  }
+
+  Future<void> deleteDivision(int divisionId) async {
+    await repository.deleteDivision(divisionId);
+  }
 }

@@ -76,4 +76,16 @@ class ApiService {
       throw Exception("Request failed: $e");
     }
   }
+
+  Future<http.Response> post(String endpoint, {Map<String, String>? headers, Map<String, dynamic>? body}) async {
+    return await request(endpoint, method: "POST", headers: headers, body: body);
+  }
+
+  Future<http.Response> put(String endpoint, {Map<String, String>? headers, Map<String, dynamic>? body}) async {
+    return await request(endpoint, method: "PUT", headers: headers, body: body);
+  }
+
+  Future<http.Response> delete(String endpoint, {Map<String, String>? headers, required Map<String, String> body}) async {
+    return await request(endpoint, method: "DELETE", headers: headers);
+  }
 }

@@ -13,7 +13,28 @@ class TownshipRepository implements ITownshipRepository {
           debugPrint("Raw data from API:$data");
           return Township.fromJson(data);
         });
+  }
 
-    // Log the response
+  Future<void> addTownship(Township township) async {
+    await ApiHelper.request(
+      endpoint: AppUrl.addTownship,
+      method: "POST",
+      body: township.toJson().map((key, value) => MapEntry(key, value.toString())),
+    );
+  }
+
+  Future<void> updateTownship(Township township) async {
+    await ApiHelper.request(
+      endpoint: '${AppUrl.updateTownship}/${township.id}',
+      method: "PUT",
+      body: township.toJson().map((key, value) => MapEntry(key, value.toString())),
+    );
+  }
+
+  Future<void> deleteTownship(int townshipId) async {
+    await ApiHelper.request(
+      endpoint: '${AppUrl.deleteTownship}/$townshipId',
+      method: "DELETE",
+    );
   }
 }

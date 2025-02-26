@@ -84,6 +84,16 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
         service: RestaurantTypeService(repository: RestaurantTypeRepository()));
     countryController = CountryController(
         service: CountryService(repository: CountryRepository()));
+    divisionController = DivisionController(
+        service: DivisionService(repository: DivisionRepository()));
+    cityController = CityController(
+        service: CityService(repository: CityRepository()));
+    townshipController = TownshipController(
+        service: TownshipService(repository: TownshipRepository()));
+    wardController = WardController(
+        service: WardService(repository: WardRepository()));
+    streetController = StreetController(
+        service: StreetService(repository: StreetRepository()));
   }
 
   Future<void> selectTime(
@@ -208,140 +218,89 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                       selectedCountryId = int.tryParse(value ?? '');
                       selectedDivisionId = selectedCityId = selectedTownshipId =
                           selectedWardId = selectedStreetId = null;
-                      divisionController = DivisionController(
-                          service:
-                              DivisionService(repository: DivisionRepository()),
-                          countryId: selectedCountryId!);
-                      divisionController.loadDivisionList(selectedCountryId!);
                       debugPrint("Selected Country ID: $selectedCountryId");
                     });
                   },
                 ),  
-                if (selectedCountryId != null)
+                if (selectedCountryId != null) ...[
                   const SizedBox(height: 10),
                   SelectorMap(
                     label: 'Division/State',
                     selectedValue: selectedDivisionId?.toString(),
-                    loadItems: () =>
-                        divisionController.loadDivisionList(selectedCountryId!),
+                    loadItems: () => divisionController.loadDivisionList(selectedCountryId!),
                     onChanged: (value) {
                       setState(() {
                         selectedDivisionId = int.tryParse(value ?? '');
-                        selectedCityId = selectedTownshipId =
-                            selectedWardId = selectedStreetId = null;
-                        
-                        cityController = CityController(
-                          service: CityService(repository: CityRepository()),
-                          divisionId: selectedDivisionId!);
-                        //cityController.loadCityList(selectedDivisionId!);
+                        selectedCityId = selectedTownshipId = selectedWardId = selectedStreetId = null;
                         debugPrint("Selected Division ID: $selectedDivisionId");
                       });
                     },
-                  ),              
-                if (selectedDivisionId != null)
+                  ),
+                ],
+                if (selectedDivisionId != null) ...[
                   const SizedBox(height: 10),
                   SelectorMap(
                     label: 'City',
                     selectedValue: selectedCityId?.toString(),
-                    loadItems: () =>
-                        cityController.loadCityList(selectedDivisionId!),
+                    loadItems: () => cityController.loadCityList(selectedDivisionId!),
                     onChanged: (value) {
                       setState(() {
                         selectedCityId = int.tryParse(value ?? '');
-                        selectedTownshipId =
-                            selectedWardId = selectedStreetId = null;
-                        townshipController = TownshipController(
-                          service:
-                              TownshipService(repository: TownshipRepository()),
-                          cityId: selectedCityId!);
-                        //townshipController.loadTownshipList(selectedCityId!);
+                        selectedTownshipId = selectedWardId = selectedStreetId = null;
                         debugPrint("Selected City ID: $selectedCityId");
                       });
                     },
-                  ),                
-                if (selectedCityId != null)
+                  ),
+                ],
+                if (selectedCityId != null) ...[
                   const SizedBox(height: 10),
                   SelectorMap(
                     label: 'Township',
                     selectedValue: selectedTownshipId?.toString(),
-                    loadItems: () =>
-                        townshipController.loadTownshipList(selectedCityId!),
+                    loadItems: () => townshipController.loadTownshipList(selectedCityId!),
                     onChanged: (value) {
                       setState(() {
                         selectedTownshipId = int.tryParse(value ?? '');
                         selectedWardId = selectedStreetId = null;
-                        wardController = WardController(
-                          service: WardService(repository: WardRepository()),
-                          townshipId: selectedTownshipId!);
-                        //wardController.loadWardList(selectedTownshipId!);
                         debugPrint("Selected Township ID: $selectedTownshipId");
                       });
                     },
                   ),
-                if (selectedTownshipId != null)
+                ],
+                if (selectedTownshipId != null) ...[
                   const SizedBox(height: 10),
                   SelectorMap(
                     label: 'Ward',
                     selectedValue: selectedWardId?.toString(),
-                    loadItems: () =>
-                        wardController.loadWardList(selectedTownshipId!),
+                    loadItems: () => wardController.loadWardList(selectedTownshipId!),
                     onChanged: (value) {
                       setState(() {
                         selectedWardId = int.tryParse(value ?? '');
                         selectedStreetId = null;
-                        streetController = StreetController(
-                          service:
-                              StreetService(repository: StreetRepository()),
-                          wardId: selectedWardId!);
-                        //streetController.loadStreetList(selectedWardId!);
                         debugPrint("Selected Ward ID: $selectedWardId");
                       });
                     },
                   ),
-                if (selectedWardId != null)
+                ],
+                if (selectedWardId != null) ...[
                   const SizedBox(height: 10),
                   SelectorMap(
                     label: 'Street',
                     selectedValue: selectedStreetId?.toString(),
-                    loadItems: () =>
-                        streetController.loadStreetList(selectedWardId!),
+                    loadItems: () => streetController.loadStreetList(selectedWardId!),
                     onChanged: (value) {
                       setState(() {
                         selectedStreetId = int.tryParse(value ?? '');
                       });
                     },
                   ),
+                ],
                 const SizedBox(height: 10),
                 buildTextFormField('Owner Name', ownerNameController,
                     keyboardType: TextInputType.text),
                 const SizedBox(height: 10),
                 buildPhoneField(phoneController),
-                // const SizedBox(height: 10),
-                // Row(
-                //   children: [
-                //     Expanded(
-                //       child: GestureDetector(
-                //         onTap: () => selectTime(context, openTimeController),
-                //         child: AbsorbPointer(
-                //           child: buildTextFormField(
-                //               'Open Time', openTimeController),
-                //         ),
-                //       ),
-                //     ),
-                //     const SizedBox(width: 10),
-                //     Expanded(
-                //       child: GestureDetector(
-                //         onTap: () => selectTime(context, closeTimeController),
-                //         child: AbsorbPointer(
-                //           child: buildTextFormField(
-                //               'Close Time', closeTimeController),
-                //         ),
-                //       ),
-                //     ),
-                //   ],
-                // ),
                 const SizedBox(height: 20),
-                // Call the buildSubmitButton method here
                 buildSubmitButton(),
               ],
             ),

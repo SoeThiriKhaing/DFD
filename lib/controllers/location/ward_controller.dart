@@ -4,8 +4,10 @@ import 'package:dailyfairdeal/services/location/ward_service.dart';
 import 'package:flutter/material.dart';
 
 class WardController extends BaseController<Ward> {
-  WardController({required WardService service, required int townshipId})
-      : super(fetchItems: () => service.getWardById(townshipId));
+  final WardService service;
+
+  WardController({required this.service, int? townshipId})
+      : super(fetchItems: () => service.getWardById(townshipId!));
 
   Future<List<Map<String, String>>> loadWardList(int i) async {
     final wardList = await loadItems((ward) => {
@@ -15,5 +17,17 @@ class WardController extends BaseController<Ward> {
         });
     debugPrint('Transformed ward list: $wardList'); // Debug transformed list
     return wardList;
+  }
+
+  Future<Ward> addWard(Ward ward) async {
+    return await service.addWard(ward);
+  }
+
+  Future<Ward> updateWard(Ward ward) async {
+    return await service.updateWard(ward);
+  }
+
+  Future<void> deleteWard(int wardId) async {
+    return await service.deleteWard(wardId);
   }
 }

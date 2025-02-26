@@ -14,7 +14,28 @@ class CityRepository implements ICityRepository {
         return City.fromJson(data);
       },
     );
+  }
 
-    // Log the response
+  Future<void> addCity(City city) async {
+    await ApiHelper.request(
+      endpoint: AppUrl.addCity,
+      method: "POST",
+      body: city.toJson().map((key, value) => MapEntry(key, value.toString())),
+    );
+  }
+
+  Future<void> updateCity(City city) async {
+    await ApiHelper.request(
+      endpoint: '${AppUrl.updateCity}/${city.id}',
+      method: "PUT",
+      body: city.toJson().map((key, value) => MapEntry(key, value.toString())),
+    );
+  }
+
+  Future<void> deleteCity(int cityId) async {
+    await ApiHelper.request(
+      endpoint: '${AppUrl.deleteCity}/$cityId',
+      method: "DELETE",
+    );
   }
 }

@@ -9,4 +9,16 @@ class CityService {
   Future<List<City>> getCityById(int divisionId) async {
     return await repository.getCityById(divisionId);
   }
+
+  Future<void> addCity(City city) async {
+    await repository.addCity(city);
+  }
+
+  Future<void> updateCity(City city) async {
+    await repository.updateCity(city);
+  }
+
+  Future<void> deleteCity(int cityId) async {
+    await repository.deleteCity(cityId);
+  }
 }

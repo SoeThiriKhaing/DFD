@@ -4,7 +4,9 @@ import 'package:dailyfairdeal/services/location/country_service.dart';
 import 'package:flutter/material.dart';
 
 class CountryController extends BaseController<Country> {
-  CountryController({required CountryService service})
+  final CountryService service;
+
+  CountryController({required this.service})
       : super(fetchItems: service.getCountries);
 
   Future<List<Map<String, String>>> loadCountryList() async {
@@ -14,5 +16,22 @@ class CountryController extends BaseController<Country> {
         });
     debugPrint('Transformed country list: $countryList'); // Debug transformed list
     return countryList;
+  }
+
+  Future<Country> addCountry(Country country) async {
+    final addedCountry = await service.addCountry(country);
+    debugPrint('Added Country in CountryController: $addedCountry'); // Debug print
+    return addedCountry;
+  }
+
+  Future<Country> updateCountry(Country country) async {
+    final updatedCountry = await service.updateCountry(country);
+    debugPrint('Updated Country in CountryController: $updatedCountry'); // Debug print
+    return updatedCountry;
+  }
+
+  Future<void> deleteCountry(int countryId) async {
+    await service.deleteCountry(countryId);
+    debugPrint('Deleted Country with ID: $countryId'); // Debug print
   }
 }

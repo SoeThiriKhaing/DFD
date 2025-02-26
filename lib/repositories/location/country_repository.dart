@@ -15,7 +15,32 @@ class CountryRepository implements ICountryRepository {
         return Country.fromJson(data);
       },
     );
-
-    // Log the response for debugging
   }
+
+  Future<Country> addCountry(Country country) async {
+    await ApiHelper.request(
+      endpoint: AppUrl.addCountry,
+      method: "POST",
+      body: country.toJson().map((key, value) => MapEntry(key, value.toString())),
+    );
+    return country;
+  }
+
+  Future<Country> updateCountry(Country country) async {
+    await ApiHelper.request(
+      endpoint: AppUrl.updateCountry,
+      method: "PUT",
+      body: country.toJson().map((key, value) => MapEntry(key, value.toString())),
+    );
+    return country;
+  }
+
+  Future<void> deleteCountry(int id) async {
+    await ApiHelper.request(
+      endpoint: AppUrl.deleteCountry,
+      method: "DELETE",
+      body: {'id': id.toString()},
+    );
+  }
+
 }

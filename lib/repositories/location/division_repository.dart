@@ -16,4 +16,27 @@ class DivisionRepository implements IDivisionRepository {
       },
     );
   }
+
+  Future<void> addDivision(Division division) async {
+    await ApiHelper.request(
+      endpoint: AppUrl.addDivision,
+      method: "POST",
+      body: division.toJson().map((key, value) => MapEntry(key, value.toString())),
+    );
+  }
+
+  Future<void> updateDivision(Division division) async {
+    await ApiHelper.request(
+      endpoint: '${AppUrl.updateDivision}/${division.id}',
+      method: "PUT",
+      body: division.toJson().map((key, value) => MapEntry(key, value.toString())),
+    );
+  }
+
+  Future<void> deleteDivision(int divisionId) async {
+    await ApiHelper.request(
+      endpoint: '${AppUrl.deleteDivision}/$divisionId',
+      method: "DELETE",
+    );
+  }
 }

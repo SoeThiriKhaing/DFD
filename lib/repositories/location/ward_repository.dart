@@ -13,7 +13,33 @@ class WardRepository implements IWardRepository {
           debugPrint("Raw data from API:$data");
           return Ward.fromJson(data);
         });
+  }
 
-    // Log the response
+  Future<Ward> addWard(Ward ward) async {
+    final response = await ApiHelper.request(
+      endpoint: AppUrl.addWard,
+      method: "POST",
+      body: ward.toJson().map((key, value) => MapEntry(key, value.toString())),
+    );
+    debugPrint("Added ward: $response");
+    return response;
+  }
+
+  Future<Ward> updateWard(Ward ward) async {
+    final response = await ApiHelper.request(
+      endpoint: '${AppUrl.updateWard}/${ward.id}',
+      method: "PUT",
+      body: ward.toJson().map((key, value) => MapEntry(key, value.toString())),
+    );
+    debugPrint("Updated ward: $response");
+    return response;
+  }
+
+  Future<void> deleteWard(int wardId) async {
+    await ApiHelper.request(
+      endpoint: '${AppUrl.deleteWard}/$wardId',
+      method: "DELETE",
+    );
+    debugPrint("Deleted ward with id: $wardId");
   }
 }

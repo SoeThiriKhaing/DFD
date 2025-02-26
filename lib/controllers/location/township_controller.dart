@@ -4,8 +4,10 @@ import 'package:dailyfairdeal/services/location/township_service.dart';
 import 'package:flutter/material.dart';
 
 class TownshipController extends BaseController<Township> {
-  TownshipController({required TownshipService service, required int cityId})
-      : super(fetchItems: () => service.getTownshipById(cityId));
+  final TownshipService service;
+
+  TownshipController({required this.service, int? cityId})
+      : super(fetchItems: () => service.getTownshipById(cityId!));
 
   Future<List<Map<String, String>>> loadTownshipList(int i) async {
     final townshipList = await loadItems((township) => {
@@ -15,5 +17,17 @@ class TownshipController extends BaseController<Township> {
         });
     debugPrint('Transformed township list: $townshipList'); // Debug transformed list
     return townshipList;
+  }
+
+  Future<void> addTownship(Township township) async {
+    await service.addTownship(township);
+  }
+
+  Future<void> updateTownship(Township township) async {
+    await service.updateTownship(township);
+  }
+
+  Future<void> deleteTownship(int townshipId) async {
+    await service.deleteTownship(townshipId);
   }
 }
