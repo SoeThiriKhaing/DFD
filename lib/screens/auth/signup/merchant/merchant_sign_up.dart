@@ -212,7 +212,7 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                 SelectorMap(
                   label: 'Country',
                   selectedValue: selectedCountryId?.toString(),
-                  loadItems: countryController.loadCountryList,
+                  loadItems: countryController.fetchCountries,
                   onChanged: (value) {
                     setState(() {
                       selectedCountryId = int.tryParse(value ?? '');
@@ -227,7 +227,7 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                   SelectorMap(
                     label: 'Division/State',
                     selectedValue: selectedDivisionId?.toString(),
-                    loadItems: () => divisionController.loadDivisionList(selectedCountryId!),
+                    loadItems: () => divisionController.fetchDivisionsbyId(selectedCountryId!),
                     onChanged: (value) {
                       setState(() {
                         selectedDivisionId = int.tryParse(value ?? '');
@@ -242,7 +242,7 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                   SelectorMap(
                     label: 'City',
                     selectedValue: selectedCityId?.toString(),
-                    loadItems: () => cityController.loadCityList(selectedDivisionId!),
+                    loadItems: () => cityController.fetchCitiesbyId(selectedDivisionId!),
                     onChanged: (value) {
                       setState(() {
                         selectedCityId = int.tryParse(value ?? '');
@@ -257,7 +257,7 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                   SelectorMap(
                     label: 'Township',
                     selectedValue: selectedTownshipId?.toString(),
-                    loadItems: () => townshipController.loadTownshipList(selectedCityId!),
+                    loadItems: () => townshipController.fetchTownshipsbyId(selectedCityId!),
                     onChanged: (value) {
                       setState(() {
                         selectedTownshipId = int.tryParse(value ?? '');
@@ -272,7 +272,7 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                   SelectorMap(
                     label: 'Ward',
                     selectedValue: selectedWardId?.toString(),
-                    loadItems: () => wardController.loadWardList(selectedTownshipId!),
+                    loadItems: () => wardController.fetchWardsbyId(selectedTownshipId!),
                     onChanged: (value) {
                       setState(() {
                         selectedWardId = int.tryParse(value ?? '');
@@ -287,7 +287,7 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                   SelectorMap(
                     label: 'Street',
                     selectedValue: selectedStreetId?.toString(),
-                    loadItems: () => streetController.loadStreetList(selectedWardId!),
+                    loadItems: () => streetController.fetchStreetsbyId(selectedWardId!),
                     onChanged: (value) {
                       setState(() {
                         selectedStreetId = int.tryParse(value ?? '');

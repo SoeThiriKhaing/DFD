@@ -113,7 +113,7 @@ class _HomeState extends State<Home> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   buildCard("Taxi", Icons.car_crash, AppColor.primaryColor,
-                      '/taxicategory'),
+                      '/taxihome'),
                   buildCard("Food", Icons.food_bank_rounded,
                       AppColor.primaryColor, '/foodcategory'),
                   buildCard("Mall", Icons.shop, AppColor.primaryColor,
