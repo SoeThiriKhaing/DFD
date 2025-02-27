@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 class WardController extends BaseController<Ward> {
   WardController({required WardService service, required int townshipId})
-      : super(fetchItems: () => service.getWardById(townshipId));
+      : super(fetchItems: () => service.getWardById());
 
   Future<List<Map<String, String>>> loadWardList(int i) async {
     final wardList = await loadItems((ward) => {

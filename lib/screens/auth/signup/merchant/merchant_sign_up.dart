@@ -12,7 +12,6 @@ import 'package:dailyfairdeal/repositories/location/division_repository.dart';
 import 'package:dailyfairdeal/repositories/location/street_repository.dart';
 import 'package:dailyfairdeal/repositories/location/township_repository.dart';
 import 'package:dailyfairdeal/repositories/location/ward_repository.dart';
-import 'package:dailyfairdeal/screens/auth/signup/merchant/selector_list.dart';
 import 'package:dailyfairdeal/screens/auth/signup/merchant/selector_map.dart';
 import 'package:dailyfairdeal/screens/food/save_res.dart';
 import 'package:dailyfairdeal/widget/phone_text_field_widget.dart';
@@ -100,11 +99,10 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
     streetController = StreetController(
         service: StreetService(repository: StreetRepository()),
         wardId: selectedWardId ?? 1);
-    
   }
 
-  
-  Future<void> selectTime(BuildContext context, TextEditingController controller) async {
+  Future<void> selectTime(
+      BuildContext context, TextEditingController controller) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -250,7 +248,7 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                   ),
                 const SizedBox(height: 10),
                 if (selectedCityId != null)
-                  SelectorList(
+                  SelectorMap(
                     label: 'townships',
                     selectedValue: selectedTownshipId?.toString(),
                     loadItems: () =>
@@ -264,7 +262,7 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                   ),
                 const SizedBox(height: 10),
                 if (selectedTownshipId != null)
-                  SelectorList(
+                  SelectorMap(
                     label: 'wards',
                     selectedValue: selectedWardId?.toString(),
                     loadItems: () =>
@@ -278,7 +276,7 @@ class _MerchantSignUpState extends State<MerchantSignUp> {
                   ),
                 const SizedBox(height: 10),
                 if (selectedWardId != null)
-                  SelectorList(
+                  SelectorMap(
                     label: 'streets',
                     selectedValue: selectedStreetId?.toString(),
                     loadItems: () =>

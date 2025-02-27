@@ -6,14 +6,14 @@ import 'package:flutter/material.dart';
 
 class DivisionRepository implements IDivisionRepository {
   @override
-  Future<List<Division>> getDivisionById(int countryId) async {
+  Future<List<Division>> getDivisionById() async {
     return await ApiHelper.fetchList<Division>(
-        endpoint: '${AppUrl.getDivisionById}/$countryId',
-        fromJson: (data) {
-           debugPrint('Raw data from API: $data'); 
-         return Division.fromJson(data);
-        });
-
-    // Log the response
+      endpoint: AppUrl.getDivisionById(), // Corrected function usage
+      fromJson: (data) {
+        debugPrint(
+            'Division Raw data from API for Country ID: $data');
+        return Division.fromJson(data);
+      },
+    );
   }
 }

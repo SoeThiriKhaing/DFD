@@ -6,7 +6,7 @@ class TownshipService {
 
   TownshipService({required this.repository});
 
-  Future<List<Township>> getTownshipById(int cityId) async {
-    return await repository.getTownshipById(cityId);
+  Future<List<Township>> getTownshipById() async {
+    return await repository.getTownshipById();
   }
 }

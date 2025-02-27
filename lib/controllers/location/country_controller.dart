@@ -12,7 +12,8 @@ class CountryController extends BaseController<Country> {
           'id': country.id.toString(),
           'name': country.name,
         });
-    debugPrint('Transformed country list: $countryList'); // Debug transformed list
+    debugPrint(
+        'Transformed country list: $countryList'); // Debug transformed list
     return countryList;
   }
 }

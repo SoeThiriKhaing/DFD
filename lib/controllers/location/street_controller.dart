@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 class StreetController extends BaseController<Street> {
   StreetController({required StreetService service, required int wardId})
-      : super(fetchItems: () => service.getStreetById(wardId));
+      : super(fetchItems: () => service.getStreetById());
 
   Future<List<Map<String, String>>> loadStreetList(int i) async {
     final streetList = await loadItems((street) => {

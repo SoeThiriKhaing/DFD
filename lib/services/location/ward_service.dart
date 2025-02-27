@@ -6,7 +6,7 @@ class WardService {
 
   WardService({required this.repository});
 
-  Future<List<Ward>> getWardById(int townshipId) async {
-    return await repository.getWardById(townshipId);
+  Future<List<Ward>> getWardById() async {
+    return await repository.getWardById();
   }
 }

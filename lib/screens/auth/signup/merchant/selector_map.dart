@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class SelectorMap extends StatelessWidget {
+class SelectorMap extends StatefulWidget {
   final String label;
   final String? selectedValue;
   final Future<List<Map<String, String>>> Function() loadItems;
@@ -15,38 +15,43 @@ class SelectorMap extends StatelessWidget {
   });
 
   @override
+  State<SelectorMap> createState() => _SelectorMapState();
+}
+
+class _SelectorMapState extends State<SelectorMap> {
+  List<Map<String, String>> items = [];
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDropdownItems();
+  }
+
+  Future<void> _loadDropdownItems() async {
+    final loadedItems = await widget.loadItems();
+    setState(() {
+      items = loadedItems;
+      isLoading = false; // Remove loading
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Map<String, String>>>(
-      future: loadItems(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        }
-
-        final items = snapshot.data ?? [];
-        if (items.isEmpty) {
-          return Text('No $label available');
-        }
-
-        return DropdownButtonFormField<String>(
-          value: selectedValue,
-          hint: Text('Select a $label'),
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            contentPadding: EdgeInsets.symmetric(horizontal: 12),
-          ),
-          items: items.map((item) {
-            return DropdownMenuItem<String>(
-              value: item['id'],
-              child: Text(item['name'] ?? ''),
-            );
-          }).toList(),
-          onChanged: onChanged,
+    return DropdownButtonFormField<String>(
+      value: widget.selectedValue,
+      hint: Text('Select a ${widget.label}'),
+      decoration: const InputDecoration(
+        border: OutlineInputBorder(),
+        contentPadding: EdgeInsets.symmetric(horizontal: 12),
+      ),
+      items: items.map((item) {
+        return DropdownMenuItem<String>(
+          value: item['id'],
+          child: Text(item['name'] ?? ''),
         );
-      },
+      }).toList(),
+      onChanged: widget.onChanged,
     );
   }
 }

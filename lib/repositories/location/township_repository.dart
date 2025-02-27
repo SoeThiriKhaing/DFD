@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 
 class TownshipRepository implements ITownshipRepository {
   @override
-  Future<List<Township>> getTownshipById(int cityId) async {
+  Future<List<Township>> getTownshipById() async {
     return await ApiHelper.fetchList<Township>(
-        endpoint: '${AppUrl.getTownshipById}/$cityId',
+        endpoint: AppUrl.getTownshipById(),
         fromJson: (data) {
-          debugPrint("Raw data from API:$data");
+          debugPrint("Township Raw data from API:$data");
           return Township.fromJson(data);
         });
 

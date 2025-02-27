@@ -6,7 +6,7 @@ class CityService {
 
   CityService({required this.repository});
 
-  Future<List<City>> getCityById(int divisionId) async {
-    return await repository.getCityById(divisionId);
+  Future<List<City>> getCityById() async {
+    return await repository.getCityById();
   }
 }

@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 
 class StreetRepository implements IStreetRepository {
   @override
-  Future<List<Street>> getStreetById(int wardId) async {
+  Future<List<Street>> getStreetById() async {
     return await ApiHelper.fetchList<Street>(
-        endpoint: '${AppUrl.getStreetById}/$wardId',
+        endpoint: AppUrl.getStreetById(),
         fromJson: (data) {
-          debugPrint("Raw data from API:$data");
+          debugPrint("Street Raw data from API:$data");
           return Street.fromJson(data);
         });
 

@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 
 class WardRepository implements IWardRepository {
   @override
-  Future<List<Ward>> getWardById(int townshipId) async {
+  Future<List<Ward>> getWardById() async {
     return await ApiHelper.fetchList<Ward>(
-        endpoint: '${AppUrl.getWardById}/$townshipId',
+        endpoint: AppUrl.getWardById(),
         fromJson: (data) {
-          debugPrint("Raw data from API:$data");
+          debugPrint("Ward Raw data from API:$data");
           return Ward.fromJson(data);
         });
 

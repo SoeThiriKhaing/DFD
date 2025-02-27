@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 class TownshipController extends BaseController<Township> {
   TownshipController({required TownshipService service, required int cityId})
-      : super(fetchItems: () => service.getTownshipById(cityId));
+      : super(fetchItems: () => service.getTownshipById());
 
   Future<List<Map<String, String>>> loadTownshipList(int i) async {
     final townshipList = await loadItems((township) => {

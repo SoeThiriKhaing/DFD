@@ -9,7 +9,7 @@ class City {
     return City(
       id: json['id'],
       name: json['name'],
-      divisionId: json['division_id'],
+      divisionId: json['state_id'],
     );
   }
 
@@ -17,7 +17,7 @@ class City {
     return {
       'id': id,
       'name': name,
-      'division_id': divisionId,
+      'state_id': divisionId,
     };
   }
 }

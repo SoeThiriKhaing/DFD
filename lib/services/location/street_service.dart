@@ -6,7 +6,7 @@ class StreetService {
 
   StreetService({required this.repository});
 
-  Future<List<Street>> getStreetById(int wardId) async {
-    return await repository.getStreetById(wardId);
+  Future<List<Street>> getStreetById() async {
+    return await repository.getStreetById();
   }
 }

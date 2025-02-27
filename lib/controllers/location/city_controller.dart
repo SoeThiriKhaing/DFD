@@ -5,13 +5,13 @@ import 'package:flutter/material.dart';
 
 class CityController extends BaseController<City> {
   CityController({required CityService service, required int divisionId})
-      : super(fetchItems: () => service.getCityById(divisionId));
+      : super(fetchItems: () => service.getCityById());
 
   Future<List<Map<String, String>>> loadCityList(int i) async {
     final cityList = await loadItems((city) => {
           'id': city.id.toString(),
           'name': city.name,
-          'division_id': city.divisionId.toString(),
+          'state_id': city.divisionId.toString(),
         });
     debugPrint('Transformed city list: $cityList'); // Debug transformed list
     return cityList;

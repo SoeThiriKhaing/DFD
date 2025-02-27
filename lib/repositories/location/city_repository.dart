@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 
 class CityRepository implements ICityRepository {
   @override
-  Future<List<City>> getCityById(int divisionId) async {
+  Future<List<City>> getCityById() async {
     return await ApiHelper.fetchList<City>(
-      endpoint: '${AppUrl.getCitiesById}/$divisionId',
+      endpoint: AppUrl.getCitiesById(),
       fromJson: (data) {
-        debugPrint('Raw data from API: $data');
+        debugPrint('City Raw data from API: $data');
         return City.fromJson(data);
       },
     );

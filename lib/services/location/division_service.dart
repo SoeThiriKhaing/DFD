@@ -6,7 +6,8 @@ class DivisionService {
 
   DivisionService({required this.repository});
 
-  Future<List<Division>> getDivisionById(int countryId) async {
-    return await repository.getDivisionById(countryId);
+  Future<List<Division>> getDivisionById() async {
+    return await repository
+        .getDivisionById(); // Pass countryId
   }
 }
