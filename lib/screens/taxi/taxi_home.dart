@@ -9,7 +9,7 @@ class TaxiHome extends StatefulWidget {
   const TaxiHome({super.key});
 
   @override
-  State<TaxiHome>  createState() => _TaxiHomeState();
+  State<TaxiHome> createState() => _TaxiHomeState();
 }
 
 class _TaxiHomeState extends State<TaxiHome> {
@@ -19,7 +19,8 @@ class _TaxiHomeState extends State<TaxiHome> {
   LatLng? sourceLocation;
   LatLng? destinationLocation;
   Set<Polyline> polylines = {};
-  String googleAPIKey = "AIzaSyA03WIyr3gmNNOZ0AxsrwNhdwvOJ4yrOgk";
+  Set<Marker> markers = {};
+  String googleAPIKey = "AIzaSyAXBWwV59Q5OlaUZ1TQs-j6YXgp_7cqHPA";
 
   List<Map<String, dynamic>> nearbyTaxiDriver = [
     {'driverName': 'John Doe', 'carNo': 'ABC123', 'price': '10 USD'},
@@ -44,13 +45,45 @@ class _TaxiHomeState extends State<TaxiHome> {
 
       if (response.statusCode == 200) {
         debugPrint('API Response: ${response.body}');
-        // Parse and display driver data
         nearbyTaxiDriver = json.decode(response.body);
         setState(() {});
       } else {
         debugPrint('Failed to fetch drivers');
       }
     }
+  }
+
+  void _showNearbyDrivers() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Nearby Taxi Drivers'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: nearbyTaxiDriver.length,
+              itemBuilder: (BuildContext context, int index) {
+                final driver = nearbyTaxiDriver[index];
+                return ListTile(
+                  title: Text(driver['driverName']),
+                  subtitle: Text('Car No: ${driver['carNo']} - Price: ${driver['price']}'),
+                );
+              },
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget sourceAutoComplete() {
@@ -64,8 +97,8 @@ class _TaxiHomeState extends State<TaxiHome> {
       getPlaceDetailWithLatLng: (Prediction prediction) {
         setState(() {
           sourceLocation = LatLng(
-            double.parse(prediction.lat ?? "0.0"),
-            double.parse(prediction.lng ?? "0.0"),
+            double.parse(prediction.lat!),
+            double.parse(prediction.lng!),
           );
           debugPrint("Source Location: $sourceLocation");
         });
@@ -90,8 +123,8 @@ class _TaxiHomeState extends State<TaxiHome> {
       getPlaceDetailWithLatLng: (Prediction prediction) {
         setState(() {
           destinationLocation = LatLng(
-            double.parse(prediction.lat ?? "0.0"),
-            double.parse(prediction.lng ?? "0.0"),
+            double.parse(prediction.lat!),
+            double.parse(prediction.lng!),
           );
           debugPrint("Destination Location: $destinationLocation");
         });
@@ -105,9 +138,11 @@ class _TaxiHomeState extends State<TaxiHome> {
     );
   }
 
-  void _setPolyline() {
+  void _setPolylineAndMarkers() {
     if (sourceLocation != null && destinationLocation != null) {
       polylines.clear();
+      markers.clear();
+
       polylines.add(
         Polyline(
           polylineId: const PolylineId("route"),
@@ -116,6 +151,23 @@ class _TaxiHomeState extends State<TaxiHome> {
           width: 5,
         ),
       );
+
+      markers.add(
+        Marker(
+          markerId: const MarkerId("source"),
+          position: sourceLocation!,
+          infoWindow: const InfoWindow(title: "Source"),
+        ),
+      );
+
+      markers.add(
+        Marker(
+          markerId: const MarkerId("destination"),
+          position: destinationLocation!,
+          infoWindow: const InfoWindow(title: "Destination"),
+        ),
+      );
+
       setState(() {});
     }
   }
@@ -131,33 +183,17 @@ class _TaxiHomeState extends State<TaxiHome> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: sourceAutoComplete(),
-            // child: TextField(
-            //   controller: sourceController,
-            //   decoration: const InputDecoration(labelText: 'Source'),
-            //   onChanged: (value) {
-            //     setState(() {
-            //       sourceLocation = const LatLng(16.8409, 96.1735);
-            //     });
-            //   },
-            // ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: destinationAutoComplete(),
-            // child: TextField(
-            //   controller: destinationController,
-            //   decoration: const InputDecoration(labelText: 'Destination'),
-            //   onChanged: (value) {
-            //     setState(() {
-            //       destinationLocation = const LatLng(16.8410, 96.1740); // Example location
-            //     });
-            //   },
-            // ),
           ),
           ElevatedButton(
             onPressed: () {
-              _setPolyline();
-              _searchDrivers();
+              _setPolylineAndMarkers();
+              // _searchDrivers().then((_) {
+              //   _showNearbyDrivers();
+              // });
             },
             child: const Text('Search'),
           ),
@@ -168,19 +204,8 @@ class _TaxiHomeState extends State<TaxiHome> {
                 target: LatLng(16.8409, 96.1735),
                 zoom: 14.0,
               ),
+              markers: markers,
               polylines: polylines,
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: nearbyTaxiDriver.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(nearbyTaxiDriver[index]['driverName']),
-                  subtitle: Text(nearbyTaxiDriver[index]['carNo']),
-                  trailing: Text(nearbyTaxiDriver[index]['price']),
-                );
-              },
             ),
           ),
         ],

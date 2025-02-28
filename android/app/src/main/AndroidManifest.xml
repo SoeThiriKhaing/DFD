@@ -8,7 +8,7 @@
         android:icon="@mipmap/dfd">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyA03WIyr3gmNNOZ0AxsrwNhdwvOJ4yrOgk"/>
+            android:value="AIzaSyAXBWwV59Q5OlaUZ1TQs-j6YXgp_7cqHPA"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
