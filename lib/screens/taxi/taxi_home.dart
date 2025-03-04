@@ -27,6 +27,8 @@ class _TaxiHomeState extends State<TaxiHome> {
   String googleAPIKey = "AIzaSyAXBWwV59Q5OlaUZ1TQs-j6YXgp_7cqHPA";
   Location location = Location();
   LatLng? currentLocation;
+  bool isLoading = false;
+  bool showDriverList = false;
 
   List<Map<String, dynamic>> nearbyTaxiDriver = [
     {'driverName': 'John Doe', 'carNo': 'ABC123', 'price': '10 USD'},
@@ -36,7 +38,20 @@ class _TaxiHomeState extends State<TaxiHome> {
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
+    _getCurrentLocation().then((_) {
+      if (currentLocation != null) {
+        sourceController.text = 'Current Location';
+        sourceLocation = currentLocation;
+        mapController?.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: currentLocation!,
+              zoom: 14.0,
+            ),
+          ),
+        );
+      }
+    });
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -52,6 +67,10 @@ class _TaxiHomeState extends State<TaxiHome> {
 
   Future<void> _searchDrivers() async {
     if (sourceLocation != null) {
+      setState(() {
+        isLoading = true;
+        showDriverList = false;
+      });
       final response = await http.post(
         Uri.parse('https://api.example.com/nearby-drivers'),
         headers: {'Content-Type': 'application/json'},
@@ -65,44 +84,15 @@ class _TaxiHomeState extends State<TaxiHome> {
       if (response.statusCode == 200) {
         debugPrint('API Response: ${response.body}');
         nearbyTaxiDriver = json.decode(response.body);
-        setState(() {});
       } else {
         debugPrint('Failed to fetch drivers');
+        nearbyTaxiDriver = [];
       }
+      setState(() {
+        isLoading = false;
+        showDriverList = true;
+      });
     }
-  }
-
-  void _showNearbyDrivers() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Nearby Taxi Drivers'),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: nearbyTaxiDriver.length,
-              itemBuilder: (BuildContext context, int index) {
-                final driver = nearbyTaxiDriver[index];
-                return ListTile(
-                  title: Text(driver['driverName']),
-                  subtitle: Text('Car No: ${driver['carNo']} - Price: ${driver['price']}'),
-                );
-              },
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   Widget sourceAutoComplete() {
@@ -373,9 +363,9 @@ class _TaxiHomeState extends State<TaxiHome> {
                         ),
                       );
                     }
-                    //_searchDrivers().then((_) {
-                      _showNearbyDrivers();
-                    //});
+                    //_searchDrivers();
+                    isLoading = false;
+                    showDriverList = true;
                   },
                   child: const Text('Search', style: TextStyle(fontSize: 14.0)),
                 ),
@@ -388,7 +378,7 @@ class _TaxiHomeState extends State<TaxiHome> {
                 GoogleMap(
                   onMapCreated: _onMapCreated,
                   initialCameraPosition: const CameraPosition(
-                    target: LatLng(16.8409, 96.1735),
+                    target: LatLng(16.8409, 96.1735), 
                     zoom: 14.0,
                   ),
                   markers: markers,
@@ -418,6 +408,29 @@ class _TaxiHomeState extends State<TaxiHome> {
               ],
             ),
           ),
+          if (showDriverList)
+            Expanded(
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : nearbyTaxiDriver.isEmpty
+                      ? const Center(child: Text('No nearby drivers found.'))
+                      : ListView.builder(
+                          itemCount: nearbyTaxiDriver.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            final driver = nearbyTaxiDriver[index];
+                            return ListTile(
+                              title: Text(driver['driverName']),
+                              subtitle: Text('Car No: ${driver['carNo']} \nPrice: ${driver['price']}'),
+                              trailing: ElevatedButton(
+                                onPressed: () {
+                                  // Handle accept button press
+                                },
+                                child: const Text('Accept'),
+                              ),
+                            );
+                          },
+                        ),
+            ),
         ],
       ),
     );
