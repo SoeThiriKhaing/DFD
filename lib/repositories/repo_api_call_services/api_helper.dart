@@ -36,7 +36,8 @@ class ApiHelper {
       final decodedResponse = jsonDecode(response.body);
 
       if (T == List<dynamic>) {
-        if (decodedResponse is Map<String, dynamic> && decodedResponse.containsKey('data')) {
+        if (decodedResponse is Map<String, dynamic> &&
+            decodedResponse.containsKey('data')) {
           return decodedResponse['data'] as T;
         } else {
           return decodedResponse as T;
@@ -70,11 +71,12 @@ class ApiHelper {
       );
 
       // Convert the list of dynamic to a list of T
-      return response.map((data) => fromJson(data as Map<String, dynamic>)).toList();
+      return response
+          .map((data) => fromJson(data as Map<String, dynamic>))
+          .toList();
     } catch (e, stackTrace) {
       LogError.logError("Error fetching list", e, stackTrace);
       throw Exception("Failed to fetch data");
     }
   }
-
 }

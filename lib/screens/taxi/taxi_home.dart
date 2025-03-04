@@ -1,3 +1,6 @@
+import 'package:dailyfairdeal/config/messages.dart';
+import 'package:dailyfairdeal/util/snackbar_helper.dart';
+import 'package:dailyfairdeal/widget/support_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
@@ -103,55 +106,103 @@ class _TaxiHomeState extends State<TaxiHome> {
   }
 
   Widget sourceAutoComplete() {
-    return GooglePlaceAutoCompleteTextField(
-      textEditingController: sourceController,
-      googleAPIKey: googleAPIKey,
-      inputDecoration: const InputDecoration(labelText: 'Source'),
-      debounceTime: 800,
-      countries: const ["MM"],
-      isLatLngRequired: true,
-      showError: true,
-      getPlaceDetailWithLatLng: (Prediction prediction) {
-        setState(() {
-          sourceLocation = LatLng(
-            double.parse(prediction.lat!),
-            double.parse(prediction.lng!),
-          );
-          debugPrint("Source Location: $sourceLocation");
-        });
-      },
-      itemClick: (Prediction prediction) {
-        sourceController.text = prediction.description!;
-        sourceController.selection = TextSelection.fromPosition(
-          TextPosition(offset: prediction.description!.length),
-        );
-      },
+    return Stack(
+      children: [
+        GooglePlaceAutoCompleteTextField(
+          textEditingController: sourceController,
+          googleAPIKey: googleAPIKey,
+          inputDecoration: InputDecoration(
+            labelText: 'Source',
+            labelStyle: const TextStyle(fontSize: 14.0),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+          ),
+          debounceTime: 800,
+          countries: const ["MM"],
+          isLatLngRequired: true,
+          showError: true,
+          getPlaceDetailWithLatLng: (Prediction prediction) {
+            setState(() {
+              sourceLocation = LatLng(
+                double.parse(prediction.lat!),
+                double.parse(prediction.lng!),
+              );
+              debugPrint("Source Location: $sourceLocation");
+            });
+          },
+          itemClick: (Prediction prediction) {
+            sourceController.text = prediction.description!;
+            sourceController.selection = TextSelection.fromPosition(
+              TextPosition(offset: prediction.description!.length),
+            );
+          },
+        ),
+        Positioned(
+          right: 0,
+          top: 0,
+          bottom: 0,
+          child: IconButton(
+            icon: const Icon(Icons.clear),
+            onPressed: () {
+              setState(() {
+                sourceController.clear();
+                sourceLocation = null;
+              });
+            },
+          ),
+        ),
+      ],
     );
   }
 
   Widget destinationAutoComplete() {
-    return GooglePlaceAutoCompleteTextField(
-      textEditingController: destinationController,
-      googleAPIKey: googleAPIKey,
-      inputDecoration: const InputDecoration(labelText: 'Destination'),
-      debounceTime: 800,
-      countries: const ["MM"],
-      isLatLngRequired: true,
-      getPlaceDetailWithLatLng: (Prediction prediction) {
-        setState(() {
-          destinationLocation = LatLng(
-            double.parse(prediction.lat!),
-            double.parse(prediction.lng!),
-          );
-          debugPrint("Destination Location: $destinationLocation");
-        });
-      },
-      itemClick: (Prediction prediction) {
-        destinationController.text = prediction.description!;
-        destinationController.selection = TextSelection.fromPosition(
-          TextPosition(offset: prediction.description!.length),
-        );
-      },
+    return Stack(
+      children: [
+        GooglePlaceAutoCompleteTextField(
+          textEditingController: destinationController,
+          googleAPIKey: googleAPIKey,
+          inputDecoration: InputDecoration(
+            labelText: 'Destination',
+            labelStyle: const TextStyle(fontSize: 14.0),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+          ),
+          debounceTime: 800,
+          countries: const ["MM"],
+          isLatLngRequired: true,
+          getPlaceDetailWithLatLng: (Prediction prediction) {
+            setState(() {
+              destinationLocation = LatLng(
+                double.parse(prediction.lat!),
+                double.parse(prediction.lng!),
+              );
+              debugPrint("Destination Location: $destinationLocation");
+            });
+          },
+          itemClick: (Prediction prediction) {
+            destinationController.text = prediction.description!;
+            destinationController.selection = TextSelection.fromPosition(
+              TextPosition(offset: prediction.description!.length),
+            );
+          },
+        ),
+        Positioned(
+          right: 0,
+          top: 0,
+          bottom: 0,
+          child: IconButton(
+            icon: const Icon(Icons.clear),
+            onPressed: () {
+              setState(() {
+                destinationController.clear();
+                destinationLocation = null;
+              });
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -165,20 +216,24 @@ class _TaxiHomeState extends State<TaxiHome> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        final points = data['routes'][0]['overview_polyline']['points'];
-        final List<LatLng> polylinePoints = _decodePolyline(points);
+        if (data['routes'].isNotEmpty) {
+          final points = data['routes'][0]['overview_polyline']['points'];
+          final List<LatLng> polylinePoints = _decodePolyline(points);
 
-        setState(() {
-          polylines.clear();
-          polylines.add(
-            Polyline(
-              polylineId: const PolylineId("route"),
-              points: polylinePoints,
-              color: Colors.blue,
-              width: 5,
-            ),
-          );
-        });
+          setState(() {
+            polylines.clear();
+            polylines.add(
+              Polyline(
+                polylineId: const PolylineId("route"),
+                points: polylinePoints,
+                color: Colors.blue,
+                width: 5,
+              ),
+            );
+          });
+        } else {
+          debugPrint('No routes found');
+        }
       } else {
         debugPrint('Failed to fetch route');
       }
@@ -241,80 +296,96 @@ class _TaxiHomeState extends State<TaxiHome> {
   }
 
   void _moveToCurrentLocation() {
-    if (currentLocation != null) {
-      mapController?.animateCamera(
-        CameraUpdate.newLatLngZoom(currentLocation!, 14.0),
-      );
+    _getCurrentLocation().then((_) {
+      if (currentLocation != null) {
+        mapController?.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: currentLocation!,
+              zoom: 14.0,
+            ),
+          ),
+        );
 
-      setState(() {
-        // markers.add(
-        //   Marker(
-        //     markerId: const MarkerId("currentLocation"),
-        //     position: currentLocation!,
-        //     infoWindow: const InfoWindow(title: "Current Location"),
-        //   ),
-        // );
-      });
-    }
+        setState(() {
+        });
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Taxi Booking'),
+        title: Text('Taxi Booking', style: AppWidget.appBarTextStyle(),),
       ),
-      body: Stack(
+      body: Column(
         children: [
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    sourceAutoComplete(),
-                    const SizedBox(height: 8.0),
-                    destinationAutoComplete(),
-                    const SizedBox(height: 8.0),
-                    ElevatedButton(
-                      onPressed: () {
-                        _setPolylineAndMarkers();
-                        if (sourceLocation != null && destinationLocation != null) {
-                          mapController?.animateCamera(
-                            CameraUpdate.newLatLngBounds(
-                              LatLngBounds(
-                                southwest: LatLng(
-                                  sourceLocation!.latitude < destinationLocation!.latitude
-                                      ? sourceLocation!.latitude
-                                      : destinationLocation!.latitude,
-                                  sourceLocation!.longitude < destinationLocation!.longitude
-                                      ? sourceLocation!.longitude
-                                      : destinationLocation!.longitude,
-                                ),
-                                northeast: LatLng(
-                                  sourceLocation!.latitude > destinationLocation!.latitude
-                                      ? sourceLocation!.latitude
-                                      : destinationLocation!.latitude,
-                                  sourceLocation!.longitude > destinationLocation!.longitude
-                                      ? sourceLocation!.longitude
-                                      : destinationLocation!.longitude,
-                                ),
-                              ),
-                              50.0,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                sourceAutoComplete(),
+                const SizedBox(height: 8.0),
+                destinationAutoComplete(),
+                const SizedBox(height: 8.0),
+                ElevatedButton(
+                  onPressed: () {
+                    if (sourceLocation == null) {
+                      SnackbarHelper.showSnackbar(
+                        title: 'Error',
+                        message: ErrorMessage.typeSource,
+                        backgroundColor: Colors.red,
+                      );
+                      return;
+                    }
+                    if (destinationLocation == null) {
+                      SnackbarHelper.showSnackbar(
+                        title: 'Error',
+                        message: ErrorMessage.typeDestination,
+                        backgroundColor: Colors.red,
+                      );
+                      return;
+                    }
+                    _setPolylineAndMarkers();
+                    if (sourceLocation != null && destinationLocation != null) {
+                      mapController?.animateCamera(
+                        CameraUpdate.newLatLngBounds(
+                          LatLngBounds(
+                            southwest: LatLng(
+                              sourceLocation!.latitude < destinationLocation!.latitude
+                                  ? sourceLocation!.latitude
+                                  : destinationLocation!.latitude,
+                              sourceLocation!.longitude < destinationLocation!.longitude
+                                  ? sourceLocation!.longitude
+                                  : destinationLocation!.longitude,
                             ),
-                          );
-                        }
-                        // _searchDrivers().then((_) {
-                        //   _showNearbyDrivers();
-                        // });
-                      },
-                      child: const Text('Search'),
-                    ),
-                  ],
+                            northeast: LatLng(
+                              sourceLocation!.latitude > destinationLocation!.latitude
+                                  ? sourceLocation!.latitude
+                                  : destinationLocation!.latitude,
+                              sourceLocation!.longitude > destinationLocation!.longitude
+                                  ? sourceLocation!.longitude
+                                  : destinationLocation!.longitude,
+                            ),
+                          ),
+                          50.0,
+                        ),
+                      );
+                    }
+                    //_searchDrivers().then((_) {
+                      _showNearbyDrivers();
+                    //});
+                  },
+                  child: const Text('Search', style: TextStyle(fontSize: 14.0)),
                 ),
-              ),
-              Expanded(
-                child: GoogleMap(
+              ],
+            ),
+          ),
+          Expanded(
+            child: Stack(
+              children: [
+                GoogleMap(
                   onMapCreated: _onMapCreated,
                   initialCameraPosition: const CameraPosition(
                     target: LatLng(16.8409, 96.1735),
@@ -324,18 +395,27 @@ class _TaxiHomeState extends State<TaxiHome> {
                   polylines: polylines,
                   myLocationEnabled: true,
                   myLocationButtonEnabled: false,
+                  scrollGesturesEnabled: true,
+                  zoomGesturesEnabled: true,
+                  tiltGesturesEnabled: true,
+                  rotateGesturesEnabled: true,
+                  onCameraMove: (CameraPosition position) {
+                    setState(() {
+                      currentLocation = position.target;
+                    });
+                  },
                 ),
-              ),
-            ],
-          ),
-          Positioned(
-            width: 50,
-            height: 50,
-            bottom: 100,
-            right: 10,
-            child: FloatingActionButton(
-              onPressed: _moveToCurrentLocation,
-              child: const Icon(Icons.my_location),
+                Positioned(
+                  width: 40,
+                  height: 40,
+                  bottom: 100,
+                  right: 10,
+                  child: FloatingActionButton(
+                    onPressed: _moveToCurrentLocation,
+                    child: const Icon(Icons.my_location),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

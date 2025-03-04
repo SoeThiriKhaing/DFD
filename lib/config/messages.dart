@@ -21,4 +21,13 @@ class Messages{
 
   //Register
   static const String registerSuccess = "Registration successful!";
+
+}
+
+class ErrorMessage{
+  //Type Destination
+  static const String typeDestination = "Please type a destination location.";
+
+  //Type Source
+  static const String typeSource = "Please type a source location.";
 }
