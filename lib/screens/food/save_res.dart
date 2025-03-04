@@ -1,4 +1,4 @@
-import 'package:dailyfairdeal/services/api_service.dart';
+import 'package:dailyfairdeal/repositories/repo_api_call_services/api_service.dart';
 import 'package:dailyfairdeal/util/appurl.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

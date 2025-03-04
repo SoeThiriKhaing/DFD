@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:dailyfairdeal/repositories/repo_api_call_services/log_error.dart';
 import 'package:dailyfairdeal/repositories/repo_api_call_services/sanitize_headers.dart';
 import 'package:dailyfairdeal/repositories/repo_api_call_services/validate_endpoint.dart';
-import 'package:dailyfairdeal/services/api_service.dart';
+import 'package:dailyfairdeal/repositories/repo_api_call_services/api_service.dart';
 
 class ApiHelper {
   static final _client = ApiService(); // Persistent HTTP client

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:dailyfairdeal/interfaces/food/i_favourite_cusine_repository.dart';
 import 'package:dailyfairdeal/models/food/fav_cuisine_model.dart';
-import 'package:dailyfairdeal/services/api_service.dart';
+import 'package:dailyfairdeal/repositories/repo_api_call_services/api_service.dart';
 import 'package:dailyfairdeal/util/appurl.dart';
 import 'package:flutter/material.dart';
 
