@@ -25,6 +25,7 @@ dependencies:
   google_places_flutter: ^2.0.9
   location: ^7.0.1
   flutter_svg: ^2.0.17
+  marquee: ^2.3.0
 
 dev_dependencies:
   flutter_test:

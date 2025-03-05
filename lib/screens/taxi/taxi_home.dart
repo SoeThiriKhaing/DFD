@@ -1,5 +1,6 @@
 import 'package:dailyfairdeal/config/messages.dart';
 import 'package:dailyfairdeal/util/snackbar_helper.dart';
+import 'package:dailyfairdeal/widget/app_color.dart';
 import 'package:dailyfairdeal/widget/support_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -8,6 +9,7 @@ import 'package:google_places_flutter/model/prediction.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:location/location.dart';
+import 'package:marquee/marquee.dart';
 
 class TaxiHome extends StatefulWidget {
   const TaxiHome({super.key});
@@ -29,11 +31,14 @@ class _TaxiHomeState extends State<TaxiHome> {
   LatLng? currentLocation;
   bool isLoading = false;
   bool showDriverList = false;
+  bool showSearchFields = true;
 
-  List<Map<String, dynamic>> nearbyTaxiDriver = [
-    {'driverName': 'John Doe', 'carNo': 'ABC123', 'price': '10 USD'},
-    {'driverName': 'Jane Smith', 'carNo': 'XYZ456', 'price': '12 USD'},
-  ];
+  // List<Map<String, dynamic>> nearbyTaxiDriver = [
+  //   {'driverName': 'John Doe', 'carNo': 'ABC123', 'price': '10 USD'},
+  //   {'driverName': 'Jane Smith', 'carNo': 'XYZ456', 'price': '12 USD'},
+  // ];
+
+  List<Map<String, dynamic>> nearbyTaxiDriver = [];
 
   @override
   void initState() {
@@ -107,6 +112,7 @@ class _TaxiHomeState extends State<TaxiHome> {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.0),
             ),
+            contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
           ),
           debounceTime: 800,
           countries: const ["MM"],
@@ -158,6 +164,7 @@ class _TaxiHomeState extends State<TaxiHome> {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.0),
             ),
+            contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
           ),
           debounceTime: 800,
           countries: const ["MM"],
@@ -308,77 +315,114 @@ class _TaxiHomeState extends State<TaxiHome> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Taxi Booking', style: AppWidget.appBarTextStyle(),),
+        backgroundColor: AppColor.primaryColor,
+        centerTitle: true,
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                sourceAutoComplete(),
-                const SizedBox(height: 8.0),
-                destinationAutoComplete(),
-                const SizedBox(height: 8.0),
-                ElevatedButton(
-                  onPressed: () {
-                    if (sourceLocation == null) {
-                      SnackbarHelper.showSnackbar(
-                        title: 'Error',
-                        message: ErrorMessage.typeSource,
-                        backgroundColor: Colors.red,
-                      );
-                      return;
-                    }
-                    if (destinationLocation == null) {
-                      SnackbarHelper.showSnackbar(
-                        title: 'Error',
-                        message: ErrorMessage.typeDestination,
-                        backgroundColor: Colors.red,
-                      );
-                      return;
-                    }
-                    _setPolylineAndMarkers();
-                    if (sourceLocation != null && destinationLocation != null) {
-                      mapController?.animateCamera(
-                        CameraUpdate.newLatLngBounds(
-                          LatLngBounds(
-                            southwest: LatLng(
-                              sourceLocation!.latitude < destinationLocation!.latitude
-                                  ? sourceLocation!.latitude
-                                  : destinationLocation!.latitude,
-                              sourceLocation!.longitude < destinationLocation!.longitude
-                                  ? sourceLocation!.longitude
-                                  : destinationLocation!.longitude,
+          Visibility(
+            visible: showSearchFields,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  sourceAutoComplete(),
+                  const SizedBox(height: 6.0),
+                  destinationAutoComplete(),
+                  const SizedBox(height: 6.0),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (sourceLocation == null) {
+                        SnackbarHelper.showSnackbar(
+                          title: 'Error',
+                          message: ErrorMessage.typeSource,
+                          backgroundColor: Colors.red,
+                        );
+                        return;
+                      }
+                      if (destinationLocation == null) {
+                        SnackbarHelper.showSnackbar(
+                          title: 'Error',
+                          message: ErrorMessage.typeDestination,
+                          backgroundColor: Colors.red,
+                        );
+                        return;
+                      }
+                      _setPolylineAndMarkers();
+                      if (sourceLocation != null && destinationLocation != null) {
+                        mapController?.animateCamera(
+                          CameraUpdate.newLatLngBounds(
+                            LatLngBounds(
+                              southwest: LatLng(
+                                sourceLocation!.latitude < destinationLocation!.latitude
+                                    ? sourceLocation!.latitude
+                                    : destinationLocation!.latitude,
+                                sourceLocation!.longitude < destinationLocation!.longitude
+                                    ? sourceLocation!.longitude
+                                    : destinationLocation!.longitude,
+                              ),
+                              northeast: LatLng(
+                                sourceLocation!.latitude > destinationLocation!.latitude
+                                    ? sourceLocation!.latitude
+                                    : destinationLocation!.latitude,
+                                sourceLocation!.longitude > destinationLocation!.longitude
+                                    ? sourceLocation!.longitude
+                                    : destinationLocation!.longitude,
+                              ),
                             ),
-                            northeast: LatLng(
-                              sourceLocation!.latitude > destinationLocation!.latitude
-                                  ? sourceLocation!.latitude
-                                  : destinationLocation!.latitude,
-                              sourceLocation!.longitude > destinationLocation!.longitude
-                                  ? sourceLocation!.longitude
-                                  : destinationLocation!.longitude,
-                            ),
+                            50.0,
                           ),
-                          50.0,
-                        ),
-                      );
-                    }
-                    //_searchDrivers();
-                    isLoading = false;
-                    showDriverList = true;
+                        );
+                      }
+                      //_searchDrivers();
+                      isLoading = false; //For Testing
+                      showDriverList = true; //For Testing
+                      setState(() {
+                        showSearchFields = false;
+                      });
+                    },
+                    child: const Text('Search', style: TextStyle(fontSize: 14.0)),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (!showSearchFields)
+            Column(
+              children: [
+                Container(
+                  width: double.infinity,
+                  height: 30.0,
+                  child: Marquee(
+                    text: 'From: ${sourceController.text.length > 20 ? '${sourceController.text.substring(0, 20)}...' : sourceController.text} To: ${destinationController.text.length > 20 ? '${destinationController.text.substring(0, 20)}...' : destinationController.text}',
+                    style: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.w500),
+                    scrollAxis: Axis.horizontal,
+                    blankSpace: 20.0,
+                    velocity: 30.0,
+                    pauseAfterRound: const Duration(seconds: 1),
+                    startPadding: 10.0,
+                    showFadingOnlyWhenScrolling: true,
+                    fadingEdgeStartFraction: 0.1,
+                    fadingEdgeEndFraction: 0.1,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.arrow_downward),
+                  onPressed: () {
+                    setState(() {
+                      showSearchFields = true;
+                    });
                   },
-                  child: const Text('Search', style: TextStyle(fontSize: 14.0)),
                 ),
               ],
             ),
-          ),
           Expanded(
             child: Stack(
               children: [
                 GoogleMap(
                   onMapCreated: _onMapCreated,
-                  initialCameraPosition: const CameraPosition(
-                    target: LatLng(16.8409, 96.1735), 
+                  initialCameraPosition: CameraPosition(
+                    target: currentLocation ?? const LatLng(16.8409, 96.1735),
                     zoom: 14.0,
                   ),
                   markers: markers,
@@ -408,28 +452,42 @@ class _TaxiHomeState extends State<TaxiHome> {
               ],
             ),
           ),
+          
           if (showDriverList)
             Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : nearbyTaxiDriver.isEmpty
-                      ? const Center(child: Text('No nearby drivers found.'))
-                      : ListView.builder(
-                          itemCount: nearbyTaxiDriver.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            final driver = nearbyTaxiDriver[index];
-                            return ListTile(
-                              title: Text(driver['driverName']),
-                              subtitle: Text('Car No: ${driver['carNo']} \nPrice: ${driver['price']}'),
-                              trailing: ElevatedButton(
-                                onPressed: () {
-                                  // Handle accept button press
+              child: Column(
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'Nearby Taxi Drivers',
+                      style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Expanded(
+                    child: isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : nearbyTaxiDriver.isEmpty
+                            ? const Center(child: Text('No nearby drivers found.'))
+                            : ListView.builder(
+                                itemCount: nearbyTaxiDriver.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  final driver = nearbyTaxiDriver[index];
+                                  return ListTile(
+                                    title: Text(driver['driverName']),
+                                    subtitle: Text('Car No: ${driver['carNo']} \nPrice: ${driver['price']}'),
+                                    trailing: ElevatedButton(
+                                      onPressed: () {
+                                        // Handle accept button press
+                                      },
+                                      child: const Text('Accept'),
+                                    ),
+                                  );
                                 },
-                                child: const Text('Accept'),
                               ),
-                            );
-                          },
-                        ),
+                  ),
+                ],
+              ),
             ),
         ],
       ),
