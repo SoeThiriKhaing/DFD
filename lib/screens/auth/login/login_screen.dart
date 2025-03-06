@@ -1,6 +1,6 @@
-import 'package:dailyfairdeal/controllers/auth_controller.dart';
-import 'package:dailyfairdeal/repositories/auth_repository.dart';
-import 'package:dailyfairdeal/services/auth_service.dart';
+import 'package:dailyfairdeal/controllers/auth/auth_controller.dart';
+import 'package:dailyfairdeal/repositories/auth/auth_repository.dart';
+import 'package:dailyfairdeal/services/auth/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dailyfairdeal/widget/app_color.dart';

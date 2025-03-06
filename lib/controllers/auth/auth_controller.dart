@@ -1,8 +1,8 @@
 import 'package:dailyfairdeal/common_calls/handle_error_snackbar.dart';
 import 'package:dailyfairdeal/common_calls/handle_success.dart';
 import 'package:dailyfairdeal/config/messages.dart';
-import 'package:dailyfairdeal/models/user_model.dart';
-import '../services/auth_service.dart';
+import 'package:dailyfairdeal/models/user/user_model.dart';
+import '../../services/auth/auth_service.dart';
 
 class AuthController{
   final AuthService authService;

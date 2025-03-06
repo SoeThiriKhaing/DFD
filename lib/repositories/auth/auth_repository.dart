@@ -1,6 +1,6 @@
 import 'package:dailyfairdeal/repositories/repo_api_call_services/api_helper.dart';
-import 'package:dailyfairdeal/interfaces/i_auth_repository.dart';
-import 'package:dailyfairdeal/models/user_model.dart';
+import 'package:dailyfairdeal/interfaces/auth/i_auth_repository.dart';
+import 'package:dailyfairdeal/models/user/user_model.dart';
 import 'package:dailyfairdeal/util/appurl.dart';
 
 class AuthRepository implements IAuthRepository {

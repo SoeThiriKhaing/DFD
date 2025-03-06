@@ -1,4 +1,4 @@
-import 'package:dailyfairdeal/models/user_model.dart';
+import 'package:dailyfairdeal/models/user/user_model.dart';
 import 'package:dailyfairdeal/common_calls/handle_error_snackbar.dart';
 import 'package:dailyfairdeal/screens/home/main_screen.dart';
 import 'package:dailyfairdeal/services/secure_storage.dart';

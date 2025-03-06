@@ -1,14 +1,21 @@
-import 'package:dailyfairdeal/config/messages.dart';
-import 'package:dailyfairdeal/util/snackbar_helper.dart';
+import 'dart:convert';
+
+import 'package:dailyfairdeal/controllers/taxi/driver/driver_controller.dart';
+import 'package:dailyfairdeal/models/taxi/driver/driver_model.dart';
+import 'package:dailyfairdeal/repositories/taxi/driver/driver_repository.dart';
+import 'package:dailyfairdeal/screens/taxi/widgets/auto_complete_text_field.dart';
+import 'package:dailyfairdeal/screens/taxi/widgets/driver_list.dart';
+import 'package:dailyfairdeal/screens/taxi/widgets/map_view.dart';
+import 'package:dailyfairdeal/services/taxi/driver/driver_service.dart';
+import 'package:dailyfairdeal/services/taxi/location/location_service.dart';
 import 'package:dailyfairdeal/widget/app_color.dart';
 import 'package:dailyfairdeal/widget/support_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_places_flutter/google_places_flutter.dart';
+import 'package:dailyfairdeal/util/snackbar_helper.dart';
+import 'package:dailyfairdeal/config/messages.dart';
 import 'package:google_places_flutter/model/prediction.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:location/location.dart';
 import 'package:marquee/marquee.dart';
 
 class TaxiHome extends StatefulWidget {
@@ -19,55 +26,79 @@ class TaxiHome extends StatefulWidget {
 }
 
 class _TaxiHomeState extends State<TaxiHome> {
-  TextEditingController sourceController = TextEditingController();
-  TextEditingController destinationController = TextEditingController();
+  final TextEditingController sourceController = TextEditingController();
+  final TextEditingController destinationController = TextEditingController();
+  final LocationService locationService = LocationService();
+  final DriverRepository driverRepository = DriverRepository();
+  late DriverService service;
+  late DriverController driverController;
   GoogleMapController? mapController;
   LatLng? sourceLocation;
   LatLng? destinationLocation;
   Set<Polyline> polylines = {};
   Set<Marker> markers = {};
-  String googleAPIKey = "AIzaSyAXBWwV59Q5OlaUZ1TQs-j6YXgp_7cqHPA";
-  Location location = Location();
   LatLng? currentLocation;
   bool isLoading = false;
   bool showDriverList = false;
   bool showSearchFields = true;
-
-  // List<Map<String, dynamic>> nearbyTaxiDriver = [
-  //   {'driverName': 'John Doe', 'carNo': 'ABC123', 'price': '10 USD'},
-  //   {'driverName': 'Jane Smith', 'carNo': 'XYZ456', 'price': '12 USD'},
-  // ];
-
-  List<Map<String, dynamic>> nearbyTaxiDriver = [];
-
+  List<DriverModel> nearbyTaxiDriver = [
+    DriverModel(
+      driverId: 1,
+      driverName: 'John Smith',
+      carNo: 'AA123',
+      price: 12000,
+      lat: 37.7749,
+      long: -122.4194,
+    ),
+     DriverModel(
+      driverId: 2,
+      driverName: 'John Doe',
+      carNo: 'BB345',
+      price: 15000,
+      lat: 37.7749,
+      long: -122.4194,
+    ),
+     DriverModel(
+      driverId: 3,
+      driverName: 'Jane Doe',
+      carNo: 'CC567',
+      price: 14000,
+      lat: 37.7749,
+      long: -122.4194,
+    ),
+     DriverModel(
+      driverId: 4,
+      driverName: 'Alice Johnson',
+      carNo: 'DD789',
+      price: 13000,
+      lat: 37.7749,
+      long: -122.4194,
+    ),
+  ];
+  String googleAPIKey = "AIzaSyAXBWwV59Q5OlaUZ1TQs-j6YXgp_7cqHPA";
+  
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation().then((_) {
-      if (currentLocation != null) {
-        sourceController.text = 'Current Location';
-        sourceLocation = currentLocation;
-        mapController?.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(
-              target: currentLocation!,
-              zoom: 14.0,
-            ),
-          ),
-        );
-      }
-    });
-  }
-
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
+    service = DriverService(repository: driverRepository);
+    driverController = DriverController(service: service);
+    _getCurrentLocation();
   }
 
   Future<void> _getCurrentLocation() async {
-    final locData = await location.getLocation();
-    setState(() {
-      currentLocation = LatLng(locData.latitude!, locData.longitude!);
-    });
+    currentLocation = await locationService.getCurrentLocation();
+    if (currentLocation != null) {
+      sourceController.text = 'Current Location';
+      sourceLocation = currentLocation;
+      mapController?.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: currentLocation!,
+            zoom: 14.0,
+          ),
+        ),
+      );
+    }
   }
 
   Future<void> _searchDrivers() async {
@@ -76,21 +107,14 @@ class _TaxiHomeState extends State<TaxiHome> {
         isLoading = true;
         showDriverList = false;
       });
-      final response = await http.post(
-        Uri.parse('https://api.example.com/nearby-drivers'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'lat': sourceLocation!.latitude,
-          'long': sourceLocation!.longitude,
-          'radius': 1,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        debugPrint('API Response: ${response.body}');
-        nearbyTaxiDriver = json.decode(response.body);
-      } else {
-        debugPrint('Failed to fetch drivers');
+      try {
+        final fetchedDrivers = await driverController.fetchNearbyDrivers(
+          sourceLocation!.latitude,
+          sourceLocation!.longitude,
+        );
+        nearbyTaxiDriver = fetchedDrivers.map((driver) => DriverModel.fromJson(driver)).toList();
+      } catch (e) {
+        debugPrint('Failed to fetch drivers: $e');
         nearbyTaxiDriver = [];
       }
       setState(() {
@@ -100,107 +124,28 @@ class _TaxiHomeState extends State<TaxiHome> {
     }
   }
 
-  Widget sourceAutoComplete() {
-    return Stack(
-      children: [
-        GooglePlaceAutoCompleteTextField(
-          textEditingController: sourceController,
-          googleAPIKey: googleAPIKey,
-          inputDecoration: InputDecoration(
-            labelText: 'Source',
-            labelStyle: const TextStyle(fontSize: 14.0),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
-          ),
-          debounceTime: 800,
-          countries: const ["MM"],
-          isLatLngRequired: true,
-          showError: true,
-          getPlaceDetailWithLatLng: (Prediction prediction) {
-            setState(() {
-              sourceLocation = LatLng(
-                double.parse(prediction.lat!),
-                double.parse(prediction.lng!),
-              );
-              debugPrint("Source Location: $sourceLocation");
-            });
-          },
-          itemClick: (Prediction prediction) {
-            sourceController.text = prediction.description!;
-            sourceController.selection = TextSelection.fromPosition(
-              TextPosition(offset: prediction.description!.length),
-            );
-          },
-        ),
-        Positioned(
-          right: 0,
-          top: 0,
-          bottom: 0,
-          child: IconButton(
-            icon: const Icon(Icons.clear),
-            onPressed: () {
-              setState(() {
-                sourceController.clear();
-                sourceLocation = null;
-              });
-            },
-          ),
-        ),
-      ],
-    );
-  }
+  void _setPolylineAndMarkers() {
+    if (sourceLocation != null && destinationLocation != null) {
+      markers.clear();
 
-  Widget destinationAutoComplete() {
-    return Stack(
-      children: [
-        GooglePlaceAutoCompleteTextField(
-          textEditingController: destinationController,
-          googleAPIKey: googleAPIKey,
-          inputDecoration: InputDecoration(
-            labelText: 'Destination',
-            labelStyle: const TextStyle(fontSize: 14.0),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
-          ),
-          debounceTime: 800,
-          countries: const ["MM"],
-          isLatLngRequired: true,
-          getPlaceDetailWithLatLng: (Prediction prediction) {
-            setState(() {
-              destinationLocation = LatLng(
-                double.parse(prediction.lat!),
-                double.parse(prediction.lng!),
-              );
-              debugPrint("Destination Location: $destinationLocation");
-            });
-          },
-          itemClick: (Prediction prediction) {
-            destinationController.text = prediction.description!;
-            destinationController.selection = TextSelection.fromPosition(
-              TextPosition(offset: prediction.description!.length),
-            );
-          },
+      markers.add(
+        Marker(
+          markerId: const MarkerId("source"),
+          position: sourceLocation!,
+          infoWindow: const InfoWindow(title: "Source"),
         ),
-        Positioned(
-          right: 0,
-          top: 0,
-          bottom: 0,
-          child: IconButton(
-            icon: const Icon(Icons.clear),
-            onPressed: () {
-              setState(() {
-                destinationController.clear();
-                destinationLocation = null;
-              });
-            },
-          ),
+      );
+
+      markers.add(
+        Marker(
+          markerId: const MarkerId("destination"),
+          position: destinationLocation!,
+          infoWindow: const InfoWindow(title: "Destination"),
         ),
-      ],
-    );
+      );
+
+      _getRoute();
+    }
   }
 
   Future<void> _getRoute() async {
@@ -268,30 +213,6 @@ class _TaxiHomeState extends State<TaxiHome> {
     return polyline;
   }
 
-  void _setPolylineAndMarkers() {
-    if (sourceLocation != null && destinationLocation != null) {
-      markers.clear();
-
-      markers.add(
-        Marker(
-          markerId: const MarkerId("source"),
-          position: sourceLocation!,
-          infoWindow: const InfoWindow(title: "Source"),
-        ),
-      );
-
-      markers.add(
-        Marker(
-          markerId: const MarkerId("destination"),
-          position: destinationLocation!,
-          infoWindow: const InfoWindow(title: "Destination"),
-        ),
-      );
-
-      _getRoute();
-    }
-  }
-
   void _moveToCurrentLocation() {
     _getCurrentLocation().then((_) {
       if (currentLocation != null) {
@@ -326,10 +247,36 @@ class _TaxiHomeState extends State<TaxiHome> {
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
-                  sourceAutoComplete(),
-                  const SizedBox(height: 6.0),
-                  destinationAutoComplete(),
-                  const SizedBox(height: 6.0),
+                  AutoCompleteTextField(
+                    controller: sourceController,
+                    googleAPIKey: googleAPIKey,
+                    labelText: 'Source',
+                    onPlaceSelected: (Prediction prediction) {
+                      setState(() {
+                        sourceLocation = LatLng(
+                          double.parse(prediction.lat!),
+                          double.parse(prediction.lng!),
+                        );
+                        debugPrint("Source Location: $sourceLocation");
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 6.0), // Reduced spacing
+                  AutoCompleteTextField(
+                    controller: destinationController,
+                    googleAPIKey: googleAPIKey,
+                    labelText: 'Destination',
+                    onPlaceSelected: (Prediction prediction) {
+                      setState(() {
+                        destinationLocation = LatLng(
+                          double.parse(prediction.lat!),
+                          double.parse(prediction.lng!),
+                        );
+                        debugPrint("Destination Location: $destinationLocation");
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 6.0), // Reduced spacing
                   ElevatedButton(
                     onPressed: () {
                       if (sourceLocation == null) {
@@ -381,7 +328,7 @@ class _TaxiHomeState extends State<TaxiHome> {
                         showSearchFields = false;
                       });
                     },
-                    child: const Text('Search', style: TextStyle(fontSize: 14.0)),
+                    child: const Text('Search', style: TextStyle(fontSize: 12.0)), // Reduced font size
                   ),
                 ],
               ),
@@ -390,7 +337,7 @@ class _TaxiHomeState extends State<TaxiHome> {
           if (!showSearchFields)
             Column(
               children: [
-                Container(
+                SizedBox(
                   width: double.infinity,
                   height: 30.0,
                   child: Marquee(
@@ -419,21 +366,14 @@ class _TaxiHomeState extends State<TaxiHome> {
           Expanded(
             child: Stack(
               children: [
-                GoogleMap(
-                  onMapCreated: _onMapCreated,
-                  initialCameraPosition: CameraPosition(
-                    target: currentLocation ?? const LatLng(16.8409, 96.1735),
-                    zoom: 14.0,
-                  ),
+                MapView(
+                  initialPosition: currentLocation ?? const LatLng(16.8409, 96.1735),
                   markers: markers,
                   polylines: polylines,
-                  myLocationEnabled: true,
-                  myLocationButtonEnabled: false,
-                  scrollGesturesEnabled: true,
-                  zoomGesturesEnabled: true,
-                  tiltGesturesEnabled: true,
-                  rotateGesturesEnabled: true,
-                  onCameraMove: (CameraPosition position) {
+                  onMapCreated: (controller) {
+                    mapController = controller;
+                  },
+                  onCameraMove: (position) {
                     setState(() {
                       currentLocation = position.target;
                     });
@@ -455,38 +395,9 @@ class _TaxiHomeState extends State<TaxiHome> {
           
           if (showDriverList)
             Expanded(
-              child: Column(
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      'Nearby Taxi Drivers',
-                      style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Expanded(
-                    child: isLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : nearbyTaxiDriver.isEmpty
-                            ? const Center(child: Text('No nearby drivers found.'))
-                            : ListView.builder(
-                                itemCount: nearbyTaxiDriver.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  final driver = nearbyTaxiDriver[index];
-                                  return ListTile(
-                                    title: Text(driver['driverName']),
-                                    subtitle: Text('Car No: ${driver['carNo']} \nPrice: ${driver['price']}'),
-                                    trailing: ElevatedButton(
-                                      onPressed: () {
-                                        // Handle accept button press
-                                      },
-                                      child: const Text('Accept'),
-                                    ),
-                                  );
-                                },
-                              ),
-                  ),
-                ],
+              child: DriverList(
+                drivers: nearbyTaxiDriver,
+                isLoading: isLoading,
               ),
             ),
         ],

@@ -1,6 +1,6 @@
-import 'package:dailyfairdeal/models/user_model.dart';
+import 'package:dailyfairdeal/models/user/user_model.dart';
 
-import '../repositories/auth_repository.dart';
+import '../../repositories/auth/auth_repository.dart';
 
 class AuthService {
   final AuthRepository authRepository;

@@ -54,4 +54,6 @@ class AppUrl {
   static String updateStreet = "$baseUrl/street";
   static String deleteStreet = "$baseUrl/street";
   
+  //Nearby Taxi Driver
+  static String getNearbyTaxiDriver = "$baseUrl/nearby_taxi_driver";
 }
