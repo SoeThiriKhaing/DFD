@@ -11,12 +11,36 @@ class CountryRepository implements ICountryRepository {
     return await ApiHelper.fetchList<Country>(
       endpoint: AppUrl.getCountry,
       fromJson: (data) {
-        debugPrint(
-            'Country Raw data from API: $data'); // Debug print to log the data
+        debugPrint('Raw data from API: $data'); // Debug print to log the data
         return Country.fromJson(data);
       },
     );
-
-    // Log the response for debugging
   }
+
+  Future<Country> addCountry(Country country) async {
+    await ApiHelper.request(
+      endpoint: AppUrl.addCountry,
+      method: "POST",
+      body: country.toJson().map((key, value) => MapEntry(key, value.toString())),
+    );
+    return country;
+  }
+
+  Future<Country> updateCountry(Country country) async {
+    await ApiHelper.request(
+      endpoint: AppUrl.updateCountry,
+      method: "PUT",
+      body: country.toJson().map((key, value) => MapEntry(key, value.toString())),
+    );
+    return country;
+  }
+
+  Future<void> deleteCountry(int id) async {
+    await ApiHelper.request(
+      endpoint: AppUrl.deleteCountry,
+      method: "DELETE",
+      body: {'id': id.toString()},
+    );
+  }
+
 }

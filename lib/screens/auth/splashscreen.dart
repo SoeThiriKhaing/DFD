@@ -10,7 +10,7 @@ class SplashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Navigate to Home screen after 10 seconds
     Future.delayed(const Duration(seconds: 3), () {
-      Get.offNamed("/toregister"); // Navigate to the "register" screen
+      Get.offNamed("/main"); // Navigate to the "register" screen
     });
 
     return Scaffold(

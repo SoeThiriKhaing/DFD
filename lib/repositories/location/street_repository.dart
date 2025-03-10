@@ -6,14 +6,35 @@ import 'package:flutter/material.dart';
 
 class StreetRepository implements IStreetRepository {
   @override
-  Future<List<Street>> getStreetById() async {
+  Future<List<Street>> getStreetById(int wardId) async {
     return await ApiHelper.fetchList<Street>(
-        endpoint: AppUrl.getStreetById(),
+        endpoint: '${AppUrl.getStreetById}/$wardId',
         fromJson: (data) {
-          debugPrint("Street Raw data from API:$data");
+          debugPrint("Raw data from API:$data");
           return Street.fromJson(data);
         });
+  }
 
-    // Log the response
+  Future<void> addStreet(Street street) async {
+    await ApiHelper.request(
+      endpoint: AppUrl.addStreet,
+      method:"POST",
+      body: street.toJson().map((key, value) => MapEntry(key, value.toString())),
+    );
+  }
+
+  Future<void> updateStreet(Street street) async {
+    await ApiHelper.request(
+      endpoint: '${AppUrl.updateStreet}/${street.id}',
+      method: "PUT",
+      body: street.toJson().map((key, value) => MapEntry(key, value.toString())),
+    );
+  }
+
+  Future<void> deleteStreet(int streetId) async {
+    await ApiHelper.request(
+      endpoint: '${AppUrl.deleteStreet}/$streetId',
+      method: "DELETE",
+    );
   }
 }

@@ -1,12 +1,8 @@
 import 'dart:convert';
 import 'package:dailyfairdeal/repositories/repo_api_call_services/log_error.dart';
-import 'package:dailyfairdeal/repositories/repo_api_call_services/parse_list.dart';
-import 'package:dailyfairdeal/repositories/repo_api_call_services/parse_list_input.dart';
 import 'package:dailyfairdeal/repositories/repo_api_call_services/sanitize_headers.dart';
 import 'package:dailyfairdeal/repositories/repo_api_call_services/validate_endpoint.dart';
-
 import 'package:dailyfairdeal/services/api_service.dart';
-import 'package:flutter/foundation.dart';
 
 class ApiHelper {
   static final _client = ApiService(); // Persistent HTTP client
@@ -36,13 +32,20 @@ class ApiHelper {
           .timeout(_timeoutDuration, onTimeout: () {
         throw Exception("Request timed out after $_timeoutDuration seconds.");
       });
+
+      final decodedResponse = jsonDecode(response.body);
+
       if (T == List<dynamic>) {
-        return jsonDecode(response.body) as T;
+        if (decodedResponse is Map<String, dynamic> && decodedResponse.containsKey('data')) {
+          return decodedResponse['data'] as T;
+        } else {
+          return decodedResponse as T;
+        }
       } else if (T == Map<String, dynamic>) {
-        return jsonDecode(response.body) as T;
+        return decodedResponse as T;
       } else if (fromJson != null) {
         // Use fromJson for custom parsing
-        return fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+        return fromJson(decodedResponse as Map<String, dynamic>);
       } else {
         throw Exception("Unsupported response type: $T");
       }
@@ -61,19 +64,13 @@ class ApiHelper {
   }) async {
     try {
       // Fetch the response
-      final response = await request<Map<String, dynamic>>(
+      final response = await request<List<dynamic>>(
         endpoint: endpoint,
         method: "GET",
       );
 
-      // Prepare data for isolate
-      final input = ParseListInput<T>(
-        responseMap: response,
-        fromJson: fromJson,
-      );
-
-      // Offload JSON parsing to a separate thread
-      return await compute(parseList, input);
+      // Convert the list of dynamic to a list of T
+      return response.map((data) => fromJson(data as Map<String, dynamic>)).toList();
     } catch (e, stackTrace) {
       LogError.logError("Error fetching list", e, stackTrace);
       throw Exception("Failed to fetch data");

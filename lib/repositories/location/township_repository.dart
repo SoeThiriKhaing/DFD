@@ -6,14 +6,35 @@ import 'package:flutter/material.dart';
 
 class TownshipRepository implements ITownshipRepository {
   @override
-  Future<List<Township>> getTownshipById() async {
+  Future<List<Township>> getTownshipById(int cityId) async {
     return await ApiHelper.fetchList<Township>(
-        endpoint: AppUrl.getTownshipById(),
+        endpoint: '${AppUrl.getTownshipById}/$cityId',
         fromJson: (data) {
-          debugPrint("Township Raw data from API:$data");
+          debugPrint("Raw data from API:$data");
           return Township.fromJson(data);
         });
+  }
 
-    // Log the response
+  Future<void> addTownship(Township township) async {
+    await ApiHelper.request(
+      endpoint: AppUrl.addTownship,
+      method: "POST",
+      body: township.toJson().map((key, value) => MapEntry(key, value.toString())),
+    );
+  }
+
+  Future<void> updateTownship(Township township) async {
+    await ApiHelper.request(
+      endpoint: '${AppUrl.updateTownship}/${township.id}',
+      method: "PUT",
+      body: township.toJson().map((key, value) => MapEntry(key, value.toString())),
+    );
+  }
+
+  Future<void> deleteTownship(int townshipId) async {
+    await ApiHelper.request(
+      endpoint: '${AppUrl.deleteTownship}/$townshipId',
+      method: "DELETE",
+    );
   }
 }

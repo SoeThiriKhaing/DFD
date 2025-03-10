@@ -6,15 +6,36 @@ import 'package:flutter/material.dart';
 
 class CityRepository implements ICityRepository {
   @override
-  Future<List<City>> getCityById() async {
+  Future<List<City>> getCityById(int divisionId) async {
     return await ApiHelper.fetchList<City>(
-      endpoint: AppUrl.getCitiesById(),
+      endpoint: '${AppUrl.getCitiesById}/$divisionId',
       fromJson: (data) {
-        debugPrint('City Raw data from API: $data');
+        debugPrint('Raw data from API: $data');
         return City.fromJson(data);
       },
     );
+  }
 
-    // Log the response
+  Future<void> addCity(City city) async {
+    await ApiHelper.request(
+      endpoint: AppUrl.addCity,
+      method: "POST",
+      body: city.toJson().map((key, value) => MapEntry(key, value.toString())),
+    );
+  }
+
+  Future<void> updateCity(City city) async {
+    await ApiHelper.request(
+      endpoint: '${AppUrl.updateCity}/${city.id}',
+      method: "PUT",
+      body: city.toJson().map((key, value) => MapEntry(key, value.toString())),
+    );
+  }
+
+  Future<void> deleteCity(int cityId) async {
+    await ApiHelper.request(
+      endpoint: '${AppUrl.deleteCity}/$cityId',
+      method: "DELETE",
+    );
   }
 }

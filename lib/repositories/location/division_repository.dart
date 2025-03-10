@@ -6,14 +6,37 @@ import 'package:flutter/material.dart';
 
 class DivisionRepository implements IDivisionRepository {
   @override
-  Future<List<Division>> getDivisionById() async {
+  Future<List<Division>> getDivisionById(int countryId) async {
     return await ApiHelper.fetchList<Division>(
-      endpoint: AppUrl.getDivisionById(), // Corrected function usage
+      endpoint: '${AppUrl.getDivisionById}/$countryId',
       fromJson: (data) {
-        debugPrint(
-            'Division Raw data from API for Country ID: $data');
+        debugPrint('Raw data from API: $data');
+        debugPrint('Endpoint is: ${AppUrl.getDivisionById}/$countryId');
         return Division.fromJson(data);
       },
+    );
+  }
+
+  Future<void> addDivision(Division division) async {
+    await ApiHelper.request(
+      endpoint: AppUrl.addDivision,
+      method: "POST",
+      body: division.toJson().map((key, value) => MapEntry(key, value.toString())),
+    );
+  }
+
+  Future<void> updateDivision(Division division) async {
+    await ApiHelper.request(
+      endpoint: '${AppUrl.updateDivision}/${division.id}',
+      method: "PUT",
+      body: division.toJson().map((key, value) => MapEntry(key, value.toString())),
+    );
+  }
+
+  Future<void> deleteDivision(int divisionId) async {
+    await ApiHelper.request(
+      endpoint: '${AppUrl.deleteDivision}/$divisionId',
+      method: "DELETE",
     );
   }
 }

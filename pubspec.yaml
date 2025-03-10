@@ -21,7 +21,17 @@ dependencies:
   cloud_firestore: ^5.6.4
   firebase_core: ^3.12.0
   http: ^0.13.6
-  flutter_google_places: ^0.3.0
+  flutter_polyline_points: ^1.0.0
+  flutter_typeahead: ^5.2.0
+  google_place: ^0.4.7
+  google_places_flutter: ^2.0.9  
+  dio: ^5.8.0+1
+  google_maps_webservice: ^0.0.19
+  location: ^8.0.0
+  marquee: ^2.3.0
+  permission_handler: ^11.4.0
+  shared_preferences: ^2.5.2
+  
   
 
 

@@ -1,229 +1,524 @@
-import 'dart:convert';
+import 'package:dailyfairdeal/config/messages.dart';
+import 'package:dailyfairdeal/util/snackbar_helper.dart';
 import 'package:dailyfairdeal/widget/app_color.dart';
+import 'package:dailyfairdeal/widget/support_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:flutter_google_places/flutter_google_places.dart';
-import 'package:google_maps_webservice/places.dart';
+import 'package:google_places_flutter/google_places_flutter.dart';
+import 'package:google_places_flutter/model/prediction.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:location/location.dart';
+import 'package:marquee/marquee.dart';
 
-class TaxiExample extends StatefulWidget {
-  const TaxiExample({super.key});
+class TaxiHome extends StatefulWidget {
+  const TaxiHome({super.key});
 
   @override
-  TaxiExampleState createState() => TaxiExampleState();
+  State<TaxiHome> createState() => _TaxiHomeState();
 }
 
-class TaxiExampleState extends State<TaxiExample> {
-  late GoogleMapController mapController;
-  Set<Marker> markers = {};
-  Set<Polyline> polylines = {};
+class _TaxiHomeState extends State<TaxiHome> {
+  TextEditingController sourceController = TextEditingController();
   TextEditingController destinationController = TextEditingController();
-  TextEditingController currentLocationController = TextEditingController();
-  LatLng? _currentLocation;
-  bool _isLoading = false;
+  GoogleMapController? mapController;
+  LatLng? sourceLocation;
+  LatLng? destinationLocation;
+  Set<Polyline> polylines = {};
+  Set<Marker> markers = {};
+  String googleAPIKey = "AIzaSyAXBWwV59Q5OlaUZ1TQs-j6YXgp_7cqHPA";
+  Location location = Location();
+  LatLng? currentLocation;
+  bool isLoading = false;
+  bool showDriverList = false;
+  bool showSearchFields = true;
 
-  static const String googleApiKey =
-      "AIzaSyAx3Ou7Qb7Qg2sBnnKsvkXm6vx8Zdnkcoc"; // Replace with your API key
+  List<Map<String, dynamic>> nearbyTaxiDriver = [];
 
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
+    _getCurrentLocation().then((_) {
+      if (currentLocation != null) {
+        sourceController.text = 'Current Location';
+        sourceLocation = currentLocation;
+        mapController?.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: currentLocation!,
+              zoom: 14.0,
+            ),
+          ),
+        );
+      }
+    });
   }
 
-  // Get current location of the user and convert it to an address
-  Future<void> _getCurrentLocation() async {
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    _currentLocation = LatLng(position.latitude, position.longitude);
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+  }
 
-    // Convert coordinates to a human-readable address
-    try {
-      List<Placemark> placemarks =
-          await placemarkFromCoordinates(position.latitude, position.longitude);
-      if (placemarks.isNotEmpty) {
-        Placemark place = placemarks.first;
-        setState(() {
-          currentLocationController.text =
-              "${place.street}, ${place.locality}, ${place.country}";
-        });
-      }
-    } catch (e) {
+  Future<void> _getCurrentLocation() async {
+    final locData = await location.getLocation();
+    setState(() {
+      currentLocation = LatLng(locData.latitude!, locData.longitude!);
+    });
+  }
+
+  Future<void> _searchDrivers() async {
+    if (sourceLocation != null) {
       setState(() {
-        currentLocationController.text = "Location not available";
+        isLoading = true;
+        showDriverList = false;
+      });
+      final response = await http.post(
+        Uri.parse('https://api.example.com/nearby-drivers'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'lat': sourceLocation!.latitude,
+          'long': sourceLocation!.longitude,
+          'radius': 1,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        debugPrint('API Response: ${response.body}');
+        nearbyTaxiDriver = json.decode(response.body);
+      } else {
+        debugPrint('Failed to fetch drivers');
+        nearbyTaxiDriver = [];
+      }
+      setState(() {
+        isLoading = false;
+        showDriverList = true;
       });
     }
   }
 
-  // Fetch available taxis from your backend API
-  Future<void> _fetchAvailableTaxis() async {
-    if (_currentLocation == null || destinationController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please provide both locations')));
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    String url = 'https://your-backend-api.com/getAvailableTaxis';
-    final response = await http.post(Uri.parse(url), body: {
-      'latitude': _currentLocation!.latitude.toString(),
-      'longitude': _currentLocation!.longitude.toString(),
-      'destination': destinationController.text,
-    });
-
-    if (response.statusCode == 200) {
-      List<dynamic> drivers = json.decode(response.body);
-      _updateTaxiMarkers(drivers);
-      _drawPolyline(drivers);
-    } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Failed to fetch taxis')));
-    }
-
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
-  // Open Google Places Autocomplete for destination input
-  Future<void> _handleDestinationSearch() async {
-    Prediction? prediction = await PlacesAutocomplete.show(
-      context: context,
-      apiKey: googleApiKey,
-      mode: Mode.overlay,
-      language: "en",
-      components: [
-        Component(Component.country, "us")
-      ], // Adjust country if needed
+  Widget sourceAutoComplete() {
+    return Stack(
+      children: [
+        GooglePlaceAutoCompleteTextField(
+          textEditingController: sourceController,
+          googleAPIKey: googleAPIKey,
+          inputDecoration: InputDecoration(
+            hintText: "Source",
+            prefixIcon: const Icon(
+              Icons.my_location,
+              color: AppColor.primaryColor,
+            ),
+            fillColor: Colors.grey[200],
+            labelStyle: const TextStyle(fontSize: 14.0),
+            filled: true,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide.none,
+            ),
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 14.0, horizontal: 16.0),
+          ),
+          debounceTime: 800,
+          countries: const ["MM"],
+          isLatLngRequired: true,
+          showError: true,
+          getPlaceDetailWithLatLng: (Prediction prediction) {
+            setState(() {
+              sourceLocation = LatLng(
+                double.parse(prediction.lat!),
+                double.parse(prediction.lng!),
+              );
+              debugPrint("Source Location: $sourceLocation");
+            });
+          },
+          itemClick: (Prediction prediction) {
+            sourceController.text = prediction.description!;
+            sourceController.selection = TextSelection.fromPosition(
+              TextPosition(offset: prediction.description!.length),
+            );
+          },
+        ),
+        Positioned(
+          right: 0,
+          top: 0,
+          bottom: 0,
+          child: IconButton(
+            icon: const Icon(Icons.clear),
+            onPressed: () {
+              setState(() {
+                sourceController.clear();
+                sourceLocation = null;
+              });
+            },
+          ),
+        ),
+      ],
     );
+  }
 
-    if (prediction != null) {
-      destinationController.text = prediction.description!;
+  Widget destinationAutoComplete() {
+    return Stack(
+      children: [
+        GooglePlaceAutoCompleteTextField(
+          textEditingController: destinationController,
+          googleAPIKey: googleAPIKey,
+          inputDecoration: InputDecoration(
+            hintText: "Destination",
+            prefixIcon: Icon(
+              Icons.location_on_sharp,
+              color: AppColor.primaryColor,
+            ),
+            fillColor: Colors.grey[200],
+            filled: true,
+            labelStyle: const TextStyle(fontSize: 14.0),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: BorderSide.none),
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 14.0, horizontal: 16.0),
+          ),
+          debounceTime: 800,
+          countries: const ["MM"],
+          isLatLngRequired: true,
+          getPlaceDetailWithLatLng: (Prediction prediction) {
+            setState(() {
+              destinationLocation = LatLng(
+                double.parse(prediction.lat!),
+                double.parse(prediction.lng!),
+              );
+              debugPrint("Destination Location: $destinationLocation");
+            });
+          },
+          itemClick: (Prediction prediction) {
+            destinationController.text = prediction.description!;
+            destinationController.selection = TextSelection.fromPosition(
+              TextPosition(offset: prediction.description!.length),
+            );
+          },
+        ),
+        Positioned(
+          right: 0,
+          top: 0,
+          bottom: 0,
+          child: IconButton(
+            icon: const Icon(Icons.clear),
+            onPressed: () {
+              setState(() {
+                destinationController.clear();
+                destinationLocation = null;
+              });
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _getRoute() async {
+    if (sourceLocation != null && destinationLocation != null) {
+      final response = await http.get(
+        Uri.parse(
+          'https://maps.googleapis.com/maps/api/directions/json?origin=${sourceLocation!.latitude},${sourceLocation!.longitude}&destination=${destinationLocation!.latitude},${destinationLocation!.longitude}&key=$googleAPIKey',
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['routes'].isNotEmpty) {
+          final points = data['routes'][0]['overview_polyline']['points'];
+          final List<LatLng> polylinePoints = _decodePolyline(points);
+
+          setState(() {
+            polylines.clear();
+            polylines.add(
+              Polyline(
+                polylineId: const PolylineId("route"),
+                points: polylinePoints,
+                color: Colors.blue,
+                width: 5,
+              ),
+            );
+          });
+        } else {
+          debugPrint('No routes found');
+        }
+      } else {
+        debugPrint('Failed to fetch route');
+      }
     }
   }
 
-  // Update markers for available taxi drivers
-  void _updateTaxiMarkers(List<dynamic> drivers) {
-    setState(() {
+  List<LatLng> _decodePolyline(String encoded) {
+    List<LatLng> polyline = [];
+    int index = 0, len = encoded.length;
+    int lat = 0, lng = 0;
+
+    while (index < len) {
+      int b, shift = 0, result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lat += dlat;
+
+      shift = 0;
+      result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lng += dlng;
+
+      polyline.add(LatLng(lat / 1E5, lng / 1E5));
+    }
+
+    return polyline;
+  }
+
+  void _setPolylineAndMarkers() {
+    if (sourceLocation != null && destinationLocation != null) {
       markers.clear();
-      for (var driver in drivers) {
-        markers.add(Marker(
-          markerId: MarkerId(driver['id']),
-          position: LatLng(driver['latitude'], driver['longitude']),
-          infoWindow: InfoWindow(title: driver['name']),
-        ));
+
+      markers.add(
+        Marker(
+          markerId: const MarkerId("source"),
+          position: sourceLocation!,
+          infoWindow: const InfoWindow(title: "Source"),
+        ),
+      );
+
+      markers.add(
+        Marker(
+          markerId: const MarkerId("destination"),
+          position: destinationLocation!,
+          infoWindow: const InfoWindow(title: "Destination"),
+        ),
+      );
+
+      _getRoute();
+    }
+  }
+
+  void _moveToCurrentLocation() {
+    _getCurrentLocation().then((_) {
+      if (currentLocation != null) {
+        mapController?.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: currentLocation!,
+              zoom: 14.0,
+            ),
+          ),
+        );
+
+        setState(() {});
       }
     });
-  }
-
-  // Draw polyline for the taxi route
-  void _drawPolyline(List<dynamic> drivers) {
-    List<LatLng> polylineCoordinates = [];
-    for (var point in drivers) {
-      polylineCoordinates.add(LatLng(point['latitude'], point['longitude']));
-    }
-
-    setState(() {
-      polylines.add(Polyline(
-        polylineId: PolylineId('route'),
-        points: polylineCoordinates,
-        color: Colors.blue,
-        width: 5,
-      ));
-    });
-  }
-
-  // Build Google Map Widget
-  Widget _buildGoogleMap() {
-    if (_currentLocation == null) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    return GoogleMap(
-      initialCameraPosition: CameraPosition(
-        target: _currentLocation!,
-        zoom: 14.0,
-      ),
-      onMapCreated: (controller) {
-        mapController = controller;
-      },
-      markers: markers,
-      polylines: polylines,
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Taxi Booking'),
+        title: Text(
+          'Taxi Booking',
+          style: AppWidget.appBarTextStyle(),
+        ),
         backgroundColor: AppColor.primaryColor,
+        centerTitle: true,
       ),
       body: Column(
         children: [
-          // Google Map Widget
-          SizedBox(
-            height: 300,
-            child: _buildGoogleMap(),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                // Current location field (read-only)
-                TextField(
-                  controller: currentLocationController,
-                  readOnly: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Current Location',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.my_location),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // Destination field with Places Autocomplete
-                TextField(
-                  controller: destinationController,
-                  readOnly: true,
-                  onTap: _handleDestinationSearch,
-                  decoration: const InputDecoration(
-                    labelText: 'Enter Destination',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.location_on),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // Search button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _fetchAvailableTaxis,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColor.primaryColor,
-                      padding: const EdgeInsets.symmetric(vertical: 15),
+          Visibility(
+            visible: showSearchFields,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  sourceAutoComplete(),
+                  const SizedBox(height: 6.0),
+                  destinationAutoComplete(),
+                  const SizedBox(height: 6.0),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColor.primaryColor),
+                      onPressed: () {
+                        if (sourceLocation == null) {
+                          SnackbarHelper.showSnackbar(
+                            title: 'Error',
+                            message: ErrorMessage.typeSource,
+                            backgroundColor: Colors.red,
+                          );
+                          return;
+                        }
+                        if (destinationLocation == null) {
+                          SnackbarHelper.showSnackbar(
+                            title: 'Error',
+                            message: ErrorMessage.typeDestination,
+                            backgroundColor: Colors.red,
+                          );
+                          return;
+                        }
+                        _setPolylineAndMarkers();
+                        if (sourceLocation != null &&
+                            destinationLocation != null) {
+                          mapController?.animateCamera(
+                            CameraUpdate.newLatLngBounds(
+                              LatLngBounds(
+                                southwest: LatLng(
+                                  sourceLocation!.latitude <
+                                          destinationLocation!.latitude
+                                      ? sourceLocation!.latitude
+                                      : destinationLocation!.latitude,
+                                  sourceLocation!.longitude <
+                                          destinationLocation!.longitude
+                                      ? sourceLocation!.longitude
+                                      : destinationLocation!.longitude,
+                                ),
+                                northeast: LatLng(
+                                  sourceLocation!.latitude >
+                                          destinationLocation!.latitude
+                                      ? sourceLocation!.latitude
+                                      : destinationLocation!.latitude,
+                                  sourceLocation!.longitude >
+                                          destinationLocation!.longitude
+                                      ? sourceLocation!.longitude
+                                      : destinationLocation!.longitude,
+                                ),
+                              ),
+                              50.0,
+                            ),
+                          );
+                        }
+                        //_searchDrivers();
+                        isLoading = false; //For Testing
+                        showDriverList = true; //For Testing
+                        setState(() {
+                          showSearchFields = false;
+                        });
+                      },
+                      child: const Text('Search',
+                          style: TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
                     ),
-                    child: _isLoading
-                        ? const SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator())
-                        : const Text(
-                            'Search',
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                          ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (!showSearchFields)
+            Column(
+              children: [
+                Container(
+                  width: double.infinity,
+                  height: 30.0,
+                  child: Marquee(
+                    text:
+                        'From: ${sourceController.text.length > 20 ? '${sourceController.text.substring(0, 20)}...' : sourceController.text} To: ${destinationController.text.length > 20 ? '${destinationController.text.substring(0, 20)}...' : destinationController.text}',
+                    style: const TextStyle(
+                        fontSize: 14.0, fontWeight: FontWeight.w500),
+                    scrollAxis: Axis.horizontal,
+                    blankSpace: 20.0,
+                    velocity: 30.0,
+                    pauseAfterRound: const Duration(seconds: 1),
+                    startPadding: 10.0,
+                    showFadingOnlyWhenScrolling: true,
+                    fadingEdgeStartFraction: 0.1,
+                    fadingEdgeEndFraction: 0.1,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.arrow_downward),
+                  onPressed: () {
+                    setState(() {
+                      showSearchFields = true;
+                    });
+                  },
+                ),
+              ],
+            ),
+          Expanded(
+            child: Stack(
+              children: [
+                GoogleMap(
+                  onMapCreated: _onMapCreated,
+                  initialCameraPosition: CameraPosition(
+                    target: currentLocation ?? const LatLng(16.8409, 96.1735),
+                    zoom: 14.0,
+                  ),
+                  markers: markers,
+                  polylines: polylines,
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: false,
+                  scrollGesturesEnabled: true,
+                  zoomGesturesEnabled: true,
+                  tiltGesturesEnabled: true,
+                  rotateGesturesEnabled: true,
+                  onCameraMove: (CameraPosition position) {
+                    setState(() {
+                      currentLocation = position.target;
+                    });
+                  },
+                ),
+                Positioned(
+                  width: 40,
+                  height: 40,
+                  bottom: 100,
+                  right: 10,
+                  child: FloatingActionButton(
+                    onPressed: _moveToCurrentLocation,
+                    child: const Icon(Icons.my_location),
                   ),
                 ),
               ],
             ),
           ),
+          if (showDriverList)
+            Expanded(
+              child: Column(
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'Nearby Taxi Drivers',
+                      style: TextStyle(
+                          fontSize: 18.0, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Expanded(
+                    child: isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : nearbyTaxiDriver.isEmpty
+                            ? const Center(
+                                child: Text('No nearby drivers found.'))
+                            : ListView.builder(
+                                itemCount: nearbyTaxiDriver.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  final driver = nearbyTaxiDriver[index];
+                                  return ListTile(
+                                    title: Text(driver['driverName']),
+                                    subtitle: Text(
+                                        'Car No: ${driver['carNo']} \nPrice: ${driver['price']}'),
+                                    trailing: ElevatedButton(
+                                      onPressed: () {
+                                        // Handle accept button press
+                                      },
+                                      child: const Text('Accept'),
+                                    ),
+                                  );
+                                },
+                              ),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     );

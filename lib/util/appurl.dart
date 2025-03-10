@@ -13,10 +13,51 @@ class AppUrl {
 
   //Location Api
 
+  //Country Api
   static String getCountry = "$baseUrl/country";
-  static String getDivisionById()=>'$baseUrl/state';
-  static String getCitiesById() => '$baseUrl/city';
-  static String getTownshipById() => '$baseUrl/township';
-  static String getWardById() => '$baseUrl/ward';
-  static String getStreetById() => '$baseUrl/street';
+  static String addCountry = "$baseUrl/country";
+  static String updateCountry = "$baseUrl/country";
+  static String deleteCountry = "$baseUrl/country";
+
+  //Division Api
+  static String getDivisionById = "$baseUrl/state";
+  static String getDivisions = "$baseUrl/state";
+  static String addDivision = "$baseUrl/state";
+  static String updateDivision = "$baseUrl/state";
+  static String deleteDivision = "$baseUrl/state";
+
+  //City Api
+  static String getCitiesById = "$baseUrl/city";
+  static String getCities = "$baseUrl/city";
+  static String addCity = "$baseUrl/city";
+  static String updateCity = "$baseUrl/city";
+  static String deleteCity = "$baseUrl/city";
+
+  //Township Api
+  static String getTownships = "$baseUrl/township";
+  static String getTownshipById = "$baseUrl/township";
+  static String addTownship = "$baseUrl/township";
+  static String updateTownship = "$baseUrl/township";
+  static String deleteTownship = "$baseUrl/township";
+
+  //Ward Api
+  static String getWards = "$baseUrl/ward";
+  static String getWardById = "$baseUrl/ward";
+  static String addWard = "$baseUrl/ward";
+  static String updateWard = "$baseUrl/ward";
+  static String deleteWard = "$baseUrl/ward";
+
+  //Street Api
+  static String getStreetById = "$baseUrl/street";
+  static String getStreets = "$baseUrl/street";
+  static String addStreet = "$baseUrl/street";
+  static String updateStreet = "$baseUrl/street";
+  static String deleteStreet = "$baseUrl/street";
+
+  //taxi driver Api
+  static String getDriverById = "$baseUrl/taxi-drivers/{id}";
+  static String getDriver = "$baseUrl/taxi-drivers";
+  static String createDriver = "$baseUrl/taxi-drivers";
+  static String updateDriver = "$baseUrl/taxi-drivers";
+  static String deleteDriver = "$baseUrl/taxi-drivers";
 }

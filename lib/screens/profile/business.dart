@@ -26,10 +26,12 @@ class BusinessPage extends StatelessWidget {
             // Three card views
             buildCard('Restaurant/Shop Owner Account', Colors.white, Icons.shop,
                 '/merchantsignup'),
-            buildCard('DFD Driver Account', Colors.white,
-                Icons.taxi_alert, '/driversignup'),
-            buildCard('DFD Rider Account', Colors.white,
-                Icons.car_crash, '/dfdridersignup'),
+            buildCard('DFD Driver Account', Colors.white, Icons.taxi_alert,
+                '/driverdashboard'),
+
+            ///driversignup
+            buildCard('DFD Rider Account', Colors.white, Icons.car_crash,
+                '/dfdridersignup'),
           ],
         ),
       ),
