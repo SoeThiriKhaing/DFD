@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:dailyfairdeal/services/secure_storage.dart';
 import 'package:dailyfairdeal/widget/app_color.dart';
 import 'package:dailyfairdeal/widget/support_widget.dart';
 
@@ -7,7 +8,6 @@ import 'package:get/get.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
-  // final APIMethods apiController = Get.put(APIMethods());
 
   @override
   State<Home> createState() => _HomeState();
@@ -18,7 +18,8 @@ class _HomeState extends State<Home> {
   List<Map<String, dynamic>> searchResults = [];
   bool isLoading = false;
   String selectedType = "food";
-  //List<Map<String, String>> featureRestaurantsList = [];
+  String? userName;
+
   final List<Map<String, String>> featureRestaurantsList = [
     {'name': 'Pizza Paradise', 'restaurant_type': 'Italian'},
     {'name': 'Burger Haven', 'restaurant_type': 'Fast Food'},
@@ -35,40 +36,17 @@ class _HomeState extends State<Home> {
     setState(() {
       isLoading = true;
     });
-
-    // try {
-    //   List<Map<String, dynamic>> results =
-    //       await ApiService.searchItemsByType(query, selectedType);
-    //   setState(() {
-    //     searchResults = results;
-    //   });
-    // } catch (e) {
-    //   if (kDebugMode) {
-    //     print("Error: $e");
-    //   }
-    // } finally {
-    //   setState(() {
-    //     isLoading = false;
-    //   });
-    // }
   }
 
   @override
   void initState() {
     super.initState();
-    //fetchFeaturedRestaurants();
+    initializeUserName();
   }
 
-  Future<void> fetchFeaturedRestaurants() async {
-    try {
-      //List<Map<String, String>>? restaurants = await APIMethods().getFeaturedRestaurants();
-      setState(() {
-        //featureRestaurantsList = restaurants!;
-      });
-    } catch (e) {
-      // ignore: avoid_print
-      print("Error fetching feature restaurants: $e");
-    }
+  Future<void> initializeUserName() async {
+    userName = await getUserName();
+    setState(() {});
   }
 
   @override
@@ -78,6 +56,8 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: AppColor.primaryColor,
+        leading: const Icon(Icons.shop),
+        title: Text("Hello, $userName", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),),
       ),
       body: SingleChildScrollView(
         child: Column(

@@ -31,6 +31,7 @@ class ApiService {
 
     final defaultHeaders = {
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
       if (token != null) 'Authorization': 'Bearer $token',
     };
 

@@ -1,7 +1,9 @@
-import 'package:dailyfairdeal/common_calls/handle_error_snackbar.dart';
-import 'package:dailyfairdeal/common_calls/handle_success.dart';
+import 'package:dailyfairdeal/controllers/auth/handle_success_auth.dart';
+import 'package:dailyfairdeal/config/api_messages.dart';
 import 'package:dailyfairdeal/config/messages.dart';
 import 'package:dailyfairdeal/models/user/user_model.dart';
+import 'package:dailyfairdeal/util/snackbar_helper.dart';
+import 'package:flutter/material.dart';
 import '../../services/auth/auth_service.dart';
 
 class AuthController{
@@ -13,18 +15,34 @@ class AuthController{
   Future<void> login(String email, String password) async {
     try {
       UserModel user = await authService.login(email, password);
-      handleSuccessAuth(user, Messages.loginSuccess);
+      if(user.accessToken.isEmpty){
+        SnackbarHelper.showSnackbar(
+          title: "Error",
+          message: ApiMessages.invalidLogin,
+          backgroundColor: Colors.red,
+        );
+      }else{
+        handleSuccessAuth(user, Messages.loginSuccess);
+      }
     } catch (e) {
-      handleErrorSnackbar(e.toString());
+      debugPrint(e.toString());
     }
   }
 
   Future<void> register(String name, String email, String password) async {
     try {
       UserModel user = await authService.register(name, email, password);
-      handleSuccessAuth(user, Messages.registerSuccess);
+      if(user.accessToken.isEmpty){
+        SnackbarHelper.showSnackbar(
+          title: "Error",
+          message: ApiMessages.failRegister,
+          backgroundColor: Colors.red,
+        );
+      }else{
+        handleSuccessAuth(user, Messages.registerSuccess);
+      }
     } catch (e) {
-      handleErrorSnackbar(e.toString());
+      debugPrint(e.toString());
     }
   }
 }

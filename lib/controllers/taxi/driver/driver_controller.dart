@@ -6,9 +6,9 @@ class DriverController {
 
   DriverController({required this.service});
 
-  Future<List<Map<String, String>>> fetchNearbyDrivers(double lat, double long) async {
-    List<DriverModel> drivers = await service.fetchNearbyDrivers(lat, long);
-    return drivers.map((driver) => {'id': driver.driverId.toString(), 'name': driver.driverName, 'carNo': driver.carNo, 'price': driver.price.toString()}).toList();
+  Future<List<Map<String, String>>> fetchNearbyDrivers() async {
+    List<DriverModel> drivers = await service.fetchNearbyDrivers();
+    return drivers.map((driver) => {'id': driver.id.toString(), 'name': driver.name, 'licensePlate': driver.licensePlate,}).toList();
   }
 
 }

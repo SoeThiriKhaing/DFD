@@ -7,18 +7,14 @@ import 'package:flutter/material.dart';
 class DriverRepository implements IDriverRepository {
   /// Fetch a list of countries from the API
   @override
-  Future<List<DriverModel>> fetchNearbyDrivers(double latitude, double longitude) async {
-    final requestBody = {"lat": latitude.toString(), "long": longitude.toString()};
-    final response = await ApiHelper.request<List<DriverModel>>(
+  Future<List<DriverModel>> fetchNearbyDrivers() async {
+    return await ApiHelper.fetchList<DriverModel>(
       endpoint: AppUrl.getNearbyTaxiDriver,
-      method: "GET",
-      body: requestBody,
       fromJson: (data) {
         debugPrint('Raw data from API: $data'); // Debug print to log the data
-        return (data as List).map((item) => DriverModel.fromJson(item)).toList();
+        return DriverModel.fromJson(data) as DriverModel;
       },
     );
-    return response;
   }
 
 }

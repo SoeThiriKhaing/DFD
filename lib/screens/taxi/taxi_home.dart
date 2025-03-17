@@ -1,16 +1,19 @@
 import 'dart:convert';
-
 import 'package:dailyfairdeal/controllers/taxi/driver/driver_controller.dart';
+import 'package:dailyfairdeal/controllers/taxi/driver/travel_controller.dart';
 import 'package:dailyfairdeal/models/taxi/driver/driver_model.dart';
 import 'package:dailyfairdeal/repositories/taxi/driver/driver_repository.dart';
+import 'package:dailyfairdeal/repositories/taxi/driver/travel_repository.dart';
 import 'package:dailyfairdeal/screens/taxi/widgets/auto_complete_text_field.dart';
 import 'package:dailyfairdeal/screens/taxi/widgets/driver_list.dart';
 import 'package:dailyfairdeal/screens/taxi/widgets/map_view.dart';
 import 'package:dailyfairdeal/services/taxi/driver/driver_service.dart';
+import 'package:dailyfairdeal/services/taxi/driver/travel_service.dart';
 import 'package:dailyfairdeal/services/taxi/location/location_service.dart';
 import 'package:dailyfairdeal/widget/app_color.dart';
 import 'package:dailyfairdeal/widget/support_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:dailyfairdeal/util/snackbar_helper.dart';
 import 'package:dailyfairdeal/config/messages.dart';
@@ -41,42 +44,10 @@ class _TaxiHomeState extends State<TaxiHome> {
   bool isLoading = false;
   bool showDriverList = false;
   bool showSearchFields = true;
-  List<DriverModel> nearbyTaxiDriver = [
-    DriverModel(
-      driverId: 1,
-      driverName: 'John Smith',
-      carNo: 'AA123',
-      price: 12000,
-      lat: 37.7749,
-      long: -122.4194,
-    ),
-     DriverModel(
-      driverId: 2,
-      driverName: 'John Doe',
-      carNo: 'BB345',
-      price: 15000,
-      lat: 37.7749,
-      long: -122.4194,
-    ),
-     DriverModel(
-      driverId: 3,
-      driverName: 'Jane Doe',
-      carNo: 'CC567',
-      price: 14000,
-      lat: 37.7749,
-      long: -122.4194,
-    ),
-     DriverModel(
-      driverId: 4,
-      driverName: 'Alice Johnson',
-      carNo: 'DD789',
-      price: 13000,
-      lat: 37.7749,
-      long: -122.4194,
-    ),
-  ];
+  List<DriverModel> nearbyTaxiDriver = [];
   String googleAPIKey = "AIzaSyAXBWwV59Q5OlaUZ1TQs-j6YXgp_7cqHPA";
-  
+  final TravelController travelController = Get.put(TravelController(
+    travelService:TravelService(travelRepository: TravelRepository())));
   @override
   void initState() {
     super.initState();
@@ -85,6 +56,7 @@ class _TaxiHomeState extends State<TaxiHome> {
     _getCurrentLocation();
   }
 
+  //To Type Automatically Current Location in the Source Location Text Field at initial state
   Future<void> _getCurrentLocation() async {
     currentLocation = await locationService.getCurrentLocation();
     if (currentLocation != null) {
@@ -101,18 +73,16 @@ class _TaxiHomeState extends State<TaxiHome> {
     }
   }
 
-  Future<void> _searchDrivers() async {
+  Future<void> searchNearByTaxiDrivers() async {
     if (sourceLocation != null) {
       setState(() {
         isLoading = true;
         showDriverList = false;
       });
       try {
-        final fetchedDrivers = await driverController.fetchNearbyDrivers(
-          sourceLocation!.latitude,
-          sourceLocation!.longitude,
-        );
-        nearbyTaxiDriver = fetchedDrivers.map((driver) => DriverModel.fromJson(driver)).toList();
+        await travelController.createTravelRequest(sourceLocation!.latitude, sourceLocation!.longitude, destinationLocation!.latitude, destinationLocation!.longitude);
+        final fetchedDrivers = await driverController.fetchNearbyDrivers();
+        nearbyTaxiDriver = await Future.wait(fetchedDrivers.map((driver) => DriverModel.fromJson(driver)));
       } catch (e) {
         debugPrint('Failed to fetch drivers: $e');
         nearbyTaxiDriver = [];
@@ -260,6 +230,7 @@ class _TaxiHomeState extends State<TaxiHome> {
                         debugPrint("Source Location: $sourceLocation");
                       });
                     },
+                    prefixIcon: const Icon(Icons.my_location, color: AppColor.primaryColor),
                   ),
                   const SizedBox(height: 6.0), // Reduced spacing
                   AutoCompleteTextField(
@@ -274,7 +245,8 @@ class _TaxiHomeState extends State<TaxiHome> {
                         );
                         debugPrint("Destination Location: $destinationLocation");
                       });
-                    },
+                    }, 
+                    prefixIcon: const Icon(Icons.location_on_sharp, color: AppColor.primaryColor),
                   ),
                   const SizedBox(height: 6.0), // Reduced spacing
                   ElevatedButton(
@@ -302,26 +274,26 @@ class _TaxiHomeState extends State<TaxiHome> {
                             LatLngBounds(
                               southwest: LatLng(
                                 sourceLocation!.latitude < destinationLocation!.latitude
-                                    ? sourceLocation!.latitude
-                                    : destinationLocation!.latitude,
+                                  ? sourceLocation!.latitude
+                                  : destinationLocation!.latitude,
                                 sourceLocation!.longitude < destinationLocation!.longitude
-                                    ? sourceLocation!.longitude
-                                    : destinationLocation!.longitude,
+                                  ? sourceLocation!.longitude
+                                  : destinationLocation!.longitude,
                               ),
                               northeast: LatLng(
                                 sourceLocation!.latitude > destinationLocation!.latitude
-                                    ? sourceLocation!.latitude
-                                    : destinationLocation!.latitude,
+                                  ? sourceLocation!.latitude
+                                  : destinationLocation!.latitude,
                                 sourceLocation!.longitude > destinationLocation!.longitude
-                                    ? sourceLocation!.longitude
-                                    : destinationLocation!.longitude,
+                                  ? sourceLocation!.longitude
+                                  : destinationLocation!.longitude,
                               ),
                             ),
                             50.0,
                           ),
                         );
                       }
-                      //_searchDrivers();
+                      //searchDrivers();
                       isLoading = false; //For Testing
                       showDriverList = true; //For Testing
                       setState(() {

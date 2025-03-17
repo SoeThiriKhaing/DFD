@@ -54,6 +54,24 @@ class AppUrl {
   static String updateStreet = "$baseUrl/street";
   static String deleteStreet = "$baseUrl/street";
   
+ //taxi driver Api
+  static String getDriverById = "$baseUrl/taxi-drivers/{id}";
+  static String getDriver = "$baseUrl/taxi-drivers";
+  static String createDriver = "$baseUrl/taxi-drivers";
+  static String updateDriver = "$baseUrl/taxi-drivers";
+  static String deleteDriver = "$baseUrl/taxi-drivers";
+  //static String getDriverByUserId = "$baseUrl/taxi-drivers/$userId";
+
   //Nearby Taxi Driver
-  static String getNearbyTaxiDriver = "$baseUrl/nearby_taxi_driver";
+  static String getNearbyTaxiDriver = "$baseUrl/nearby-taxi-drivers";
+
+  //travel Api
+  static String createTravel = "$baseUrl/travels";
+  static String updateTravle = "$baseUrl/travels";
+  static String deleteTravel = "$baseUrl/travels";
+  static String getTravel = "$baseUrl/travels";
+
+  //Driver Notification
+
+  static String getNoti = "$baseUrl/driver/{driverId}/notifications";
 }

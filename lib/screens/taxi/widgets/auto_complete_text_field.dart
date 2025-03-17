@@ -7,12 +7,15 @@ class AutoCompleteTextField extends StatelessWidget {
   final String googleAPIKey;
   final String labelText;
   final Function(Prediction) onPlaceSelected;
+  final Icon prefixIcon; // Add prefixIcon parameter
 
-  const AutoCompleteTextField({super.key, 
+  const AutoCompleteTextField({
+    super.key,
     required this.controller,
     required this.googleAPIKey,
     required this.labelText,
     required this.onPlaceSelected,
+    required this.prefixIcon, // Initialize prefixIcon
   });
 
   @override
@@ -23,10 +26,13 @@ class AutoCompleteTextField extends StatelessWidget {
           textEditingController: controller,
           googleAPIKey: googleAPIKey,
           inputDecoration: InputDecoration(
-            labelText: labelText,
-            labelStyle: const TextStyle(fontSize: 12.0),
+            hintText: labelText,
+            prefixIcon: prefixIcon, // Use prefixIcon if provided
+            fillColor: Colors.grey[200],
+            labelStyle: const TextStyle(fontSize: 14.0),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
           ),

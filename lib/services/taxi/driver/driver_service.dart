@@ -7,8 +7,8 @@ class DriverService {
 
   DriverService({required this.repository});
 
-  Future<List<DriverModel>> fetchNearbyDrivers(double latitude, double longitude) async {
-    final drivers = await repository.fetchNearbyDrivers(latitude, longitude);
+  Future<List<DriverModel>> fetchNearbyDrivers() async {
+    final drivers = await repository.fetchNearbyDrivers();
     debugPrint('Nearby Drivers in DriverService: $drivers'); // Debug print
     return drivers;
   }
