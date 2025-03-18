@@ -1,10 +1,11 @@
-import 'package:geolocator/geolocator.dart';
+import 'package:dailyfairdeal/services/taxi/location/location_service.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class DriverModel {
   final int? id;
   final String name; //added additionally
-  final double price;//added additionally
-  final int userId; // Store only user ID instead of UserModel
+  final double? price;//added additionally
+  final int? userId; // Store only user ID instead of UserModel
   final double latitude;
   final double longitude;
   final bool isAvailable;
@@ -19,8 +20,8 @@ class DriverModel {
   DriverModel({
     this.id,
     required this.name, //added additionally
-    required this.price, //added additionally
-    required this.userId, // Only user ID
+    this.price, //added additionally
+    this.userId, // Only user ID
     required this.latitude,
     required this.longitude,
     required this.isAvailable,
@@ -35,15 +36,15 @@ class DriverModel {
 
   // Fetch current location asynchronously
   static Future<DriverModel> fromJson(Map<String, dynamic> json) async {
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-
+    // Position position = await Geolocator.getCurrentPosition(
+    //     desiredAccuracy: LocationAccuracy.high);
+    LatLng? position = await LocationService().getCurrentLocation();
     return DriverModel(
       id: json['id'] ?? 0,
       name: json['name'], //added additionally
       price: json['price'], //added additionally
       userId: json['rider_id'] ?? 0, // Extract only user ID
-      latitude: position.latitude,
+      latitude: position!.latitude,
       longitude: position.longitude,
       isAvailable: json['is_available'] ?? false,
       carYear: json['car_year'] ?? 0,

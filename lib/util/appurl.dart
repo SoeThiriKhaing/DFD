@@ -65,6 +65,9 @@ class AppUrl {
   //Nearby Taxi Driver
   static String getNearbyTaxiDriver = "$baseUrl/nearby-taxi-drivers";
 
+  //Get the number of taxi driver
+  static String getNumberOfTaxiDriver = "$baseUrl/taxi-driver/user";
+
   //travel Api
   static String createTravel = "$baseUrl/travels";
   static String updateTravle = "$baseUrl/travels";

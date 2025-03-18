@@ -12,4 +12,23 @@ class DriverService {
     debugPrint('Nearby Drivers in DriverService: $drivers'); // Debug print
     return drivers;
   }
+
+  Future<List<DriverModel>> fetchTaxiDriverCount(String userId) async {
+    return await repository.getTaxiDriverByUserId(int.parse(userId));
+  }
+
+  Future<void> updateLocation(int driverId, double latitude, double longitude) {
+    return repository.updateDriverLocation(driverId, latitude, longitude);
+  }
+
+  Future<void> setAvailability(int driverId, bool isAvailable) {
+    return repository.updateDriverAvailability(driverId, isAvailable);
+  }
+
+  Future<int> createDriver(DriverModel driver) {
+    return repository.createDriver(driver);
+  }
+
+
+
 }

@@ -9,6 +9,7 @@ import 'package:dailyfairdeal/screens/dashboard/dashboard.dart';
 import 'package:dailyfairdeal/screens/dashboard/restaurant/restaurant_owner_dashboard.dart';
 import 'package:dailyfairdeal/screens/dashboard/restaurant/restaurant_setting/change_restaurant_image.dart';
 import 'package:dailyfairdeal/screens/dashboard/restaurant/restaurant_setting/profile_setting.dart';
+import 'package:dailyfairdeal/screens/dashboard/taxi_driver/taxi_driver_dashboard.dart';
 import 'package:dailyfairdeal/screens/food/foodpage/food_page.dart';
 import 'package:dailyfairdeal/screens/home/main_screen.dart';
 import 'package:dailyfairdeal/screens/payment/add_card_screen.dart';
@@ -44,9 +45,6 @@ class MyApp extends StatelessWidget {
           GetPage(name: '/merchantsignup', page: () => const MerchantSignUp()),
           GetPage(name: '/profile', page: () => const Profile()),
           GetPage(name: '/main', page: () => MainScreen()),
-          // GetPage(
-          //     name: '/popularrestaurant',
-          //     page: () => const PopularRestaurantsPage()),
           GetPage(name: '/dashboard', page: () => const Dashboard()),
           GetPage(
               name: '/restaurantownerdashboard',
@@ -56,6 +54,7 @@ class MyApp extends StatelessWidget {
               name: '/changerestaurantimage',
               page: () => const ChangeRestaurantImage()),
           GetPage(name: '/addcardscreen', page: () => const AddCardScreen()),
+          GetPage(name: '/driverdashboard', page: () => const DriverDashboard()),
         ]);
   }
 }

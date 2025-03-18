@@ -33,3 +33,11 @@ Future<void> saveUserRole(String userRole) async {
 Future<String?> getUserRole() async {
   return await storage.read(key: 'userRole');
 }
+
+Future<void> saveDriverId(String driverId) async {
+  await storage.write(key: 'driverId', value: driverId);
+}
+
+Future<String?> getDriverId() async {
+  return await storage.read(key: 'driverId');
+}

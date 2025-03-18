@@ -17,4 +17,50 @@ class DriverRepository implements IDriverRepository {
     );
   }
 
+  @override
+  Future<int> createDriver(DriverModel driver) async {
+    final response = await ApiHelper.request(
+      endpoint: AppUrl.createDriver,
+      method: "POST",
+      body:driver.toJson().map((key, value) => MapEntry(key, value.toString())),
+    );
+    return response['statusCode'] ?? 500;
+  }
+
+  @override
+  Future<List<DriverModel>> getTaxiDriverByUserId(int userId) async {
+    return await ApiHelper.fetchList<DriverModel>(
+      endpoint: AppUrl.getNumberOfTaxiDriver,
+      fromJson: (data) {
+        debugPrint('Raw data from API: $data'); // Debug print to log the data
+        return DriverModel.fromJson(data) as DriverModel;
+      },
+    );
+    
+  }
+
+  @override
+  Future<void> updateDriverAvailability(int driverId, bool isAvailable) {
+    
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> updateDriverLocation(
+      int driverId, double latitude, double longitude) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<DriverModel?>> getDriverData() {
+    throw UnimplementedError();
+  }
+  
+  @override
+  Future<List<DriverModel>> getDriverByUserId(int userId) {
+    throw UnimplementedError();
+  }
+
+
+
 }
