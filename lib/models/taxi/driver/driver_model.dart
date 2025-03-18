@@ -2,8 +2,8 @@ import 'package:geolocator/geolocator.dart';
 
 class DriverModel {
   final int? id;
-  final String name;
-  final double price;
+  final String name; //added additionally
+  final double price;//added additionally
   final int userId; // Store only user ID instead of UserModel
   final double latitude;
   final double longitude;
@@ -18,8 +18,8 @@ class DriverModel {
 
   DriverModel({
     this.id,
-    required this.name, 
-    required this.price, 
+    required this.name, //added additionally
+    required this.price, //added additionally
     required this.userId, // Only user ID
     required this.latitude,
     required this.longitude,
@@ -39,9 +39,9 @@ class DriverModel {
         desiredAccuracy: LocationAccuracy.high);
 
     return DriverModel(
-      id: json['taxi_driver_id'] ?? 0,
-      name: json['name'],
-      price: json['price'],
+      id: json['id'] ?? 0,
+      name: json['name'], //added additionally
+      price: json['price'], //added additionally
       userId: json['rider_id'] ?? 0, // Extract only user ID
       latitude: position.latitude,
       longitude: position.longitude,
@@ -67,7 +67,6 @@ class DriverModel {
       "car_colour": carColour,
       "license_plate": licensePlate,
       "other_info": otherInfo,
-      //
     };
   }
 }
