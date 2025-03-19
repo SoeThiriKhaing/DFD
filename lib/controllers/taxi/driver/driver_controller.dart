@@ -49,9 +49,9 @@ class DriverController extends StateNotifier<int>{
     }
   }
 
-  Future<List<Map<String, String>>> loadTaxiDriverByUserId(String userId) async {
-    List<DriverModel> drivers = await service.fetchTaxiDriverCount(userId);
-    return drivers.map((driver) => {'rider_id': driver.userId.toString()}).toList();
+  Future<bool> isDriverAlreadyRegistered(String userId) async {
+    return await service.doesDriverExist(userId);
   }
+
 
 }

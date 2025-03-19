@@ -28,15 +28,25 @@ class DriverRepository implements IDriverRepository {
   }
 
   @override
-  Future<List<DriverModel>> getTaxiDriverByUserId(int userId) async {
-    return await ApiHelper.fetchList<DriverModel>(
-      endpoint: AppUrl.getNumberOfTaxiDriver,
-      fromJson: (data) {
-        debugPrint('Raw data from API: $data'); // Debug print to log the data
-        return DriverModel.fromJson(data) as DriverModel;
-      },
-    );
-    
+  Future<DriverModel> getTaxiDriverByUserId(int userId) async {
+      final response = await ApiHelper.request(
+        endpoint: 'AppUrl.getNumberOfTaxiDriver/$userId',
+        method: 'GET',
+      );
+
+      if (response != null && response['data'] != null) {
+          debugPrint('Driver data: ${response['data']}');
+          return DriverModel.fromJson(response['data']); // ✅ Correctly parsing single object
+      }
+      throw Exception('Driver not found');
+  }
+
+
+  // ✅ New method to check if the driver exists
+  @override
+  Future<bool> checkDriverExists(int userId) async {
+      DriverModel? driver = await getTaxiDriverByUserId(userId);
+      return driver.id != null; // ✅ If driver exists and has a valid ID, return true
   }
 
   @override

@@ -7,5 +7,6 @@ abstract class IDriverRepository {
   Future<void> updateDriverLocation(int driverId, double latitude, double longitude);
   Future<void> updateDriverAvailability(int driverId, bool isAvailable);
   Future<int> createDriver(DriverModel driver);
-  Future<List<DriverModel>> getTaxiDriverByUserId(int userId);
+  Future<DriverModel> getTaxiDriverByUserId(int userId);
+  Future<bool> checkDriverExists(int userId); 
 }

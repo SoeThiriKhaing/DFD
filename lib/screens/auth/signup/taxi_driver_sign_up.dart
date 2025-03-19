@@ -38,9 +38,11 @@ class _TaxiDriverSignUpState extends State<TaxiDriverSignUp> {
         String? userName = await getUserName();
         String? userId = await getUserId();
 
-        List<Map<String, String>> uid = await driverController.loadTaxiDriverByUserId(userId!);
-        if(uid.isNotEmpty){
-          SnackbarHelper.showSnackbar(title: "Error", message: "You have already create account with your current email");
+        bool isDriverExists = await driverController.isDriverAlreadyRegistered(userId!);
+        if (isDriverExists) {
+          SnackbarHelper.showSnackbar(
+              title: "Error",
+              message: "You have already created a driver account with this email.");
           return;
         }
 
@@ -82,7 +84,7 @@ class _TaxiDriverSignUpState extends State<TaxiDriverSignUp> {
 
         // ✅ Show error message if mounted
         if (mounted) {
-          SnackbarHelper.showSnackbar(title: "Error", message: 'An error occurred: $e');
+          SnackbarHelper.showSnackbar(title: "Error", backgroundColor: Colors.red, message: 'An error occurred: $e');
         }
       }
     }

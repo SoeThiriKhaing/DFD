@@ -13,9 +13,15 @@ class DriverService {
     return drivers;
   }
 
-  Future<List<DriverModel>> fetchTaxiDriverCount(String userId) async {
-    return await repository.getTaxiDriverByUserId(int.parse(userId));
+  Future<DriverModel> fetchTaxiDriverByUserId(String userId) async {
+      return await repository.getTaxiDriverByUserId(int.parse(userId));
   }
+
+  // ✅ New method to check if a driver exists
+  Future<bool> doesDriverExist(String userId) async {
+      return await repository.checkDriverExists(int.parse(userId));
+  }
+
 
   Future<void> updateLocation(int driverId, double latitude, double longitude) {
     return repository.updateDriverLocation(driverId, latitude, longitude);
