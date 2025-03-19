@@ -46,7 +46,6 @@ class _TaxiDriverSignUpState extends State<TaxiDriverSignUp> {
         }
 
         bool isDriverExists = await driverController.isDriverAlreadyRegistered(int.parse(userId));
-        debugPrint("Is Driver Exist? : $isDriverExists");
         if (isDriverExists) {
           SnackbarHelper.showSnackbar(
               title: "Error",
@@ -88,7 +87,7 @@ class _TaxiDriverSignUpState extends State<TaxiDriverSignUp> {
 
         // ✅ Navigate to dashboard if mounted
         if (mounted) {
-          Get.offNamed('/driverdashboard');
+          SnackbarHelper.showSnackbar(title: "Success", message: "Your account is created successfully. Please contact with the admin team.");
         }
       } catch (e) {
         debugPrint('❌ Error during request: $e');

@@ -5,7 +5,6 @@ import 'package:dailyfairdeal/screens/auth/signup/rider_sign_up.dart';
 import 'package:dailyfairdeal/screens/auth/signup/taxi_driver_sign_up.dart';
 import 'package:dailyfairdeal/screens/auth/splashscreen.dart';
 import 'package:dailyfairdeal/screens/auth/to_register.dart';
-import 'package:dailyfairdeal/screens/dashboard/dashboard.dart';
 import 'package:dailyfairdeal/screens/dashboard/restaurant/restaurant_owner_dashboard.dart';
 import 'package:dailyfairdeal/screens/dashboard/restaurant/restaurant_setting/change_restaurant_image.dart';
 import 'package:dailyfairdeal/screens/dashboard/restaurant/restaurant_setting/profile_setting.dart';
@@ -45,7 +44,6 @@ class MyApp extends StatelessWidget {
           GetPage(name: '/merchantsignup', page: () => const MerchantSignUp()),
           GetPage(name: '/profile', page: () => const Profile()),
           GetPage(name: '/main', page: () => MainScreen()),
-          GetPage(name: '/dashboard', page: () => const Dashboard()),
           GetPage(
               name: '/restaurantownerdashboard',
               page: () => const RestaurantOwnerDashboard()),

@@ -13,7 +13,7 @@ class DriverService {
     return drivers;
   }
 
-  Future<DriverModel> fetchTaxiDriverByUserId(int userId) async {
+  Future<DriverModel?> fetchTaxiDriverByUserId(int userId) async {
       return await repository.getTaxiDriverByUserId(userId);
   }
 

@@ -53,5 +53,8 @@ class DriverController extends StateNotifier<int>{
     return await service.doesDriverExist(userId);
   }
 
-
+  Future<int?> fetchTaxiDriverByUserId(int userId) async {
+    DriverModel? drivers = await service.fetchTaxiDriverByUserId(userId);
+    return drivers?.id;
+  }
 }

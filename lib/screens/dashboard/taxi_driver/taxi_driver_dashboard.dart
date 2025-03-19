@@ -1,7 +1,7 @@
 import 'package:dailyfairdeal/screens/dashboard/taxi_driver/driver_profile.dart';
 import 'package:dailyfairdeal/screens/dashboard/taxi_driver/earning_summary.dart';
 import 'package:dailyfairdeal/screens/dashboard/taxi_driver/rider_request.dart';
-import 'package:dailyfairdeal/screens/dashboard/taxi_driver/taxi_home.dart';
+import 'package:dailyfairdeal/screens/dashboard/taxi_driver/taxi_driver_home.dart';
 import 'package:dailyfairdeal/screens/dashboard/taxi_driver/trip_history.dart';
 import 'package:dailyfairdeal/widget/app_color.dart';
 import 'package:dailyfairdeal/widget/support_widget.dart';

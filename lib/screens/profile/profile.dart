@@ -1,4 +1,9 @@
+import 'package:dailyfairdeal/controllers/taxi/driver/driver_controller.dart';
+import 'package:dailyfairdeal/repositories/taxi/driver/driver_repository.dart';
 import 'package:dailyfairdeal/screens/profile/business.dart';
+import 'package:dailyfairdeal/services/secure_storage.dart';
+import 'package:dailyfairdeal/services/taxi/driver/driver_service.dart';
+import 'package:dailyfairdeal/util/snackbar_helper.dart';
 import 'package:dailyfairdeal/widget/app_color.dart';
 import 'package:dailyfairdeal/widget/build_list_tile_widget.dart';
 import 'package:dailyfairdeal/widget/support_widget.dart';
@@ -6,9 +11,50 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:get/get.dart';
 
-class Profile extends StatelessWidget {
+class Profile extends StatefulWidget {
   const Profile({super.key});
 
+  @override
+  State<Profile> createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
+  
+  String? userRole;
+  int? userId;
+  final DriverController driverController=Get.put(DriverController(service: DriverService(repository: DriverRepository()))); 
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserData();
+  }
+
+  Future<void> loadUserData() async {
+    String? role = await getUserRole(); // Fetch role from secure storage
+    String? uid = await getUserId();
+    setState(() {
+      userRole = role;
+      userId = int.parse(uid!);
+    });
+  }
+  
+  Future<void> navigateToDriverDashboard() async {
+    if (userId != null) {
+      int? driverId = await driverController.fetchTaxiDriverByUserId(userId!);
+      if (driverId != null) {
+        saveDriverId(driverId.toString()); // Save to the secure storage
+        Get.toNamed("/driverdashboard", arguments: {"driverId": driverId});
+      } else {
+        SnackbarHelper.showSnackbar(
+          title: "Error",
+          message: "Driver not found.",
+          backgroundColor: Colors.red,
+        );
+      }
+    }
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,49 +84,53 @@ class Profile extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 30),
-
-            Center(
+            
+            // Display Business Section only if the user is NOT a "user"
+            if (userRole == 'user') ...[
+              Center(
                 child: Text("List your business on DailyFairDeal!",
                     style: AppWidget.subTitle())),
-            Center(child: Text("Be Our Partner?", style: AppWidget.subTitle())),
-            const SizedBox(height: 5),
+              Center(child: Text("Be Our Partner?", style: AppWidget.subTitle())),
+              const SizedBox(height: 5),
 
-            // Card View
-            GestureDetector(
-              onTap: () {
-                Get.to(() => const BusinessPage());
-              },
-              child: Card(
-                color: Colors.white,
-                margin: const EdgeInsets.symmetric(horizontal: 16.0),
-                elevation: 5,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.all(20.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Business Centre',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+              // Card View
+              GestureDetector(
+                onTap: () {
+                  Get.to(() => const BusinessPage());
+                },
+                child: Card(
+                  color: Colors.white,
+                  margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                  elevation: 5,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15.0),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Business Centre',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      Icon(
-                        Icons.business_center,
-                        size: 40.0,
-                        color: AppColor.primaryColor,
-                      ),
-                    ],
+                        Icon(
+                          Icons.business_center,
+                          size: 40.0,
+                          color: AppColor.primaryColor,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
+            ],
+            
             Padding(
               padding: const EdgeInsets.only(left: 15),
               child: Text("General", style: AppWidget.subTitle()),
@@ -93,7 +143,29 @@ class Profile extends StatelessWidget {
               physics:
                   const NeverScrollableScrollPhysics(), // Prevents list view from scrolling
               children: [
-                buildListTile(icon: Icons.dashboard_customize, iconColor: Colors.yellow, title: "Your Dashboard", subtitle: "Go and view your dashboard.", onTap: (){ Get.toNamed("/dashboard");}),
+                if (userRole != "user") ...[
+
+                  if(userRole == 'driver')
+                    buildListTile(
+                      icon: Icons.dashboard_customize,
+                      iconColor: Colors.yellow,
+                      title: "Driver Dashboard",
+                      subtitle: "Go and view your dashboard.",
+                      onTap: navigateToDriverDashboard,
+                    ),
+                  
+                  if(userRole == 'admin')
+                    buildListTile(icon: Icons.dashboard_customize, iconColor: Colors.yellow, title: "Admin Dashboard", subtitle: "Go and view your dashboard.", onTap: (){ Get.toNamed("/dashboard");}),
+
+                  if(userRole == 'rider')
+                    buildListTile(icon: Icons.dashboard_customize, iconColor: Colors.yellow, title: "Rider Dashboard", subtitle: "Go and view your dashboard.", onTap: (){ Get.toNamed("/dashboard");}),
+
+                  if(userRole == 'restaurant_owner')
+                    buildListTile(icon: Icons.dashboard_customize, iconColor: Colors.yellow, title: "Restaurant Owner Dashboard", subtitle: "Go and view your dashboard.", onTap: (){ Get.toNamed("/ashboard");}),
+
+                  if(userRole == 'mall_owner')
+                    buildListTile(icon: Icons.dashboard_customize, iconColor: Colors.yellow, title: "Mall Owner Dashboard", subtitle: "Go and view your dashboard.", onTap: (){ Get.toNamed("/dashboard");}),
+                ],
                 buildListTile(icon: Icons.person, iconColor: Colors.blue, title: "Profile Details", subtitle: "View and edit your profile information.", onTap: (){}),
                 buildListTile(icon: Icons.shopping_cart, iconColor: Colors.green, title: "Orders & Reordering", subtitle: "Track and reorder your past orders.", onTap: (){}),
                 buildListTile(icon: Icons.card_giftcard, iconColor: Colors.orange, title: "Vouchers", subtitle: "Check available vouchers and discounts.", onTap: (){}),

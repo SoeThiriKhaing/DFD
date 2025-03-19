@@ -33,15 +33,19 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
   Future<void> _fetchRideRequests() async {
     try {
       List<TravelModel> requests = await travelController.fetchRideRequests();
-      setState(() {
-        rideRequests = requests;
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          rideRequests = requests;
+          isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        errorMessage = "Error: $e";
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          errorMessage = "Error: $e";
+          isLoading = false;
+        });
+      }
     }
   }
 

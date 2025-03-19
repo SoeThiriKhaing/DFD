@@ -28,26 +28,35 @@ class DriverRepository implements IDriverRepository {
   }
 
   @override
-  Future<DriverModel> getTaxiDriverByUserId(int userId) async {
-      final response = await ApiHelper.request(
-        endpoint: '${AppUrl.getNumberOfTaxiDriver}/$userId',
-        method: 'GET',
-      );
+  Future<DriverModel?> getTaxiDriverByUserId(int userId) async {
+    final response = await ApiHelper.request(
+      endpoint: '${AppUrl.getNumberOfTaxiDriver}/$userId',
+      method: 'GET',
+    );
 
-      if (response != null && response['data'] != null) {
-          debugPrint('Driver data: ${response['data']}');
-          return DriverModel.fromJson(response['data']); // ✅ Correctly parsing single object
+    if (response != null) {
+      if (response['data'] is Map<String, dynamic>) {
+        debugPrint('Driver data: ${response['data']}');
+        return DriverModel.fromJson(response['data']); // ✅ Correctly parsing single object
+      } else if (response['data'] is List && response['data'].isEmpty) {
+        return null;
       }
-      throw Exception('Driver not found');
+    }
+    throw Exception('Unexpected response format');
   }
 
 
   // ✅ New method to check if the driver exists
   @override
   Future<bool> checkDriverExists(int userId) async {
-      DriverModel driver = await getTaxiDriverByUserId(userId);
+    try {
+      DriverModel? driver = await getTaxiDriverByUserId(userId);
       debugPrint("Data in repo method: $driver");
-      return driver.id != null;
+      return driver != null;
+    } catch (e) {
+      debugPrint("Error checking driver existence: $e");
+      return false;
+    }
   }
 
   @override
