@@ -1,21 +1,22 @@
 import 'package:dailyfairdeal/controllers/taxi/driver/travel_controller.dart';
 import 'package:dailyfairdeal/models/taxi/driver/travel_model.dart';
 import 'package:dailyfairdeal/repositories/taxi/driver/travel_repository.dart';
+import 'package:dailyfairdeal/services/secure_storage.dart';
 import 'package:dailyfairdeal/services/taxi/driver/travel_service.dart';
 import 'package:dailyfairdeal/widget/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class RideRequestsScreen extends StatefulWidget {
-  final String driverId;
-
-  const RideRequestsScreen({super.key, required this.driverId});
+  
+  const RideRequestsScreen({super.key});
 
   @override
   RideRequestsScreenState createState() => RideRequestsScreenState();
 }
 
 class RideRequestsScreenState extends State<RideRequestsScreen> {
+  late int driverId;
   late TravelController travelController;
   List<TravelModel> rideRequests = [];
   bool isLoading = true;
@@ -24,6 +25,12 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
   @override
   void initState() {
     super.initState();
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    String? taxiDriverId = await getDriverId(); //Get from secure storage
+    driverId = int.parse(taxiDriverId!);
     travelController = Get.put(TravelController(
         travelService:
             TravelService(travelRepository: TravelRepository())));
@@ -32,7 +39,7 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
 
   Future<void> _fetchRideRequests() async {
     try {
-      List<TravelModel> requests = await travelController.fetchRideRequests();
+      List<TravelModel> requests = await travelController.fetchRideRequests(driverId);
       if (mounted) {
         setState(() {
           rideRequests = requests;

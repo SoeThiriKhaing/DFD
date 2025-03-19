@@ -21,7 +21,7 @@ class TravelController {
   }
 
   //To show the notifaction in the Driver Dashboard
-  Future<List<TravelModel>> fetchRideRequests() async {
-    return await travelService.getRideRequests();
+  Future<List<TravelModel>> fetchRideRequests(int driverId) async {
+    return await travelService.getRideRequests(driverId);
   }
 }

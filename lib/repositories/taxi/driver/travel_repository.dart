@@ -17,9 +17,9 @@ class TravelRepository implements ITravelRepository {
   }
 
   @override
-  Future<List<TravelModel>> fetchRideRequests() async {
+  Future<List<TravelModel>> fetchRideRequests(int driverId) async {
     return await ApiHelper.fetchList<TravelModel>(
-        endpoint: AppUrl.getNoti,
+        endpoint: '${AppUrl.getNoti}/$driverId/notifications',
         fromJson: (data) {
           debugPrint("Raw data for RideRequest:$data");
           return TravelModel.fromJson(data);

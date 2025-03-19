@@ -13,13 +13,9 @@ class TaxiHomeScreen extends StatefulWidget {
 
 class TaxiHomeScreenState extends State<TaxiHomeScreen> {
   final TaxiController taxiController = Get.put(TaxiController());
-  final Map<String, dynamic> arguments = Get.arguments;
-  late int driverId;
   @override
   void initState() {
     super.initState();
-    driverId = arguments['driverId'];
-    debugPrint("Driver ID in taxi driver dashboard is $driverId");
     _checkLocationPermission();
   }
 

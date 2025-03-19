@@ -76,5 +76,5 @@ class AppUrl {
 
   //Driver Notification
 
-  static String getNoti = "$baseUrl/driver/{driverId}/notifications";
+  static String getNoti = "$baseUrl/driver";
 }

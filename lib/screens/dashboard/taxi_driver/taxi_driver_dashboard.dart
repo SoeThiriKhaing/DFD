@@ -6,6 +6,7 @@ import 'package:dailyfairdeal/screens/dashboard/taxi_driver/trip_history.dart';
 import 'package:dailyfairdeal/widget/app_color.dart';
 import 'package:dailyfairdeal/widget/support_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class DriverDashboard extends StatefulWidget {
   const DriverDashboard({super.key});
@@ -15,12 +16,22 @@ class DriverDashboard extends StatefulWidget {
 }
 
 class DriverDashboardState extends State<DriverDashboard> {
+  final Map<String, dynamic> arguments = Get.arguments;
+  late int driverId;
+
+  @override
+  void initState() {
+    super.initState();
+    driverId = arguments['driverId'];
+    debugPrint("Driver ID in taxi driver dashboard is $driverId");
+  }
+
   int selectedIndex = 0;
   final PageController _pageController = PageController();
 
   final List<Widget> _screens = [
     const TaxiHomeScreen(),
-    const RideRequestsScreen(driverId: ''),
+    const RideRequestsScreen(),
     const EarningsSummaryScreen(),
     const TripHistoryScreen(),
     const ProfileScreen(),

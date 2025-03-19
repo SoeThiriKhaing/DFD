@@ -12,10 +12,10 @@ class TravelService {
   }
 
   //To show notification from the driver dashboard
-  Future<List<TravelModel>> getRideRequests() async {
+  Future<List<TravelModel>> getRideRequests(int driverId) async {
     try {
       List<TravelModel> rideRequests =
-          await travelRepository.fetchRideRequests();
+          await travelRepository.fetchRideRequests(driverId);
       debugPrint("Fetched ${rideRequests.length} ride requests successfully");
       return rideRequests;
     } catch (e) {
