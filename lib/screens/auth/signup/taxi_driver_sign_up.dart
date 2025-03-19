@@ -34,27 +34,42 @@ class _TaxiDriverSignUpState extends State<TaxiDriverSignUp> {
   void handleSubmit() async {
     if (formKey.currentState!.validate()) {
       try {
-        //Get username from secure storage
+        // Get username and userId from secure storage
         String? userName = await getUserName();
         String? userId = await getUserId();
 
-        bool isDriverExists = await driverController.isDriverAlreadyRegistered(userId!);
+        if (userName == null || userId == null) {
+          SnackbarHelper.showSnackbar(
+              title: "Error",
+              message: "Information is missing. Please Login again.");
+          return;
+        }
+
+        bool isDriverExists = await driverController.isDriverAlreadyRegistered(int.parse(userId));
+        debugPrint("Is Driver Exist? : $isDriverExists");
         if (isDriverExists) {
           SnackbarHelper.showSnackbar(
               title: "Error",
-              message: "You have already created a driver account with this email.");
+              message: "You have already created a driver account with this email.",
+              backgroundColor: Colors.red
+            );
           return;
         }
 
         // Get current position
-        // Position position = await Geolocator.getCurrentPosition(
-        //     desiredAccuracy: LocationAccuracy.high);
         LatLng? position = await LocationService().getCurrentLocation();
+        if (position == null) {
+          SnackbarHelper.showSnackbar(
+              title: "Error",
+              message: "Unable to get current location.");
+          return;
+        }
+
         // Create DriverModel object with gathered data
         final driver = DriverModel(
-          userId: int.tryParse(userId),
-          name: userName!,
-          latitude: position!.latitude,
+          userId: int.tryParse(userId) ?? 0,
+          name: userName,
+          latitude: position.latitude,
           longitude: position.longitude,
           isAvailable: true,
           carYear: int.tryParse(carYearController.text) ?? 0,
@@ -70,10 +85,6 @@ class _TaxiDriverSignUpState extends State<TaxiDriverSignUp> {
 
         // Call the method to save the driver data in backend
         await driverController.createDriver(driver);
-
-        // ✅ Save driver data in SharedPreferences
-        //await saveDriver(driver);
-        //debugPrint("✅ Driver data saved locally!");
 
         // ✅ Navigate to dashboard if mounted
         if (mounted) {

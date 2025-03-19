@@ -12,7 +12,7 @@ class DriverRepository implements IDriverRepository {
       endpoint: AppUrl.getNearbyTaxiDriver,
       fromJson: (data) {
         debugPrint('Raw data from API: $data'); // Debug print to log the data
-        return DriverModel.fromJson(data) as DriverModel;
+        return DriverModel.fromJson(data);
       },
     );
   }
@@ -30,7 +30,7 @@ class DriverRepository implements IDriverRepository {
   @override
   Future<DriverModel> getTaxiDriverByUserId(int userId) async {
       final response = await ApiHelper.request(
-        endpoint: 'AppUrl.getNumberOfTaxiDriver/$userId',
+        endpoint: '${AppUrl.getNumberOfTaxiDriver}/$userId',
         method: 'GET',
       );
 
@@ -45,8 +45,9 @@ class DriverRepository implements IDriverRepository {
   // ✅ New method to check if the driver exists
   @override
   Future<bool> checkDriverExists(int userId) async {
-      DriverModel? driver = await getTaxiDriverByUserId(userId);
-      return driver.id != null; // ✅ If driver exists and has a valid ID, return true
+      DriverModel driver = await getTaxiDriverByUserId(userId);
+      debugPrint("Data in repo method: $driver");
+      return driver.id != null;
   }
 
   @override

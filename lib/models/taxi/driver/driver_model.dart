@@ -1,9 +1,6 @@
-import 'package:dailyfairdeal/services/taxi/location/location_service.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-
 class DriverModel {
   final int? id;
-  final String name; //added additionally
+  final String? name; //added additionally
   final double? price;//added additionally
   final int? userId; // Store only user ID instead of UserModel
   final double latitude;
@@ -19,7 +16,7 @@ class DriverModel {
 
   DriverModel({
     this.id,
-    required this.name, //added additionally
+    this.name, //added additionally
     this.price, //added additionally
     this.userId, // Only user ID
     required this.latitude,
@@ -35,30 +32,28 @@ class DriverModel {
   });
 
   // Fetch current location asynchronously
-  static Future<DriverModel> fromJson(Map<String, dynamic> json) async {
-    // Position position = await Geolocator.getCurrentPosition(
-    //     desiredAccuracy: LocationAccuracy.high);
-    LatLng? position = await LocationService().getCurrentLocation();
+  //static Future<DriverModel> fromJson(Map<String, dynamic> json) async {
+  static DriverModel fromJson(Map<String, dynamic> json) {
     return DriverModel(
-      id: json['id'] ?? 0,
-      name: json['name'], //added additionally
-      price: json['price'], //added additionally
+      id: json['id'] ?? 0,//added additionally
       userId: json['rider_id'] ?? 0, // Extract only user ID
-      latitude: position!.latitude,
-      longitude: position.longitude,
-      isAvailable: json['is_available'] ?? false,
+      latitude: json['latitude'],
+      longitude: json['longitude'],
+      isAvailable: json['is_available'] == 1,
       carYear: json['car_year'] ?? 0,
       carMake: json['car_make'] ?? '',
       carModel: json['car_model'] ?? '',
       carColour: json['car_colour'] ?? '',
       licensePlate: json['license_plate'] ?? '',
       otherInfo: json['other_info'] ?? '',
-     // role: json['user_role']?['name'] ?? 'user',
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      //"id": id,
+      //"name": name,
+      //"price": price,
       "latitude": latitude,
       "longitude": longitude,
       "is_available": isAvailable ? 1 : 0,

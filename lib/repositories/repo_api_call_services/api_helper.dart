@@ -34,7 +34,6 @@ class ApiHelper {
       });
 
       final decodedResponse = jsonDecode(response.body);
-
       if (T == List<dynamic>) {
         if (decodedResponse is Map<String, dynamic> &&
             decodedResponse.containsKey('data')) {
@@ -46,7 +45,9 @@ class ApiHelper {
         return decodedResponse as T;
       } else if (fromJson != null) {
         // Use fromJson for custom parsing
-        return fromJson(decodedResponse as Map<String, dynamic>);
+        return fromJson(decodedResponse);
+      } else if (T == dynamic) {
+        return decodedResponse as T;
       } else {
         throw Exception("Unsupported response type: $T");
       }

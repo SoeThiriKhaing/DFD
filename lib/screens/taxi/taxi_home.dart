@@ -82,7 +82,7 @@ class _TaxiHomeState extends State<TaxiHome> {
       try {
         await travelController.createTravelRequest(sourceLocation!.latitude, sourceLocation!.longitude, destinationLocation!.latitude, destinationLocation!.longitude);
         final fetchedDrivers = await driverController.fetchNearbyDrivers();
-        nearbyTaxiDriver = await Future.wait(fetchedDrivers.map((driver) => DriverModel.fromJson(driver)));
+        nearbyTaxiDriver = fetchedDrivers.map((driver) => DriverModel.fromJson(driver)).toList();
       } catch (e) {
         debugPrint('Failed to fetch drivers: $e');
         nearbyTaxiDriver = [];

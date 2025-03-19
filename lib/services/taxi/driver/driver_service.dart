@@ -13,13 +13,13 @@ class DriverService {
     return drivers;
   }
 
-  Future<DriverModel> fetchTaxiDriverByUserId(String userId) async {
-      return await repository.getTaxiDriverByUserId(int.parse(userId));
+  Future<DriverModel> fetchTaxiDriverByUserId(int userId) async {
+      return await repository.getTaxiDriverByUserId(userId);
   }
 
   // ✅ New method to check if a driver exists
-  Future<bool> doesDriverExist(String userId) async {
-      return await repository.checkDriverExists(int.parse(userId));
+  Future<bool> doesDriverExist(int userId) async {
+      return await repository.checkDriverExists(userId);
   }
 
 

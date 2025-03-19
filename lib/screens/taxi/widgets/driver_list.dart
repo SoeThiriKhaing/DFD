@@ -39,7 +39,7 @@ class DriverList extends StatelessWidget {
               itemBuilder: (BuildContext context, int index) {
                 final driver = drivers[index];
                 return ListTile(
-                  title: Text(driver.name),
+                  title: Text(driver.name ?? 'Unknown Driver'),
                   subtitle: Text('Car No: ${driver.licensePlate} \nPrice: ${driver.price} MMK'),
                   trailing: ElevatedButton(
                     onPressed: () {

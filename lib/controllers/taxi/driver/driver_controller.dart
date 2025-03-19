@@ -8,7 +8,7 @@ class DriverController extends StateNotifier<int>{
 
   DriverController({required this.service}): super(0);
 
-  Future<List<Map<String, String>>> fetchNearbyDrivers() async {
+  Future<List<Map<String, String?>>> fetchNearbyDrivers() async {
     List<DriverModel> drivers = await service.fetchNearbyDrivers();
     return drivers.map((driver) => {'id': driver.id.toString(), 'name': driver.name, 'licensePlate': driver.licensePlate,}).toList();
   }
@@ -49,7 +49,7 @@ class DriverController extends StateNotifier<int>{
     }
   }
 
-  Future<bool> isDriverAlreadyRegistered(String userId) async {
+  Future<bool> isDriverAlreadyRegistered(int userId) async {
     return await service.doesDriverExist(userId);
   }
 
