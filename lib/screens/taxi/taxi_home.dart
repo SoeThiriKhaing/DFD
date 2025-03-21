@@ -1,14 +1,13 @@
 import 'dart:convert';
-import 'package:dailyfairdeal/controllers/taxi/driver/driver_controller.dart';
+import 'package:dailyfairdeal/controllers/taxi/driver/nearby_taxi_driver_controller.dart';
 import 'package:dailyfairdeal/controllers/taxi/driver/travel_controller.dart';
-import 'package:dailyfairdeal/models/taxi/driver/driver_model.dart';
 import 'package:dailyfairdeal/models/taxi/driver/travel_model.dart';
-import 'package:dailyfairdeal/repositories/taxi/driver/driver_repository.dart';
+import 'package:dailyfairdeal/repositories/taxi/driver/nearby_taxi_driver_repository.dart';
 import 'package:dailyfairdeal/repositories/taxi/driver/travel_repository.dart';
 import 'package:dailyfairdeal/screens/taxi/widgets/auto_complete_text_field.dart';
 import 'package:dailyfairdeal/screens/taxi/widgets/driver_list.dart';
 import 'package:dailyfairdeal/screens/taxi/widgets/map_view.dart';
-import 'package:dailyfairdeal/services/taxi/driver/driver_service.dart';
+import 'package:dailyfairdeal/services/taxi/driver/nearby_taxi_driver_service.dart';
 import 'package:dailyfairdeal/services/taxi/driver/travel_service.dart';
 import 'package:dailyfairdeal/services/taxi/location/location_service.dart';
 import 'package:dailyfairdeal/widget/app_color.dart';
@@ -33,9 +32,9 @@ class _TaxiHomeState extends State<TaxiHome> {
   final TextEditingController sourceController = TextEditingController();
   final TextEditingController destinationController = TextEditingController();
   final LocationService locationService = LocationService();
-  final DriverRepository driverRepository = DriverRepository();
-  late DriverService service;
-  late DriverController driverController;
+  final NearByTaxiDriverRepository repository = NearByTaxiDriverRepository();
+  late NearByTaxiDriverService service;
+  late NearByTaxiDriverController controller;
   GoogleMapController? mapController;
   LatLng? sourceLocation;
   LatLng? destinationLocation;
@@ -45,15 +44,15 @@ class _TaxiHomeState extends State<TaxiHome> {
   bool isLoading = false;
   bool showDriverList = false;
   bool showSearchFields = true;
-  List<DriverModel> nearbyTaxiDriver = [];
+  List<Map<String, String?>> nearbyTaxiDriver = [];
   String googleAPIKey = "AIzaSyAXBWwV59Q5OlaUZ1TQs-j6YXgp_7cqHPA";
   final TravelController travelController = Get.put(TravelController(
     travelService:TravelService(travelRepository: TravelRepository())));
   @override
   void initState() {
     super.initState();
-    service = DriverService(repository: driverRepository);
-    driverController = DriverController(service: service);
+    service = NearByTaxiDriverService(repository: repository);
+    controller = NearByTaxiDriverController(service: service);
     _getCurrentLocation();
   }
 
@@ -89,16 +88,17 @@ class _TaxiHomeState extends State<TaxiHome> {
         status: 'pending',
       );
         await travelController.createTravelRequest(travel);
-        final fetchedDrivers = await driverController.fetchNearbyDrivers();
-        nearbyTaxiDriver = fetchedDrivers.map((driver) => DriverModel.fromJson(driver)).toList();
+        List<Map<String, String?>> driversList = await controller.fetchNearbyDrivers();
+        nearbyTaxiDriver = driversList;
+        setState(() {
+          isLoading = false;
+          showDriverList = true;
+        });
       } catch (e) {
         debugPrint('Failed to fetch drivers: $e');
         nearbyTaxiDriver = [];
       }
-      setState(() {
-        isLoading = false;
-        showDriverList = true;
-      });
+      
     }
   }
 
@@ -374,7 +374,7 @@ class _TaxiHomeState extends State<TaxiHome> {
           if (showDriverList)
             Expanded(
               child: DriverList(
-                drivers: nearbyTaxiDriver,
+                driversList: nearbyTaxiDriver,
                 isLoading: isLoading,
               ),
             ),

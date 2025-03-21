@@ -8,11 +8,6 @@ class DriverController extends StateNotifier<int>{
 
   DriverController({required this.service}): super(0);
 
-  Future<List<Map<String, String?>>> fetchNearbyDrivers() async {
-    List<DriverModel> drivers = await service.fetchNearbyDrivers();
-    return drivers.map((driver) => {'id': driver.id.toString(), 'name': driver.name, 'licensePlate': driver.licensePlate,}).toList();
-  }
-
   Future<void> updateLocation(
       int driverId, double latitude, double longitude) async {
     try {

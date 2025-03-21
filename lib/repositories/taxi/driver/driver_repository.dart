@@ -5,17 +5,6 @@ import 'package:dailyfairdeal/util/appurl.dart';
 import 'package:flutter/material.dart';
 
 class DriverRepository implements IDriverRepository {
-  /// Fetch a list of countries from the API
-  @override
-  Future<List<DriverModel>> fetchNearbyDrivers() async {
-    return await ApiHelper.fetchList<DriverModel>(
-      endpoint: AppUrl.getNearbyTaxiDriver,
-      fromJson: (data) {
-        debugPrint('Raw data from API: $data'); // Debug print to log the data
-        return DriverModel.fromJson(data);
-      },
-    );
-  }
 
   @override
   Future<int> createDriver(DriverModel driver) async {
@@ -30,7 +19,7 @@ class DriverRepository implements IDriverRepository {
   @override
   Future<DriverModel?> getTaxiDriverByUserId(int userId) async {
     final response = await ApiHelper.request(
-      endpoint: '${AppUrl.getNumberOfTaxiDriver}/$userId',
+      endpoint: '${AppUrl.getTaxiDriverByUserId}/$userId',
       method: 'GET',
     );
 

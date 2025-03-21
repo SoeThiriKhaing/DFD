@@ -27,6 +27,7 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
   List<TravelModel> rideRequests = [];
   bool isLoading = true;
   String? errorMessage;
+  Map<int, bool> bidStatus = {}; //Track bid status per travelId
 
   @override
   void initState() {
@@ -47,13 +48,17 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
   Future<void> _fetchRideRequests() async {
     try {
       List<TravelModel> requests = await travelController.fetchRiderRequests(driverId);
+      Map<int, bool> tempBidStatus = {}; // Temporary map to track bid existence
       for (var request in requests) {
         request.pickupAddress = await _getAddressFromLatLng(request.pickupLatitude, request.pickupLongitude);
         request.destinationAddress = await _getAddressFromLatLng(request.destinationLatitude, request.destinationLongitude);
+        //bool bidPriceExist = await bidPriceController.isBidPriceAlreadyExist(request.travelId!, driverId); //To Check Bid Price Exist or Not
+        //tempBidStatus[request.travelId!] = bidPriceExist; //Store status per travelId
       }
       if (mounted) {
         setState(() {
           rideRequests = requests;
+          bidStatus = tempBidStatus; //Update state with bid status
           isLoading = false;
         });
       }
@@ -125,15 +130,17 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
       bool success = await bidPriceController.submitBidPrice(travelId, driverId, bidPrice);
 
       if (success) {
-        SnackbarHelper.showSnackbar(title: "Success", message: "Bid submitted successfully!");
+        SnackbarHelper.showSnackbar(title: "Success", message: "Bid price is submitted successfully!");
+        setState(() {
+          bidStatus[travelId] = true; //Update UI when bid is placed
+        });
       } else {
-        SnackbarHelper.showSnackbar(title: "Error", message: "Failed to submit bid.", backgroundColor: Colors.red);
+        SnackbarHelper.showSnackbar(title: "Error", message: "Failed to submit bid price.", backgroundColor: Colors.red);
       }
     } catch (e) {
       debugPrint("Error: $e");
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -142,48 +149,54 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
           ? const Center(child: CircularProgressIndicator())
           : errorMessage != null
               ? Center(
-                  child:
-                      Text(errorMessage!, style: const TextStyle(fontSize: 16)))
-              : ListView.builder(
-                  padding: const EdgeInsets.all(10),
-                  itemCount: rideRequests.length,
-                  itemBuilder: (context, index) {
-                    final request = rideRequests[index];
+                  child: Text(errorMessage!, style: const TextStyle(fontSize: 16)))
+              : rideRequests.isEmpty //Check if ride requests are empty
+                  ? const Center( 
+                      child: Text( 
+                        'No Rider Request', 
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), 
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(10),
+                      itemCount: rideRequests.length,
+                      itemBuilder: (context, index) {
+                        final request = rideRequests[index];
+                        final bool hasBid = bidStatus[request.travelId] ?? false; //Check bid status
 
-                    return Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      elevation: 5,
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      child: ListTile(
-                        // leading: const Icon(Icons.location_on,
-                        //     color: AppColor.primaryColor, size: 30),
-                        title: Text(
-                          "Ride Request #${request.travelId}",
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("📍Pickup: ${request.pickupAddress ?? 'Fetching...'}"),
-                            Text("📍Dropoff: ${request.destinationAddress ?? 'Fetching...'}"),
-                            Text("👤Rider: ${request.user!.name}"),
-                            Text("📞Phone: ${request.user!.phone ?? 'N/A'}"),
-                          ],
-                        ),
-                        trailing: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColor.primaryColor,
+                        return Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                          onPressed: () =>
-                              _showBidPriceDialog(context, request.travelId!),
-                          child: const Text("Bid Price"),
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                          elevation: 5,
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          child: ListTile(
+                            title: Text(
+                              "Ride Request #${request.travelId}",
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("📍Pickup: ${request.pickupAddress ?? 'Fetching...'}"),
+                                Text("📍Dropoff: ${request.destinationAddress ?? 'Fetching...'}"),
+                                Text("👤Rider: ${request.user!.name}"),
+                                Text("📞Phone: ${request.user!.phone ?? 'N/A'}"),
+                              ],
+                            ),
+                            trailing: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColor.primaryColor,
+                              ),
+                              onPressed: hasBid
+                                  ? null //Disable button if bid exists
+                                  : () => _showBidPriceDialog(context, request.travelId!),
+                              child: Text(hasBid ? "Accepted" : "Bid Price"),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
     );
   }
 }

@@ -63,13 +63,18 @@ class AppUrl {
   //static String getDriverByUserId = "$baseUrl/taxi-drivers/$userId";
 
   //Nearby Taxi Driver
-  static String getNearbyTaxiDriver = "$baseUrl/biddings";
+  static String getNearbyTaxiDriver = "$baseUrl/user/bidding-prices";
 
   //Submit Bid Price by Taxi Driver
   static String submitBidPrice = "$baseUrl/biddings";
 
+  //Accept Driver by the Rider
+  static String acceptDriver = "$baseUrl/accept_drivers";
+  //Get Bid Price by Travel Id
+  static String getBidPriceByTravelId="$baseUrl/biddings";
+
   //Get the number of taxi driver
-  static String getNumberOfTaxiDriver = "$baseUrl/taxi-driver/user";
+  static String getTaxiDriverByUserId = "$baseUrl/taxi-driver/user";
 
   //travel Api
   static String createTravel = "$baseUrl/travels";
