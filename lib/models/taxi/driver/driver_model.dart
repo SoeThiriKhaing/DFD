@@ -1,7 +1,6 @@
 class DriverModel {
   final int? id;
   final String? name; //added additionally
-  final double? price;//added additionally
   final int? userId; // Store only user ID instead of UserModel
   final double latitude;
   final double longitude;
@@ -16,8 +15,7 @@ class DriverModel {
 
   DriverModel({
     this.id,
-    this.name, //added additionally
-    this.price, //added additionally
+    this.name, //added additionally //added additionally
     this.userId, // Only user ID
     required this.latitude,
     required this.longitude,

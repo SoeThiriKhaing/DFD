@@ -40,7 +40,7 @@ class DriverList extends StatelessWidget {
                 final driver = drivers[index];
                 return ListTile(
                   title: Text(driver.name ?? 'Unknown Driver'),
-                  subtitle: Text('Car No: ${driver.licensePlate} \nPrice: ${driver.price} MMK'),
+                  subtitle: Text('Car No: ${driver.licensePlate}'),
                   trailing: ElevatedButton(
                     onPressed: () {
                       // Handle accept button press

@@ -7,21 +7,22 @@ class TravelController {
 
   TravelController({required this.travelService});
 
-  Future<void> createTravelRequest(double sourceLat, double sourceLong, double destinationLat, double destinationLong) async {
+  Future<void> createTravelRequest(TravelModel travel) async {
     try {
-      TravelModel travel = await travelService.requestTravel(sourceLat, sourceLong, destinationLat, destinationLong);
-      if(travel.status.isEmpty){
+      TravelModel myTravel = await travelService.requestTravel(travel);
+      if(myTravel.status.isEmpty){
          debugPrint("Invalid to pass the data from Controller");
       } else{
         debugPrint("Success from Controller");
       }
     } catch (e) {
-      debugPrint('Error occurred: $e');
+      debugPrint('Error occurred in create travel request: $e');
     }
   }
 
   //To show the notifaction in the Driver Dashboard
-  Future<List<TravelModel>> fetchRideRequests(int driverId) async {
-    return await travelService.getRideRequests(driverId);
+  Future<List<TravelModel>> fetchRiderRequests(int driverId) async {
+    return await travelService.getRiderRequests(driverId);
   }
+
 }

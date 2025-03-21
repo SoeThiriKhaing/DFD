@@ -7,15 +7,15 @@ class TravelService {
 
   TravelService({required this.travelRepository});
 
-  Future<TravelModel> requestTravel(double sourceLat, double sourceLong, double destinationLat, double destinationLong) {
-    return travelRepository.createTravel(sourceLat, sourceLong, destinationLat, destinationLong);
+  Future<TravelModel> requestTravel(TravelModel travel) {
+    return travelRepository.createTravel(travel);
   }
 
   //To show notification from the driver dashboard
-  Future<List<TravelModel>> getRideRequests(int driverId) async {
+  Future<List<TravelModel>> getRiderRequests(int driverId) async {
     try {
       List<TravelModel> rideRequests =
-          await travelRepository.fetchRideRequests(driverId);
+          await travelRepository.fetchRiderRequests(driverId);
       debugPrint("Fetched ${rideRequests.length} ride requests successfully");
       return rideRequests;
     } catch (e) {
@@ -23,4 +23,5 @@ class TravelService {
       return [];
     }
   }
+
 }

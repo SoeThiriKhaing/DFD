@@ -15,7 +15,7 @@ class AuthController{
   Future<void> login(String email, String password) async {
     try {
       UserModel user = await authService.login(email, password);
-      if(user.accessToken.isEmpty){
+      if(user.accessToken!.isEmpty){
         SnackbarHelper.showSnackbar(
           title: "Error",
           message: ApiMessages.invalidLogin,
@@ -32,7 +32,7 @@ class AuthController{
   Future<void> register(String name, String email, String password) async {
     try {
       UserModel user = await authService.register(name, email, password);
-      if(user.accessToken.isEmpty){
+      if(user.accessToken!.isEmpty){
         SnackbarHelper.showSnackbar(
           title: "Error",
           message: ApiMessages.failRegister,

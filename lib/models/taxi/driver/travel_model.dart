@@ -8,25 +8,29 @@ class TravelModel {
   final double destinationLatitude;
   final double destinationLongitude;
   final String status;
-  final UserModel user;
+  final UserModel? user;
+  String? pickupAddress;
+  String? destinationAddress;
 
   TravelModel({
-    required this.travelId,
+    this.travelId,
     required this.pickupLatitude,
     required this.pickupLongitude,
     required this.destinationLatitude,
     required this.destinationLongitude,
     required this.status,
-    required this.user,
+    this.user,
+    this.pickupAddress,
+    this.destinationAddress,
   });
 
   factory TravelModel.fromJson(Map<String, dynamic> json) {
     return TravelModel(
       travelId: json['travel_id'],
-      pickupLatitude: json['pickup_latitude'],
-      pickupLongitude: json['pickup_longitude'],
-      destinationLatitude: json['destination_latitude'],
-      destinationLongitude: json['destination_longitude'],
+      pickupLatitude: double.tryParse(json['pickup_location']['latitude'].toString()) ?? 0.0,
+      pickupLongitude: double.tryParse(json['pickup_location']['longitude'].toString()) ?? 0.0,
+      destinationLatitude: double.tryParse(json['destination_location']['latitude'].toString()) ?? 0.0,
+      destinationLongitude: double.tryParse(json['destination_location']['longitude'].toString()) ?? 0.0,
       status: json['status'],
       user: UserModel.fromJson(json['user']),
     );

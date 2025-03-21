@@ -6,18 +6,17 @@ import 'package:flutter/material.dart';
 
 class TravelRepository implements ITravelRepository {
   @override
-  Future<TravelModel> createTravel(double sourceLat, double sourceLong, double destinationLat, double destinationLong) async {
-    final requestBody = {"pickupLatitude": sourceLat.toString(), "pickupLongitude": sourceLong.toString(), "destinationLatitude": destinationLat.toString(), "destinationLongitude": destinationLong.toString()};
-    return await ApiHelper.request(
+  Future<TravelModel> createTravel(TravelModel travel) async {
+    await ApiHelper.request(
       endpoint: AppUrl.createTravel,
       method: "POST",
-      body: requestBody,
-      fromJson: (data) => TravelModel.fromJson(data),
+      body: travel.toJson().map((key, value) => MapEntry(key, value.toString())),
     );
+    return travel;
   }
 
   @override
-  Future<List<TravelModel>> fetchRideRequests(int driverId) async {
+  Future<List<TravelModel>> fetchRiderRequests(int driverId) async {
     return await ApiHelper.fetchList<TravelModel>(
         endpoint: '${AppUrl.getNoti}/$driverId/notifications',
         fromJson: (data) {

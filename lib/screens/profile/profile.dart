@@ -1,4 +1,5 @@
 import 'package:dailyfairdeal/controllers/taxi/driver/driver_controller.dart';
+import 'package:dailyfairdeal/models/taxi/driver/driver_model.dart';
 import 'package:dailyfairdeal/repositories/taxi/driver/driver_repository.dart';
 import 'package:dailyfairdeal/screens/profile/business.dart';
 import 'package:dailyfairdeal/services/secure_storage.dart';
@@ -22,7 +23,7 @@ class _ProfileState extends State<Profile> {
   
   String? userRole;
   int? userId;
-  final DriverController driverController=Get.put(DriverController(service: DriverService(repository: DriverRepository()))); 
+  final DriverController driverController = Get.put(DriverController(service: DriverService(repository: DriverRepository()))); 
 
   @override
   void initState() {
@@ -41,10 +42,10 @@ class _ProfileState extends State<Profile> {
   
   Future<void> navigateToDriverDashboard() async {
     if (userId != null) {
-      int? driverId = await driverController.fetchTaxiDriverByUserId(userId!);
-      if (driverId != null) {
-        saveDriverId(driverId.toString()); // Save to the secure storage
-        Get.toNamed("/driverdashboard", arguments: {"driverId": driverId});
+      DriverModel? driver = await driverController.fetchTaxiDriverByUserId(userId!);
+      if (driver?.id != null) {
+        saveDriverId(driver!.id.toString()); // Save to the secure storage
+        Get.toNamed("/driverdashboard", arguments: {"driverId": driver.id});
       } else {
         SnackbarHelper.showSnackbar(
           title: "Error",

@@ -1,10 +1,15 @@
+import 'package:dailyfairdeal/controllers/taxi/driver/bid_price_controller.dart';
 import 'package:dailyfairdeal/controllers/taxi/driver/travel_controller.dart';
 import 'package:dailyfairdeal/models/taxi/driver/travel_model.dart';
+import 'package:dailyfairdeal/repositories/taxi/driver/bid_price_repository.dart';
 import 'package:dailyfairdeal/repositories/taxi/driver/travel_repository.dart';
 import 'package:dailyfairdeal/services/secure_storage.dart';
+import 'package:dailyfairdeal/services/taxi/driver/bid_price_service.dart';
 import 'package:dailyfairdeal/services/taxi/driver/travel_service.dart';
+import 'package:dailyfairdeal/util/snackbar_helper.dart';
 import 'package:dailyfairdeal/widget/app_color.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 
 class RideRequestsScreen extends StatefulWidget {
@@ -18,6 +23,7 @@ class RideRequestsScreen extends StatefulWidget {
 class RideRequestsScreenState extends State<RideRequestsScreen> {
   late int driverId;
   late TravelController travelController;
+  late BidPriceController bidPriceController;
   List<TravelModel> rideRequests = [];
   bool isLoading = true;
   String? errorMessage;
@@ -34,12 +40,17 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
     travelController = Get.put(TravelController(
         travelService:
             TravelService(travelRepository: TravelRepository())));
+    bidPriceController = Get.put(BidPriceController(bidPriceService: BidPriceService(bidPriceRepository: BidPriceRepository())));
     _fetchRideRequests();
   }
 
   Future<void> _fetchRideRequests() async {
     try {
-      List<TravelModel> requests = await travelController.fetchRideRequests(driverId);
+      List<TravelModel> requests = await travelController.fetchRiderRequests(driverId);
+      for (var request in requests) {
+        request.pickupAddress = await _getAddressFromLatLng(request.pickupLatitude, request.pickupLongitude);
+        request.destinationAddress = await _getAddressFromLatLng(request.destinationLatitude, request.destinationLongitude);
+      }
       if (mounted) {
         setState(() {
           rideRequests = requests;
@@ -56,12 +67,73 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
     }
   }
 
-  void _acceptRide(int id, BuildContext context) {
-    // Implement ride acceptance logic here
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Accepted ride request #$id")),
+  Future<String> _getAddressFromLatLng(double lat, double lng) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks.first;
+        return "${place.name}, ${place.street}, ${place.subLocality}, ${place.locality}, ${place.administrativeArea}";
+      }
+      return "Unknown location";
+    } catch (e) {
+      return "Location not found";
+    }
+  }
+
+  void _showBidPriceDialog(BuildContext context, int travelId) {
+    TextEditingController bidPriceController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Enter Your Bid Price"),
+          content: TextField(
+            controller: bidPriceController,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              hintText: "Enter bid price",
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                String bidPrice = bidPriceController.text.trim();
+                double? driverBidPrice = double.tryParse(bidPrice);
+                if (driverBidPrice != null) {
+                  _submitBidPrice(travelId, driverId, driverBidPrice);
+                  Navigator.pop(context);
+                }else {
+                  debugPrint("Invalid bid price: $bidPrice");
+                }
+              },
+              child: const Text("Accept"),
+            ),
+          ],
+        );
+      },
     );
   }
+
+  void _submitBidPrice(int travelId, int driverId, double bidPrice) async {
+    try {
+      bool success = await bidPriceController.submitBidPrice(travelId, driverId, bidPrice);
+
+      if (success) {
+        SnackbarHelper.showSnackbar(title: "Success", message: "Bid submitted successfully!");
+      } else {
+        SnackbarHelper.showSnackbar(title: "Error", message: "Failed to submit bid.", backgroundColor: Colors.red);
+      }
+    } catch (e) {
+      debugPrint("Error: $e");
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -85,8 +157,8 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
                       elevation: 5,
                       margin: const EdgeInsets.symmetric(vertical: 8),
                       child: ListTile(
-                        leading: const Icon(Icons.location_on,
-                            color: AppColor.primaryColor, size: 30),
+                        // leading: const Icon(Icons.location_on,
+                        //     color: AppColor.primaryColor, size: 30),
                         title: Text(
                           "Ride Request #${request.travelId}",
                           style: const TextStyle(fontWeight: FontWeight.bold),
@@ -94,12 +166,10 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                                "📍 Pickup: ${request.pickupLatitude}, ${request.pickupLongitude}"),
-                            Text(
-                                "📍 Dropoff: ${request.destinationLatitude}, ${request.destinationLongitude}"),
-                            Text("👤 Rider: ${request.user.name}"),
-                            //Text("📞 Phone: ${request.user.phoneNo}"),
+                            Text("📍Pickup: ${request.pickupAddress ?? 'Fetching...'}"),
+                            Text("📍Dropoff: ${request.destinationAddress ?? 'Fetching...'}"),
+                            Text("👤Rider: ${request.user!.name}"),
+                            Text("📞Phone: ${request.user!.phone ?? 'N/A'}"),
                           ],
                         ),
                         trailing: ElevatedButton(
@@ -107,8 +177,8 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
                             backgroundColor: AppColor.primaryColor,
                           ),
                           onPressed: () =>
-                              _acceptRide(request.travelId!, context),
-                          child: const Text("Accept"),
+                              _showBidPriceDialog(context, request.travelId!),
+                          child: const Text("Bid Price"),
                         ),
                       ),
                     );

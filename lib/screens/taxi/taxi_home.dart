@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:dailyfairdeal/controllers/taxi/driver/driver_controller.dart';
 import 'package:dailyfairdeal/controllers/taxi/driver/travel_controller.dart';
 import 'package:dailyfairdeal/models/taxi/driver/driver_model.dart';
+import 'package:dailyfairdeal/models/taxi/driver/travel_model.dart';
 import 'package:dailyfairdeal/repositories/taxi/driver/driver_repository.dart';
 import 'package:dailyfairdeal/repositories/taxi/driver/travel_repository.dart';
 import 'package:dailyfairdeal/screens/taxi/widgets/auto_complete_text_field.dart';
@@ -80,7 +81,14 @@ class _TaxiHomeState extends State<TaxiHome> {
         showDriverList = false;
       });
       try {
-        await travelController.createTravelRequest(sourceLocation!.latitude, sourceLocation!.longitude, destinationLocation!.latitude, destinationLocation!.longitude);
+        TravelModel travel = TravelModel(
+        pickupLatitude: sourceLocation!.latitude,
+        pickupLongitude: sourceLocation!.longitude,
+        destinationLatitude: destinationLocation!.latitude,
+        destinationLongitude: destinationLocation!.longitude,
+        status: 'pending',
+      );
+        await travelController.createTravelRequest(travel);
         final fetchedDrivers = await driverController.fetchNearbyDrivers();
         nearbyTaxiDriver = fetchedDrivers.map((driver) => DriverModel.fromJson(driver)).toList();
       } catch (e) {
@@ -293,9 +301,7 @@ class _TaxiHomeState extends State<TaxiHome> {
                           ),
                         );
                       }
-                      //searchDrivers();
-                      isLoading = false; //For Testing
-                      showDriverList = true; //For Testing
+                      searchNearByTaxiDrivers();
                       setState(() {
                         showSearchFields = false;
                       });
