@@ -10,11 +10,7 @@ class BidPriceService {
     return bidPriceRepository.submitBidPrice(travelId, driverId, price);
   }
 
-  Future<bool> doesBidPriceExist(int travelId, int driverId) async {
-    return await bidPriceRepository.checkBidPriceExists(travelId, driverId);
-  }
-
-   Future<BidPriceModel> acceptDriver(int driverId, int travelId, double price) {
+  Future<BidPriceModel> acceptDriver(int driverId, int travelId, double price) {
     return bidPriceRepository.acceptDriver(driverId, travelId, price);
   }
 

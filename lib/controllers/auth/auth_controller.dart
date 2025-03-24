@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dailyfairdeal/controllers/auth/handle_success_auth.dart';
 import 'package:dailyfairdeal/config/api_messages.dart';
 import 'package:dailyfairdeal/config/messages.dart';
@@ -13,6 +14,16 @@ class AuthController{
 
   Future<void> login(String email, String password) async {
     try {
+      // Check network connectivity
+      var connectivityResult = await Connectivity().checkConnectivity();
+      if (connectivityResult == ConnectivityResult.none) {
+        SnackbarHelper.showSnackbar(
+          title: "No Internet",
+          message: "Please check your internet connection and try again.",
+          backgroundColor: Colors.orange,
+        );
+        return;
+      }
       UserModel user = await authService.login(email, password);
       
       if (user.accessToken != null && user.accessToken!.isNotEmpty) {
@@ -44,6 +55,15 @@ class AuthController{
 
   Future<void> register(String name, String email, String password) async {
     try {
+      var connectivityResult = await Connectivity().checkConnectivity();
+      if (connectivityResult == ConnectivityResult.none) {
+        SnackbarHelper.showSnackbar(
+          title: "No Internet",
+          message: "Please check your internet connection and try again.",
+          backgroundColor: Colors.orange,
+        );
+        return;
+      }
       UserModel user = await authService.register(name, email, password);
 
       if (user.accessToken != null && user.accessToken!.isNotEmpty) {

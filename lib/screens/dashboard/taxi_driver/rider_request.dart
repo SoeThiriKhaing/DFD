@@ -27,7 +27,6 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
   List<TravelModel> rideRequests = [];
   bool isLoading = true;
   String? errorMessage;
-  Map<int, bool> bidStatus = {}; //Track bid status per travelId
 
   @override
   void initState() {
@@ -48,17 +47,13 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
   Future<void> _fetchRideRequests() async {
     try {
       List<TravelModel> requests = await travelController.fetchRiderRequests(driverId);
-      Map<int, bool> tempBidStatus = {}; // Temporary map to track bid existence
       for (var request in requests) {
         request.pickupAddress = await _getAddressFromLatLng(request.pickupLatitude, request.pickupLongitude);
         request.destinationAddress = await _getAddressFromLatLng(request.destinationLatitude, request.destinationLongitude);
-        //bool bidPriceExist = await bidPriceController.isBidPriceAlreadyExist(request.travelId!, driverId); //To Check Bid Price Exist or Not
-        //tempBidStatus[request.travelId!] = bidPriceExist; //Store status per travelId
       }
       if (mounted) {
         setState(() {
           rideRequests = requests;
-          bidStatus = tempBidStatus; //Update state with bid status
           isLoading = false;
         });
       }
@@ -131,9 +126,6 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
 
       if (success) {
         SnackbarHelper.showSnackbar(title: "Success", message: "Bid price is submitted successfully!");
-        setState(() {
-          bidStatus[travelId] = true; //Update UI when bid is placed
-        });
       } else {
         SnackbarHelper.showSnackbar(title: "Error", message: "Failed to submit bid price.", backgroundColor: Colors.red);
       }
@@ -162,7 +154,6 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
                       itemCount: rideRequests.length,
                       itemBuilder: (context, index) {
                         final request = rideRequests[index];
-                        final bool hasBid = bidStatus[request.travelId] ?? false; //Check bid status
 
                         return Card(
                           shape: RoundedRectangleBorder(
@@ -188,10 +179,8 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColor.primaryColor,
                               ),
-                              onPressed: hasBid
-                                  ? null //Disable button if bid exists
-                                  : () => _showBidPriceDialog(context, request.travelId!),
-                              child: Text(hasBid ? "Accepted" : "Bid Price"),
+                              onPressed: () => _showBidPriceDialog(context, request.travelId!),
+                              child: const Text("Bid Price"),
                             ),
                           ),
                         );

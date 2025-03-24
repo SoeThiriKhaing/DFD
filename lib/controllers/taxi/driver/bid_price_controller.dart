@@ -16,10 +16,6 @@ class BidPriceController {
     }
   }
 
-  Future<bool> isBidPriceAlreadyExist(int travelId, int driverId) async {
-    return await bidPriceService.doesBidPriceExist(travelId, driverId);
-  }
-
   Future<bool> acceptDriver(int driverId, int travelId, double price) async {
     try {
       await bidPriceService.acceptDriver(driverId, travelId, price);
