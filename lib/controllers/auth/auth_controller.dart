@@ -1,4 +1,4 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'dart:io';
 import 'package:dailyfairdeal/controllers/auth/handle_success_auth.dart';
 import 'package:dailyfairdeal/config/api_messages.dart';
 import 'package:dailyfairdeal/config/messages.dart';
@@ -12,11 +12,23 @@ class AuthController{
 
   AuthController({required this.authService});
 
+  Future<bool> hasNetworkConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result.first.rawAddress.isNotEmpty) {
+        return true; // Internet is available
+      }
+    } catch (e) {
+      return false; // No internet connection
+    }
+    return false;
+  }
+
   Future<void> login(String email, String password) async {
     try {
-      // Check network connectivity
-      var connectivityResult = await Connectivity().checkConnectivity();
-      if (connectivityResult == ConnectivityResult.none) {
+      // Check network connection
+      bool isConnected = await hasNetworkConnection();
+      if (!isConnected) {
         SnackbarHelper.showSnackbar(
           title: "No Internet",
           message: "Please check your internet connection and try again.",
@@ -24,6 +36,7 @@ class AuthController{
         );
         return;
       }
+
       UserModel user = await authService.login(email, password);
       
       if (user.accessToken != null && user.accessToken!.isNotEmpty) {
@@ -55,8 +68,9 @@ class AuthController{
 
   Future<void> register(String name, String email, String password) async {
     try {
-      var connectivityResult = await Connectivity().checkConnectivity();
-      if (connectivityResult == ConnectivityResult.none) {
+      // Check network connection
+      bool isConnected = await hasNetworkConnection();
+      if (!isConnected) {
         SnackbarHelper.showSnackbar(
           title: "No Internet",
           message: "Please check your internet connection and try again.",
@@ -64,6 +78,7 @@ class AuthController{
         );
         return;
       }
+      
       UserModel user = await authService.register(name, email, password);
 
       if (user.accessToken != null && user.accessToken!.isNotEmpty) {
