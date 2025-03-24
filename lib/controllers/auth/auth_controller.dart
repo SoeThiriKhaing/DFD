@@ -11,38 +11,66 @@ class AuthController{
 
   AuthController({required this.authService});
 
-
   Future<void> login(String email, String password) async {
     try {
       UserModel user = await authService.login(email, password);
-      if(user.accessToken!.isEmpty){
+      
+      if (user.accessToken != null && user.accessToken!.isNotEmpty) {
+        handleSuccessAuth(user, Messages.loginSuccess);
+      } else {
         SnackbarHelper.showSnackbar(
           title: "Error",
           message: ApiMessages.invalidLogin,
           backgroundColor: Colors.red,
         );
-      }else{
-        handleSuccessAuth(user, Messages.loginSuccess);
       }
     } catch (e) {
-      debugPrint(e.toString());
+      if (e.toString().contains("401")) {
+        SnackbarHelper.showSnackbar(
+          title: "Error",
+          message: "Invalid Email or Password",
+          backgroundColor: Colors.red,
+        );
+      } else {
+        SnackbarHelper.showSnackbar(
+          title: "Error",
+          message: "Something went wrong. Please try again.",
+          backgroundColor: Colors.red,
+        );
+      }
+      debugPrint("Login Error: $e");
     }
   }
 
   Future<void> register(String name, String email, String password) async {
     try {
       UserModel user = await authService.register(name, email, password);
-      if(user.accessToken!.isEmpty){
+
+      if (user.accessToken != null && user.accessToken!.isNotEmpty) {
+        handleSuccessAuth(user, Messages.registerSuccess);
+      } else {
         SnackbarHelper.showSnackbar(
           title: "Error",
           message: ApiMessages.failRegister,
           backgroundColor: Colors.red,
         );
-      }else{
-        handleSuccessAuth(user, Messages.registerSuccess);
       }
     } catch (e) {
-      debugPrint(e.toString());
+      if (e.toString().contains("401")) {
+        SnackbarHelper.showSnackbar(
+          title: "Error",
+          message: "Registration failed. Email may already be in use.",
+          backgroundColor: Colors.red,
+        );
+      } else {
+        SnackbarHelper.showSnackbar(
+          title: "Error",
+          message: "Something went wrong. Please try again.",
+          backgroundColor: Colors.red,
+        );
+      }
+      debugPrint("Register Error: $e");
     }
   }
+
 }
