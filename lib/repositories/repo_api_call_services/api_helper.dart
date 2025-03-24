@@ -6,7 +6,7 @@ import 'package:dailyfairdeal/repositories/repo_api_call_services/api_service.da
 
 class ApiHelper {
   static final _client = ApiService(); // Persistent HTTP client
-  static const _timeoutDuration = Duration(seconds: 10); // Request timeout
+  static const _timeoutDuration = Duration(milliseconds: 500); // Request timeout
 
   /// Makes an API request and returns the parsed response.
   static Future<T> request<T>({
@@ -22,14 +22,12 @@ class ApiHelper {
       final sanitizedHeaders = SanitizeHeaders.sanitizeHeaders(headers);
 
       // Make the API request with timeout
-      final response = await _client
-          .request(
+      final response = await _client.request(
         endpoint,
         method: method,
         body: body,
         headers: sanitizedHeaders,
-      )
-          .timeout(_timeoutDuration, onTimeout: () {
+      ).timeout(_timeoutDuration, onTimeout: () {
         throw Exception("Request timed out after $_timeoutDuration seconds.");
       });
 
@@ -73,8 +71,8 @@ class ApiHelper {
 
       // Convert the list of dynamic to a list of T
       return response
-          .map((data) => fromJson(data as Map<String, dynamic>))
-          .toList();
+        .map((data) => fromJson(data as Map<String, dynamic>))
+        .toList();
     } catch (e, stackTrace) {
       LogError.logError("Error fetching list", e, stackTrace);
       throw Exception("Failed to fetch data");
