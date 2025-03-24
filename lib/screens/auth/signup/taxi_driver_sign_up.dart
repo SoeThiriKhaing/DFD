@@ -26,6 +26,7 @@ class _TaxiDriverSignUpState extends State<TaxiDriverSignUp> {
   final TextEditingController carModelController = TextEditingController();
   final TextEditingController carColorController = TextEditingController();
   final TextEditingController licensePlateController = TextEditingController();
+  final TextEditingController driverLicenseNoController = TextEditingController();
 
   final TextEditingController otherInfoController = TextEditingController();
   final DriverController driverController = Get.put(DriverController(
@@ -66,8 +67,6 @@ class _TaxiDriverSignUpState extends State<TaxiDriverSignUp> {
 
         // Create DriverModel object with gathered data
         final driver = DriverModel(
-          userId: int.tryParse(userId) ?? 0,
-          name: userName,
           latitude: position.latitude,
           longitude: position.longitude,
           isAvailable: true,
@@ -76,6 +75,7 @@ class _TaxiDriverSignUpState extends State<TaxiDriverSignUp> {
           carModel: carModelController.text,
           carColour: carColorController.text,
           licensePlate: licensePlateController.text,
+          driverLicenseNo: driverLicenseNoController.text,
           otherInfo: otherInfoController.text,
         );
 
@@ -136,6 +136,7 @@ class _TaxiDriverSignUpState extends State<TaxiDriverSignUp> {
                 buildTextField("Car Model", carModelController),
                 buildTextField("Car Colour", carColorController),
                 buildTextField("License Plate", licensePlateController),
+                buildTextField("Driver License Number", driverLicenseNoController),
                 buildTextField("Other Info", otherInfoController),
                 const SizedBox(height: 20),
                 SizedBox(

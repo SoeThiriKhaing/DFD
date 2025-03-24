@@ -1,7 +1,8 @@
+import 'package:dailyfairdeal/models/user/user_model.dart';
+
 class DriverModel {
   final int? id;
-  final String? name; //added additionally
-  final int? userId; // Store only user ID instead of UserModel
+  final int? userId;
   final double latitude;
   final double longitude;
   final bool isAvailable;
@@ -10,13 +11,13 @@ class DriverModel {
   final String carModel;
   final String carColour;
   final String licensePlate;
+  final String driverLicenseNo;
   final String otherInfo;
- // final String role;
+  final UserModel? user;
 
   DriverModel({
     this.id,
-    this.name, //added additionally //added additionally
-    this.userId, // Only user ID
+    this.userId,
     required this.latitude,
     required this.longitude,
     required this.isAvailable,
@@ -25,15 +26,14 @@ class DriverModel {
     required this.carModel,
     required this.carColour,
     required this.licensePlate,
+    required this.driverLicenseNo,
     required this.otherInfo,
-   // required this.role,
+    this.user,
   });
 
-  // Fetch current location asynchronously
-  //static Future<DriverModel> fromJson(Map<String, dynamic> json) async {
   static DriverModel fromJson(Map<String, dynamic> json) {
     return DriverModel(
-      id: json['id'] ?? 0,//added additionally
+      id: json['id'] ?? 0,
       userId: json['rider_id'] ?? 0, // Extract only user ID
       latitude: json['latitude'],
       longitude: json['longitude'],
@@ -43,15 +43,14 @@ class DriverModel {
       carModel: json['car_model'] ?? '',
       carColour: json['car_colour'] ?? '',
       licensePlate: json['license_plate'] ?? '',
+      driverLicenseNo: json['driver_license_number'] ?? '',
       otherInfo: json['other_info'] ?? '',
+      user: json['user'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      //"id": id,
-      //"name": name,
-      //"price": price,
       "latitude": latitude,
       "longitude": longitude,
       "is_available": isAvailable ? 1 : 0,
@@ -60,6 +59,7 @@ class DriverModel {
       "car_model": carModel,
       "car_colour": carColour,
       "license_plate": licensePlate,
+      "driver_license_number": driverLicenseNo,
       "other_info": otherInfo,
     };
   }

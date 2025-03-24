@@ -10,7 +10,7 @@ void handleSuccessAuth(UserModel user, String successMessage) {
     debugPrint("User Name is ${user.name}");
     debugPrint("User Role Name is ${user.role}");
     saveToken(user.accessToken!); //save token
-    saveUserId(user.id); //save user id
+    saveUserId(user.id!); //save user id
     saveUserName(user.name); //save user name
     saveUserRole(user.role!); //save user role
     SnackbarHelper.showSnackbar(

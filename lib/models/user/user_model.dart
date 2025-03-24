@@ -1,5 +1,5 @@
 class UserModel {
-  final int id;
+  final int? id;
   final String name;
   final String email;
   final String? role;
@@ -10,7 +10,7 @@ class UserModel {
   final String? message;
 
   UserModel({
-    required this.id,
+    this.id,
     required this.name,
     required this.email,
     this.role,
