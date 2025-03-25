@@ -1,5 +1,5 @@
-import 'package:dailyfairdeal/models/taxi/driver/travel_model.dart';
-import 'package:dailyfairdeal/repositories/taxi/driver/travel_repository.dart';
+import 'package:dailyfairdeal/models/taxi/travel/travel_model.dart';
+import 'package:dailyfairdeal/repositories/taxi/travel/travel_repository.dart';
 import 'package:flutter/material.dart';
 
 class TravelService {

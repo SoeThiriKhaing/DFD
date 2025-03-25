@@ -41,3 +41,8 @@ Future<void> saveDriverId(String driverId) async {
 Future<String?> getDriverId() async {
   return await storage.read(key: 'driverId');
 }
+
+//Clear all secure storage
+Future<void> clearSecureStorage() async {
+  await storage.deleteAll();
+}

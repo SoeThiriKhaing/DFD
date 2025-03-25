@@ -1,4 +1,4 @@
-import 'package:dailyfairdeal/services/taxi/driver/bid_price_service.dart';
+import 'package:dailyfairdeal/services/taxi/bid_price/bid_price_service.dart';
 import 'package:flutter/material.dart';
 
 class BidPriceController {

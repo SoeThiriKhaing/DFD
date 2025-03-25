@@ -108,4 +108,21 @@ class AuthController{
     }
   }
 
+  //For Logout
+  Future<void> logout() async {
+    try {
+      await authService.logout();
+      SnackbarHelper.showSnackbar(
+        title: "Success",
+        message: "You have been logged out successfully.",
+      );
+    } catch (e) {
+      SnackbarHelper.showSnackbar(
+        title: "Error",
+        message: "Failed to logout.",
+        backgroundColor: Colors.red,
+      );
+      debugPrint("Logout Error: $e");
+    }
+  }
 }

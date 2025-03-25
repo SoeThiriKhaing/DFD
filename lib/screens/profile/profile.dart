@@ -1,7 +1,10 @@
+import 'package:dailyfairdeal/controllers/auth/auth_controller.dart';
 import 'package:dailyfairdeal/controllers/taxi/driver/driver_controller.dart';
 import 'package:dailyfairdeal/models/taxi/driver/driver_model.dart';
+import 'package:dailyfairdeal/repositories/auth/auth_repository.dart';
 import 'package:dailyfairdeal/repositories/taxi/driver/driver_repository.dart';
 import 'package:dailyfairdeal/screens/profile/business.dart';
+import 'package:dailyfairdeal/services/auth/auth_service.dart';
 import 'package:dailyfairdeal/services/secure_storage.dart';
 import 'package:dailyfairdeal/services/taxi/driver/driver_service.dart';
 import 'package:dailyfairdeal/util/snackbar_helper.dart';
@@ -23,7 +26,8 @@ class _ProfileState extends State<Profile> {
   
   String? userRole;
   int? userId;
-  final DriverController driverController = Get.put(DriverController(service: DriverService(repository: DriverRepository()))); 
+  final DriverController driverController = Get.put(DriverController(service: DriverService(repository: DriverRepository())));
+  final AuthController authController = Get.put(AuthController(authService: AuthService(authRepository: AuthRepository())));
 
   @override
   void initState() {
@@ -173,6 +177,32 @@ class _ProfileState extends State<Profile> {
                 buildListTile(icon: Icons.favorite, iconColor: Colors.red, title: "Favourites", subtitle: "View your saved favorite items.", onTap: (){}),
                 buildListTile(icon: Icons.settings, iconColor: Colors.grey, title: "Settings", subtitle: "Manage your account settings.", onTap: (){}),
                 buildListTile(icon: Icons.security, iconColor: Colors.purple, title: "Safety Settings", subtitle: "Update your safety and privacy settings.", onTap: (){}),
+                buildListTile(
+                  icon: Icons.logout,
+                  iconColor: Colors.red,
+                  title: "Logout",
+                  subtitle: "Logout from the app.", 
+                  onTap: (){
+                    //Show alert box before logout
+                    Get.defaultDialog(
+                      title: "Logout",
+                      middleText: "Are you sure you want to logout?",
+                      actions: [
+                        TextButton(
+                          onPressed: () => Get.back(),
+                          child: const Text("Cancel"),
+                        ),
+                        TextButton(
+                          onPressed: () async{
+                            await authController.logout();
+                            clearSecureStorage();
+                            Get.offAllNamed("/login");
+                          },
+                          child: const Text("Logout"),
+                        ),
+                      ],
+                    );
+                  }),
               ],
             ),
           ],

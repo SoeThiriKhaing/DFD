@@ -2,6 +2,7 @@ class AppUrl {
   static var baseUrl = "http://api.dailyfairdeal.com/api";
   static var loginEndpoint = '$baseUrl/login';
   static var registerEndpoint = '$baseUrl/signup';
+  static var logoutEndpoint = '$baseUrl/logout';
 
   //Food Api
   static var getAllRestaurant = '$baseUrl/restaurant';

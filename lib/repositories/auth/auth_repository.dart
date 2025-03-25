@@ -25,4 +25,12 @@ class AuthRepository implements IAuthRepository {
       fromJson: (data) => UserModel.fromJson(data),
     );
   }
+
+  @override
+  Future<void> logout() async { 
+    return await ApiHelper.request<void>(
+      endpoint: AppUrl.logoutEndpoint,
+      method: "POST",
+    );
+  }
 }

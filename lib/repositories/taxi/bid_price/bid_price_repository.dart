@@ -1,5 +1,5 @@
-import 'package:dailyfairdeal/interfaces/taxi/driver/i_bid_price_repository.dart';
-import 'package:dailyfairdeal/models/taxi/driver/bid_price_model.dart';
+import 'package:dailyfairdeal/interfaces/taxi/bid_price/i_bid_price_repository.dart';
+import 'package:dailyfairdeal/models/taxi/bid_price/bid_price_model.dart';
 import 'package:dailyfairdeal/repositories/repo_api_call_services/api_helper.dart';
 import 'package:dailyfairdeal/util/appurl.dart';
 

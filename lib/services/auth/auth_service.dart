@@ -14,4 +14,8 @@ class AuthService {
   Future<UserModel> register(String name, String email, String password) async {
     return await authRepository.register(name, email, password);
   }
+
+  Future<void> logout() async {
+    return await authRepository.logout();
+  }
 }

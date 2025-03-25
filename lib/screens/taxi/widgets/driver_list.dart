@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:dailyfairdeal/controllers/taxi/driver/bid_price_controller.dart';
-import 'package:dailyfairdeal/repositories/taxi/driver/bid_price_repository.dart';
-import 'package:dailyfairdeal/services/taxi/driver/bid_price_service.dart';
+import 'package:dailyfairdeal/controllers/taxi/bid_price/bid_price_controller.dart';
+import 'package:dailyfairdeal/repositories/taxi/bid_price/bid_price_repository.dart';
+import 'package:dailyfairdeal/services/taxi/bid_price/bid_price_service.dart';
 import 'package:dailyfairdeal/util/snackbar_helper.dart';
 
 class DriverList extends StatelessWidget {

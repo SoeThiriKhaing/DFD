@@ -1,4 +1,4 @@
-import 'package:dailyfairdeal/models/taxi/driver/bid_price_model.dart';
+import 'package:dailyfairdeal/models/taxi/bid_price/bid_price_model.dart';
 import 'package:dailyfairdeal/models/taxi/driver/driver_model.dart';
 
 class NearbyTaxiDriverModel {
