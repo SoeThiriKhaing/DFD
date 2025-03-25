@@ -71,12 +71,16 @@ class AppUrl {
 
   //Accept Driver by the Rider
   static String acceptDriver = "$baseUrl/accept_drivers";
+
   //Get Bid Price by Travel Id
   static String getBidPriceByTravelId="$baseUrl/biddings";
 
   //Get the number of taxi driver
   static String getTaxiDriverByUserId = "$baseUrl/taxi-driver/user";
 
+  //Taxi Driver Location by Driver ID
+  static String getTaxiDriverLocationById = "$baseUrl/taxi-drivers/get-location"; //To Create New from the Backend team
+  static String updateTaxiDriverLocation = "$baseUrl/taxi-drivers/update-location"; //To Create New from the Backend team
   //travel Api
   static String createTravel = "$baseUrl/travels";
   static String updateTravle = "$baseUrl/travels";

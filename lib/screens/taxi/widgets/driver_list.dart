@@ -1,3 +1,4 @@
+import 'package:dailyfairdeal/screens/taxi/taxi_home.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dailyfairdeal/controllers/taxi/bid_price/bid_price_controller.dart';
@@ -78,6 +79,8 @@ class DriverList extends StatelessWidget {
                                 title: "Success",
                                 message: "Your trip is accepted successfully",
                               );
+                              // Hide driver list and mark locations on the map
+                              Get.find<TaxiHomeState>().updatePolylineAndMarker(driver);
                             } else {
                               SnackbarHelper.showSnackbar(
                                 title: "Error",
@@ -103,10 +106,11 @@ class DriverList extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(driver['driver_name'] ?? "Driver Details"),
+          title: const Text("Driver Details"),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              _buildDriverInfoRow("Name", driver['driver_name']),
               _buildDriverInfoRow("Age", driver['driver_age']),
               _buildDriverInfoRow("Phone", driver['driver_phone']),
               _buildDriverInfoRow("Email", driver['driver_email']),

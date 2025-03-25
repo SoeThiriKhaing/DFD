@@ -1,8 +1,17 @@
+import 'dart:async';
+
+import 'package:dailyfairdeal/controllers/taxi/driver/driver_location_controller.dart';
+import 'package:dailyfairdeal/models/taxi/driver/driver_location_model.dart';
+import 'package:dailyfairdeal/repositories/taxi/driver/driver_location_repository.dart';
 import 'package:dailyfairdeal/screens/dashboard/taxi_driver/toggle_state.dart';
+import 'package:dailyfairdeal/services/secure_storage.dart';
+import 'package:dailyfairdeal/services/taxi/driver/driver_location_service.dart';
+import 'package:dailyfairdeal/services/taxi/location/location_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+
 
 class TaxiHomeScreen extends StatefulWidget {
   const TaxiHomeScreen({super.key});
@@ -13,10 +22,17 @@ class TaxiHomeScreen extends StatefulWidget {
 
 class TaxiHomeScreenState extends State<TaxiHomeScreen> {
   final TaxiController taxiController = Get.put(TaxiController());
+  final LocationService locationService = LocationService();
+  final DriverLocationController driverLocationController = DriverLocationController(
+      service: DriverLocationService(repository: DriverLocationRepository()));
   @override
   void initState() {
     super.initState();
     _checkLocationPermission();
+      // Update driver location every 5 seconds
+    Timer.periodic(const Duration(seconds: 5), (timer) {
+      updateDriverLocation();
+    });
   }
 
   Future<void> _checkLocationPermission() async {
@@ -24,6 +40,36 @@ class TaxiHomeScreenState extends State<TaxiHomeScreen> {
     if (permission == LocationPermission.denied ||
         permission == LocationPermission.deniedForever) {
       await Geolocator.requestPermission();
+    }
+  }
+
+  Future<void> updateDriverLocation() async {
+    try {
+      LatLng? currentLocation = await locationService.getCurrentLocation();
+
+      String? driverId = await getDriverId();// Replace with dynamic ID if needed
+      int taxiDriverId = int.parse(driverId!);
+      bool isAvailable = taxiController.isAvailable.value; // Get online status
+
+      // Create DriverLocation model instance
+      DriverLocationModel driverLocation = DriverLocationModel(
+        driverId: taxiDriverId,
+        latitude: currentLocation!.latitude,
+        longitude: currentLocation.longitude,
+        isAvailable: isAvailable,
+      );
+
+      await driverLocationController.updateLocation(driverLocation);
+
+      if(mounted){
+         // Update the driver's location on the map
+        setState(() {
+          taxiController.currentPosition.value = LatLng(currentLocation.latitude, currentLocation.longitude);
+        });
+      } 
+       
+    } catch (e) {
+      debugPrint("Error updating driver location: $e");
     }
   }
 

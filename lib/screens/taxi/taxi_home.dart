@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'package:dailyfairdeal/common_calls/constant.dart';
 import 'package:dailyfairdeal/controllers/taxi/driver/nearby_taxi_driver_controller.dart';
 import 'package:dailyfairdeal/controllers/taxi/travel/travel_controller.dart';
 import 'package:dailyfairdeal/models/taxi/travel/travel_model.dart';
@@ -10,6 +12,7 @@ import 'package:dailyfairdeal/screens/taxi/widgets/map_view.dart';
 import 'package:dailyfairdeal/services/taxi/driver/nearby_taxi_driver_service.dart';
 import 'package:dailyfairdeal/services/taxi/travel/travel_service.dart';
 import 'package:dailyfairdeal/services/taxi/location/location_service.dart';
+import 'package:dailyfairdeal/util/appurl.dart';
 import 'package:dailyfairdeal/widget/app_color.dart';
 import 'package:dailyfairdeal/widget/support_widget.dart';
 import 'package:flutter/material.dart';
@@ -25,10 +28,10 @@ class TaxiHome extends StatefulWidget {
   const TaxiHome({super.key});
 
   @override
-  State<TaxiHome> createState() => _TaxiHomeState();
+  State<TaxiHome> createState() => TaxiHomeState();
 }
 
-class _TaxiHomeState extends State<TaxiHome> {
+class TaxiHomeState extends State<TaxiHome> {
   final TextEditingController sourceController = TextEditingController();
   final TextEditingController destinationController = TextEditingController();
   final LocationService locationService = LocationService();
@@ -46,7 +49,7 @@ class _TaxiHomeState extends State<TaxiHome> {
   bool showSearchFields = true;
   List<Map<String, String?>> nearbyTaxiDriver = [];
   int? travelId;
-  String googleAPIKey = "AIzaSyAXBWwV59Q5OlaUZ1TQs-j6YXgp_7cqHPA";
+  Timer? locationUpdateTimer;
   final TravelController travelController = Get.put(TravelController(
     travelService:TravelService(travelRepository: TravelRepository())));
   bool isSearchButtonEnabled = true;
@@ -115,6 +118,52 @@ class _TaxiHomeState extends State<TaxiHome> {
     }
   }
 
+  //After the rider accept the trip, update the polyline and marker from the rider to the driver
+  void updatePolylineAndMarker(Map<String, String?> driver) async {
+    String driverId = driver['driver_id']!; // Get driver ID
+    trackDriverLocation(driverId);
+  }
+
+  //After the rider accept the trip, the driver location will be tracked and draw the polyline
+  void trackDriverLocation(String driverId) {
+    locationUpdateTimer?.cancel(); // Cancel any existing timer
+    locationUpdateTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
+      try {
+        final response = await http.get(
+          Uri.parse('${AppUrl.getTaxiDriverLocationById}/${int.parse(driverId)}'),
+        );
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          double lat = double.parse(data['latitude']);
+          double lng = double.parse(data['longitude']);
+
+          LatLng driverLatLng = LatLng(lat, lng);
+
+          setState(() {
+            showDriverList = false; // Hide driver list
+            markers.removeWhere((marker) => marker.markerId == MarkerId(driverId));
+            markers.add(
+              Marker(
+                markerId: MarkerId(driverId),
+                position: driverLatLng,
+                infoWindow: const InfoWindow(title: "Driver Location"),
+                icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+              ),
+            );
+            destinationLocation = driverLatLng;
+          });
+
+          mapController?.animateCamera(CameraUpdate.newLatLng(driverLatLng));
+          _getRoute();
+        }
+      } catch (e) {
+        debugPrint("Error fetching driver location: $e");
+      }
+    });
+  }
+
+  //For the rider search first time
   void _setPolylineAndMarkers() {
     if (sourceLocation != null && destinationLocation != null) {
       markers.clear();
@@ -327,6 +376,7 @@ class _TaxiHomeState extends State<TaxiHome> {
                       const SizedBox(width: 8.0),
                       ElevatedButton(
                         onPressed: isCancelButtonEnabled ? () async{
+                          locationUpdateTimer?.cancel(); // Stop live tracking
                           await travelController.deleteTravel(travelId!);
                           setState(() {
                             showSearchFields = false;

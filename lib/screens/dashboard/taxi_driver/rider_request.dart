@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:dailyfairdeal/common_calls/constant.dart';
+import 'package:http/http.dart' as http;
 import 'package:dailyfairdeal/controllers/taxi/bid_price/bid_price_controller.dart';
 import 'package:dailyfairdeal/controllers/taxi/travel/travel_controller.dart';
 import 'package:dailyfairdeal/models/taxi/travel/travel_model.dart';
@@ -9,7 +12,6 @@ import 'package:dailyfairdeal/services/taxi/travel/travel_service.dart';
 import 'package:dailyfairdeal/util/snackbar_helper.dart';
 import 'package:dailyfairdeal/widget/app_color.dart';
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 
 class RideRequestsScreen extends StatefulWidget {
@@ -68,15 +70,24 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
   }
 
   Future<String> _getAddressFromLatLng(double lat, double lng) async {
+    final String url =
+        "https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=$googleAPIKey";
+
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
-      if (placemarks.isNotEmpty) {
-        Placemark place = placemarks.first;
-        return "${place.name}, ${place.street}, ${place.subLocality}, ${place.locality}, ${place.administrativeArea}";
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data["status"] == "OK" && data["results"].isNotEmpty) {
+          return data["results"][0]["formatted_address"];
+        } else {
+          return "Unknown location";
+        }
+      } else {
+        return "Failed to fetch location";
       }
-      return "Unknown location";
     } catch (e) {
-      return "Location not found";
+      return "Error: $e";
     }
   }
 

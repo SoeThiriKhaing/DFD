@@ -19,8 +19,6 @@ class TaxiController extends GetxController {
 
   Future<void> getCurrentLocation() async {
     try {
-      // Position position = await Geolocator.getCurrentPosition(
-      //     desiredAccuracy: LocationAccuracy.high);
       LatLng? position = await LocationService().getCurrentLocation();
       currentPosition.value = LatLng(position!.latitude, position.longitude);
       mapController?.animateCamera(CameraUpdate.newLatLng(currentPosition.value!));
