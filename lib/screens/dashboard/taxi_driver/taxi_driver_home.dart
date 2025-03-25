@@ -25,14 +25,21 @@ class TaxiHomeScreenState extends State<TaxiHomeScreen> {
   final LocationService locationService = LocationService();
   final DriverLocationController driverLocationController = DriverLocationController(
       service: DriverLocationService(repository: DriverLocationRepository()));
+  int? taxiDriverId;
   @override
   void initState() {
     super.initState();
     _checkLocationPermission();
+    _getDriverId();
       // Update driver location every 5 seconds
     Timer.periodic(const Duration(seconds: 5), (timer) {
       updateDriverLocation();
     });
+  }
+
+  Future<void> _getDriverId() async {
+    String? driverId = await getDriverId(); // From the Secure Storage
+    taxiDriverId = int.parse(driverId!);
   }
 
   Future<void> _checkLocationPermission() async {
@@ -46,14 +53,11 @@ class TaxiHomeScreenState extends State<TaxiHomeScreen> {
   Future<void> updateDriverLocation() async {
     try {
       LatLng? currentLocation = await locationService.getCurrentLocation();
-
-      String? driverId = await getDriverId();// Replace with dynamic ID if needed
-      int taxiDriverId = int.parse(driverId!);
       bool isAvailable = taxiController.isAvailable.value; // Get online status
 
       // Create DriverLocation model instance
       DriverLocationModel driverLocation = DriverLocationModel(
-        driverId: taxiDriverId,
+        driverId: taxiDriverId!,
         latitude: currentLocation!.latitude,
         longitude: currentLocation.longitude,
         isAvailable: isAvailable,
@@ -91,7 +95,7 @@ class TaxiHomeScreenState extends State<TaxiHomeScreen> {
                 ),
                 markers: {
                   Marker(
-                    markerId: const MarkerId("driver"),
+                    markerId: MarkerId(taxiDriverId.toString()),
                     position: taxiController.currentPosition.value!,
                     infoWindow: const InfoWindow(title: "Your Location"),
                     icon: BitmapDescriptor.defaultMarkerWithHue(
