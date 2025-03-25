@@ -24,4 +24,12 @@ class TravelRepository implements ITravelRepository {
           return TravelModel.fromJson(data);
         });
   }
+
+  @override
+  Future<void> deleteTravel(int travelId) async {
+    await ApiHelper.request(
+      endpoint: '${AppUrl.deleteTravel}/$travelId',
+      method: "DELETE",
+    );
+  }
 }

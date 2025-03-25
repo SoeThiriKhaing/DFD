@@ -45,9 +45,12 @@ class _TaxiHomeState extends State<TaxiHome> {
   bool showDriverList = false;
   bool showSearchFields = true;
   List<Map<String, String?>> nearbyTaxiDriver = [];
+  int? travelId;
   String googleAPIKey = "AIzaSyAXBWwV59Q5OlaUZ1TQs-j6YXgp_7cqHPA";
   final TravelController travelController = Get.put(TravelController(
     travelService:TravelService(travelRepository: TravelRepository())));
+  bool isSearchButtonEnabled = true;
+  bool isCancelButtonEnabled = false;
   @override
   void initState() {
     super.initState();
@@ -87,12 +90,22 @@ class _TaxiHomeState extends State<TaxiHome> {
         destinationLongitude: destinationLocation!.longitude,
         status: 'pending',
       );
-        await travelController.createTravelRequest(travel);
+        Map<String, dynamic> response = await travelController.createTravelRequest(travel);
+        String status = response['status'];
+        String myTravelId = response['travelId'].toString();
+        travelId = int.parse(myTravelId);
         List<Map<String, String?>> driversList = await controller.fetchNearbyDrivers();
         nearbyTaxiDriver = driversList;
         setState(() {
           isLoading = false;
           showDriverList = true;
+          if (status == 'pending' || status == 'bidding') {
+            isSearchButtonEnabled = false;
+            isCancelButtonEnabled = true;
+          } else if (status == 'accept') {
+            isSearchButtonEnabled = false;
+            isCancelButtonEnabled = true;
+          }
         });
       } catch (e) {
         debugPrint('Failed to fetch drivers: $e');
@@ -257,56 +270,78 @@ class _TaxiHomeState extends State<TaxiHome> {
                     prefixIcon: const Icon(Icons.location_on_sharp, color: AppColor.primaryColor),
                   ),
                   const SizedBox(height: 6.0), // Reduced spacing
-                  ElevatedButton(
-                    onPressed: () {
-                      if (sourceLocation == null) {
-                        SnackbarHelper.showSnackbar(
-                          title: 'Error',
-                          message: ErrorMessage.typeSource,
-                          backgroundColor: Colors.red,
-                        );
-                        return;
-                      }
-                      if (destinationLocation == null) {
-                        SnackbarHelper.showSnackbar(
-                          title: 'Error',
-                          message: ErrorMessage.typeDestination,
-                          backgroundColor: Colors.red,
-                        );
-                        return;
-                      }
-                      _setPolylineAndMarkers();
-                      if (sourceLocation != null && destinationLocation != null) {
-                        mapController?.animateCamera(
-                          CameraUpdate.newLatLngBounds(
-                            LatLngBounds(
-                              southwest: LatLng(
-                                sourceLocation!.latitude < destinationLocation!.latitude
-                                  ? sourceLocation!.latitude
-                                  : destinationLocation!.latitude,
-                                sourceLocation!.longitude < destinationLocation!.longitude
-                                  ? sourceLocation!.longitude
-                                  : destinationLocation!.longitude,
+                  Row(
+                    children: [
+                      ElevatedButton(
+                        onPressed: isSearchButtonEnabled ? () async {
+                          if (sourceLocation == null) {
+                            SnackbarHelper.showSnackbar(
+                              title: 'Error',
+                              message: ErrorMessage.typeSource,
+                              backgroundColor: Colors.red,
+                            );
+                            return;
+                          }
+                          if (destinationLocation == null) {
+                            SnackbarHelper.showSnackbar(
+                              title: 'Error',
+                              message: ErrorMessage.typeDestination,
+                              backgroundColor: Colors.red,
+                            );
+                            return;
+                          }
+                          _setPolylineAndMarkers();
+                          if (sourceLocation != null && destinationLocation != null) {
+                            mapController?.animateCamera(
+                              CameraUpdate.newLatLngBounds(
+                                LatLngBounds(
+                                  southwest: LatLng(
+                                    sourceLocation!.latitude < destinationLocation!.latitude
+                                      ? sourceLocation!.latitude
+                                      : destinationLocation!.latitude,
+                                    sourceLocation!.longitude < destinationLocation!.longitude
+                                      ? sourceLocation!.longitude
+                                      : destinationLocation!.longitude,
+                                  ),
+                                  northeast: LatLng(
+                                    sourceLocation!.latitude > destinationLocation!.latitude
+                                      ? sourceLocation!.latitude
+                                      : destinationLocation!.latitude,
+                                    sourceLocation!.longitude > destinationLocation!.longitude
+                                      ? sourceLocation!.longitude
+                                      : destinationLocation!.longitude,
+                                  ),
+                                ),
+                                50.0,
                               ),
-                              northeast: LatLng(
-                                sourceLocation!.latitude > destinationLocation!.latitude
-                                  ? sourceLocation!.latitude
-                                  : destinationLocation!.latitude,
-                                sourceLocation!.longitude > destinationLocation!.longitude
-                                  ? sourceLocation!.longitude
-                                  : destinationLocation!.longitude,
-                              ),
-                            ),
-                            50.0,
-                          ),
-                        );
-                      }
-                      searchNearByTaxiDrivers();
-                      setState(() {
-                        showSearchFields = false;
-                      });
-                    },
-                    child: const Text('Search', style: TextStyle(fontSize: 12.0)), // Reduced font size
+                            );
+                          }
+                          setState(() {
+                            isSearchButtonEnabled = false;
+                            isCancelButtonEnabled = true;
+                          });
+                          await searchNearByTaxiDrivers();
+                        } : null,
+                        child: const Text('Search', style: TextStyle(fontSize: 12.0)), // Reduced font size
+                      ),
+                      const SizedBox(width: 8.0),
+                      ElevatedButton(
+                        onPressed: isCancelButtonEnabled ? () async{
+                          await travelController.deleteTravel(travelId!);
+                          setState(() {
+                            showSearchFields = false;
+                            showDriverList = false;
+                            isSearchButtonEnabled = true;
+                            isCancelButtonEnabled = false;
+                            sourceController.clear();
+                            destinationController.clear();
+                            polylines.clear();
+                            markers.clear();
+                          });
+                        } : null,
+                        child: const Text('Cancel', style: TextStyle(fontSize: 12.0)), // Reduced font size
+                      ),
+                    ],
                   ),
                 ],
               ),

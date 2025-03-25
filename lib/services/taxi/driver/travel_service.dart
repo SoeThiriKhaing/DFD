@@ -24,4 +24,13 @@ class TravelService {
     }
   }
 
+  //To delete travel
+  Future<void> deleteTravel(int travelId) async {
+    try {
+      await travelRepository.deleteTravel(travelId);
+    } catch (e) {
+      debugPrint('Error occurred in delete travel: $e');
+    }
+  }
+
 }
