@@ -81,6 +81,13 @@ class DriverDashboardState extends State<DriverDashboard> {
     }
   }
 
+   @override
+  void dispose() {
+    // Cancel the timer when the screen is disposed (when navigating back)
+    timer?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
