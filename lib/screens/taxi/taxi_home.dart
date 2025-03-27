@@ -75,6 +75,7 @@ class TaxiHomeState extends State<TaxiHome> {
   @override
   void dispose() {
     _timer.cancel();
+    locationUpdateTimer?.cancel();
     super.dispose();
   }
 
@@ -152,7 +153,6 @@ class TaxiHomeState extends State<TaxiHome> {
 
   //After the rider accept the trip, update the polyline and marker from the rider to the driver and track driver location
   void updatePolylineAndMarker(Map<String, String?> driver) async {
-
     showDriverList = false; // Hide driver list
     showSearchFields = false; // Hide search fields
     isSearchButtonEnabled = false;
@@ -163,7 +163,6 @@ class TaxiHomeState extends State<TaxiHome> {
     final response = await driverController.fetchTaxiDriverByDriverId(int.parse(driverId));
 
     if (response.id != null) {
-      
       LatLng driverLocation = LatLng(response.latitude, response.longitude);
 
       setState(() {
@@ -175,20 +174,23 @@ class TaxiHomeState extends State<TaxiHome> {
           ),
         );
 
-        polylines.add(
-          Polyline(
-            polylineId: PolylineId("route_to_driver_${driver['taxi_driver_id']}"),
-            points: [sourceLocation!, driverLocation],
-            color: Colors.green,
-            width: 5,
-          ),
-        );
+        // Update source and destination locations dynamically
+        sourceLocation = driverLocation; // Set driver as the new source
       });
-    }
-    else{
+
+      // Call _getRoute() to dynamically fetch the route
+      await _getRoute();
+
+      // Update the polyline from the rider to the driver every 5 seconds
+      locationUpdateTimer?.cancel(); // Cancel the previous timer
+      locationUpdateTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+        updatePolylineAndMarker(driver);
+      });
+    } else {
       debugPrint("Driver location is not available");
     }
   }
+
 
   //For the rider search first time
   void _setPolylineAndMarkers() {
