@@ -6,5 +6,5 @@ abstract class IAuthRepository {
   //For Register
   Future<UserModel> register(String name, String email, String password);
   //For Logout
-  Future<void> logout();
+  Future<String> logout();
 }

@@ -32,7 +32,14 @@ class ApiHelper {
       });
 
       final decodedResponse = jsonDecode(response.body);
-      if (T == List<dynamic>) {
+      if (T == String) {
+        // If the expected type is String, extract the 'message' field
+        if (decodedResponse is Map<String, dynamic> && decodedResponse.containsKey('message')) {
+          return decodedResponse['message'] as T;
+        } else {
+          throw Exception("Expected 'message' field in response, but not found.");
+        }
+      } else if (T == List<dynamic>) {
         if (decodedResponse is Map<String, dynamic> &&
             decodedResponse.containsKey('data')) {
           return decodedResponse['data'] as T;

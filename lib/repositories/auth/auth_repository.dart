@@ -27,10 +27,12 @@ class AuthRepository implements IAuthRepository {
   }
 
   @override
-  Future<void> logout() async { 
-    return await ApiHelper.request<void>(
+  Future<String> logout() async { 
+    final response = await ApiHelper.request<String>(
       endpoint: AppUrl.logoutEndpoint,
       method: "POST",
     );
+
+    return response;
   }
 }

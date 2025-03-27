@@ -26,13 +26,17 @@ class TaxiHomeScreenState extends State<TaxiHomeScreen> {
   final DriverLocationController driverLocationController = DriverLocationController(
       service: DriverLocationService(repository: DriverLocationRepository()));
   int? taxiDriverId;
+  // Declare a Timer variable
+  Timer? _timer;
+
   @override
   void initState() {
     super.initState();
     _checkLocationPermission();
     _getDriverId();
-      // Update driver location every 5 seconds
-    Timer.periodic(const Duration(seconds: 10), (timer) {
+      
+    // Start the timeer to update driver location every 10 seconds
+    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
       updateDriverLocation();
     });
   }
@@ -88,6 +92,13 @@ class TaxiHomeScreenState extends State<TaxiHomeScreen> {
     } catch (e) {
       debugPrint("Exception updating driver location: $e");
     }
+  }
+
+  @override
+  void dispose() {
+    // Cancel the timer when the screen is disposed (when navigating back)
+    _timer?.cancel();
+    super.dispose();
   }
 
 
