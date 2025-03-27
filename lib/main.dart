@@ -14,10 +14,15 @@ import 'package:dailyfairdeal/screens/home/main_screen.dart';
 import 'package:dailyfairdeal/screens/payment/add_card_screen.dart';
 import 'package:dailyfairdeal/screens/profile/profile.dart';
 import 'package:dailyfairdeal/screens/taxi/taxi_home.dart';
+import 'package:dailyfairdeal/services/fcm/fcm_service.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  FCMService.setupFCM();
   runApp(const MyApp());
 }
 

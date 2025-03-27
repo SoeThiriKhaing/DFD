@@ -92,6 +92,7 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data["status"] == "OK" && data["results"].isNotEmpty) {
+          debugPrint("Address: $data");
           return data["results"][0]["formatted_address"];
         } else {
           return "Unknown location";

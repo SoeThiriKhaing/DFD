@@ -7,6 +7,7 @@ import 'package:dailyfairdeal/screens/dashboard/taxi_driver/earning_summary.dart
 import 'package:dailyfairdeal/screens/dashboard/taxi_driver/rider_request.dart';
 import 'package:dailyfairdeal/screens/dashboard/taxi_driver/taxi_driver_home.dart';
 import 'package:dailyfairdeal/screens/dashboard/taxi_driver/trip_history.dart';
+import 'package:dailyfairdeal/services/fcm/fcm_service.dart';
 import 'package:dailyfairdeal/services/taxi/travel/travel_service.dart';
 import 'package:dailyfairdeal/widget/app_color.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +33,13 @@ class DriverDashboardState extends State<DriverDashboard> {
   
   @override
   void initState(){
+    FCMService.setupFCM();
+
+    // Listen for new ride requests
+    FCMService.onRideRequestReceived = () {
+      _fetchRideRequestsCount();  // ✅ Update notification count when new request comes in
+    };
+
     super.initState();
     driverId = arguments['driverId'];
     debugPrint("Driver ID in taxi driver dashboard is $driverId");
@@ -41,7 +49,9 @@ class DriverDashboardState extends State<DriverDashboard> {
   Future<void> _initialize() async{  
     _fetchRideRequestsCount();
       timer = Timer.periodic(const Duration(seconds: 3), (timer) {
-      _fetchRideRequestsCount(); // Fetch ride requests every 3 seconds
+        FCMService.onRideRequestReceived = () {
+          _fetchRideRequestsCount();  // ✅ Update notification count when new request comes in
+        };
     });
   }
 
@@ -80,6 +90,7 @@ class DriverDashboardState extends State<DriverDashboard> {
       }
     }
   }
+
 
    @override
   void dispose() {

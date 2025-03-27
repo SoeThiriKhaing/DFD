@@ -440,6 +440,7 @@ class TaxiHomeState extends State<TaxiHome> {
                           showDriverList = false;
                           isSearchButtonEnabled = true;
                           isCancelButtonEnabled = false;
+                          showSelectedDriverInfo = false;
                           sourceController.clear();
                           destinationController.clear();
                           polylines.clear();
@@ -548,6 +549,7 @@ class TaxiHomeState extends State<TaxiHome> {
                     radius: 40.0,
                     backgroundImage: AssetImage('assets/images/avatar.png'),
                   ),
+                  const SizedBox(height: 8.0),
                   const Text('Driver Information', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8.0),
                   Row(
