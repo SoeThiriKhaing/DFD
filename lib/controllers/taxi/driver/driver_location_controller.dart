@@ -7,20 +7,22 @@ class DriverLocationController{
 
   DriverLocationController({required this.service});
 
-  Future<void> updateLocation(DriverLocationModel driverLocation) async {
+  Future <int> updateLocation(DriverLocationModel driverLocation) async {
     try {
       int statusCode = await service.updateDriverLocation(driverLocation);
       if (statusCode == 200 || statusCode == 201) {
         debugPrint('Driver Location updated successfully!');
       } else if (statusCode == 422) {
-        debugPrint('Validation error: Invalid data provided.');
+        debugPrint('Validation error: Invalid data provided.'); 
       } else if (statusCode == 500) {
         debugPrint('Internal server error. Please try again later.');
       } else {
         debugPrint('Unexpected error: $statusCode');
       }
+      return statusCode;
     } catch (e) {
       debugPrint("Error updating location: $e");
+      return -1; // or any other default error code
     }
   }
 }

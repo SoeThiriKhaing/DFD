@@ -1,18 +1,21 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:dailyfairdeal/common_calls/constant.dart';
-import 'package:dailyfairdeal/controllers/taxi/driver/nearby_taxi_driver_controller.dart';
+import 'package:dailyfairdeal/controllers/taxi/driver/driver_controller.dart';
+import 'package:dailyfairdeal/controllers/taxi/driver/get_nearby_taxi_driver_controller.dart';
 import 'package:dailyfairdeal/controllers/taxi/travel/travel_controller.dart';
+import 'package:dailyfairdeal/models/taxi/travel/create_travel_model.dart';
 import 'package:dailyfairdeal/models/taxi/travel/travel_model.dart';
-import 'package:dailyfairdeal/repositories/taxi/driver/nearby_taxi_driver_repository.dart';
+import 'package:dailyfairdeal/repositories/taxi/driver/driver_repository.dart';
+import 'package:dailyfairdeal/repositories/taxi/driver/get_nearby_taxi_driver_repository.dart';
 import 'package:dailyfairdeal/repositories/taxi/travel/travel_repository.dart';
 import 'package:dailyfairdeal/screens/taxi/widgets/auto_complete_text_field.dart';
 import 'package:dailyfairdeal/screens/taxi/widgets/driver_list.dart';
 import 'package:dailyfairdeal/screens/taxi/widgets/map_view.dart';
-import 'package:dailyfairdeal/services/taxi/driver/nearby_taxi_driver_service.dart';
+import 'package:dailyfairdeal/services/taxi/driver/driver_service.dart';
+import 'package:dailyfairdeal/services/taxi/driver/get_nearby_taxi_driver_service.dart';
 import 'package:dailyfairdeal/services/taxi/travel/travel_service.dart';
 import 'package:dailyfairdeal/services/taxi/location/location_service.dart';
-import 'package:dailyfairdeal/util/appurl.dart';
 import 'package:dailyfairdeal/widget/app_color.dart';
 import 'package:dailyfairdeal/widget/support_widget.dart';
 import 'package:flutter/material.dart';
@@ -35,9 +38,9 @@ class TaxiHomeState extends State<TaxiHome> {
   final TextEditingController sourceController = TextEditingController();
   final TextEditingController destinationController = TextEditingController();
   final LocationService locationService = LocationService();
-  final NearByTaxiDriverRepository repository = NearByTaxiDriverRepository();
-  late NearByTaxiDriverService service;
-  late NearByTaxiDriverController controller;
+  final GetNearByTaxiDriverRepository repository = GetNearByTaxiDriverRepository();
+  late GetNearByTaxiDriverService service;
+  late GetNearByTaxiDriverController controller;
   GoogleMapController? mapController;
   LatLng? sourceLocation;
   LatLng? destinationLocation;
@@ -47,19 +50,40 @@ class TaxiHomeState extends State<TaxiHome> {
   bool isLoading = false;
   bool showDriverList = false;
   bool showSearchFields = true;
+  List<NearbyDriverModel> nearbyDrivers = []; //To check the nearby drivers is exist or not if the user search the taxi
   List<Map<String, String?>> nearbyTaxiDriver = [];
   int? travelId;
   Timer? locationUpdateTimer;
   final TravelController travelController = Get.put(TravelController(
     travelService:TravelService(travelRepository: TravelRepository())));
+  final DriverController driverController = Get.put(DriverController(service: DriverService(repository: DriverRepository())));
   bool isSearchButtonEnabled = true;
   bool isCancelButtonEnabled = false;
+
+  late Timer _timer;
+
   @override
   void initState() {
     super.initState();
-    service = NearByTaxiDriverService(repository: repository);
-    controller = NearByTaxiDriverController(service: service);
+    _startTimer();
+    service = GetNearByTaxiDriverService(repository: GetNearByTaxiDriverRepository());
+    controller = GetNearByTaxiDriverController(service: service);
     _getCurrentLocation();
+    Get.put(this); // Inject this instance
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      setState(() {
+
+      });
+    });
   }
 
   //To Type Automatically Current Location in the Source Location Text Field at initial state
@@ -79,11 +103,21 @@ class TaxiHomeState extends State<TaxiHome> {
     }
   }
 
+  Future<void> fetchNearByTaxiDrivers() async {
+    try {
+      List<Map<String, String?>> driversList = await controller.fetchNearbyDrivers(travelId!);
+        nearbyTaxiDriver = driversList;
+        debugPrint("Near by Taxi Drivers Already Bid Price in the Taxi Home: $nearbyTaxiDriver");
+    } catch (e) {
+      debugPrint('Failed to fetch drivers: $e');
+      nearbyTaxiDriver = [];
+    }
+  }
   Future<void> searchNearByTaxiDrivers() async {
-    if (sourceLocation != null) {
+    if (sourceLocation != null && destinationLocation != null) {
       setState(() {
         isLoading = true;
-        showDriverList = false;
+        showDriverList = true;
       });
       try {
         TravelModel travel = TravelModel(
@@ -95,17 +129,15 @@ class TaxiHomeState extends State<TaxiHome> {
       );
         Map<String, dynamic> response = await travelController.createTravelRequest(travel);
         String status = response['status'];
-        String myTravelId = response['travelId'].toString();
-        travelId = int.parse(myTravelId);
-        List<Map<String, String?>> driversList = await controller.fetchNearbyDrivers();
-        nearbyTaxiDriver = driversList;
+        int myTravelId = response['travelId'];
+        nearbyDrivers = List<NearbyDriverModel>.from(response["nearbyDriverList"]);
+        debugPrint("Travel ID in User Taxi Home: $myTravelId");
+        travelId = myTravelId;
+        fetchNearByTaxiDrivers();
         setState(() {
           isLoading = false;
           showDriverList = true;
           if (status == 'pending' || status == 'bidding') {
-            isSearchButtonEnabled = false;
-            isCancelButtonEnabled = true;
-          } else if (status == 'accept') {
             isSearchButtonEnabled = false;
             isCancelButtonEnabled = true;
           }
@@ -118,49 +150,44 @@ class TaxiHomeState extends State<TaxiHome> {
     }
   }
 
-  //After the rider accept the trip, update the polyline and marker from the rider to the driver
+  //After the rider accept the trip, update the polyline and marker from the rider to the driver and track driver location
   void updatePolylineAndMarker(Map<String, String?> driver) async {
-    String driverId = driver['driver_id']!; // Get driver ID
-    trackDriverLocation(driverId);
-  }
 
-  //After the rider accept the trip, the driver location will be tracked and draw the polyline
-  void trackDriverLocation(String driverId) {
-    locationUpdateTimer?.cancel(); // Cancel any existing timer
-    locationUpdateTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
-      try {
-        final response = await http.get(
-          Uri.parse('${AppUrl.getTaxiDriverLocationById}/${int.parse(driverId)}'),
+    showDriverList = false; // Hide driver list
+    showSearchFields = false; // Hide search fields
+    isSearchButtonEnabled = false;
+    isCancelButtonEnabled = true;
+
+    String driverId = driver['taxi_driver_id']!;
+
+    final response = await driverController.fetchTaxiDriverByDriverId(int.parse(driverId));
+
+    if (response.id != null) {
+      
+      LatLng driverLocation = LatLng(response.latitude, response.longitude);
+
+      setState(() {
+        markers.add(
+          Marker(
+            markerId: MarkerId("driver_${driver['taxi_driver_id']}"),
+            position: driverLocation,
+            infoWindow: InfoWindow(title: "Driver ${driver['driver_name']}"),
+          ),
         );
 
-        if (response.statusCode == 200) {
-          final data = json.decode(response.body);
-          double lat = double.parse(data['latitude']);
-          double lng = double.parse(data['longitude']);
-
-          LatLng driverLatLng = LatLng(lat, lng);
-
-          setState(() {
-            showDriverList = false; // Hide driver list
-            markers.removeWhere((marker) => marker.markerId == MarkerId(driverId));
-            markers.add(
-              Marker(
-                markerId: MarkerId(driverId),
-                position: driverLatLng,
-                infoWindow: const InfoWindow(title: "Driver Location"),
-                icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-              ),
-            );
-            destinationLocation = driverLatLng;
-          });
-
-          mapController?.animateCamera(CameraUpdate.newLatLng(driverLatLng));
-          _getRoute();
-        }
-      } catch (e) {
-        debugPrint("Error fetching driver location: $e");
-      }
-    });
+        polylines.add(
+          Polyline(
+            polylineId: PolylineId("route_to_driver_${driver['taxi_driver_id']}"),
+            points: [sourceLocation!, driverLocation],
+            color: Colors.green,
+            width: 5,
+          ),
+        );
+      });
+    }
+    else{
+      debugPrint("Driver location is not available");
+    }
   }
 
   //For the rider search first time
@@ -367,6 +394,7 @@ class TaxiHomeState extends State<TaxiHome> {
                           }
                           setState(() {
                             isSearchButtonEnabled = false;
+                            showSearchFields = false;
                             isCancelButtonEnabled = true;
                           });
                           await searchNearByTaxiDrivers();
@@ -379,7 +407,7 @@ class TaxiHomeState extends State<TaxiHome> {
                           locationUpdateTimer?.cancel(); // Stop live tracking
                           await travelController.deleteTravel(travelId!);
                           setState(() {
-                            showSearchFields = false;
+                            showSearchFields = true;
                             showDriverList = false;
                             isSearchButtonEnabled = true;
                             isCancelButtonEnabled = false;
@@ -456,13 +484,25 @@ class TaxiHomeState extends State<TaxiHome> {
             ),
           ),
           
-          if (showDriverList)
-            Expanded(
-              child: DriverList(
-                driversList: nearbyTaxiDriver,
-                isLoading: isLoading,
+          if (showDriverList)...[
+            if(nearbyDrivers.isNotEmpty) ...[
+              Expanded(
+                child: DriverList(
+                  driversList: nearbyTaxiDriver,
+                  isLoading: isLoading,
+                  onDriverAccepted: (driver) {
+                    updatePolylineAndMarker(driver);
+                  },
+                ),
               ),
-            ),
+            ]
+            else ...[
+              const SizedBox(
+                height: 100.0,
+                child: Center(child: Text('No nearby drivers found.')),
+              ),
+            ],
+          ]
         ],
       ),
     );

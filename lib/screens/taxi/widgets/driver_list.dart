@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:dailyfairdeal/screens/taxi/taxi_home.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -6,32 +7,69 @@ import 'package:dailyfairdeal/repositories/taxi/bid_price/bid_price_repository.d
 import 'package:dailyfairdeal/services/taxi/bid_price/bid_price_service.dart';
 import 'package:dailyfairdeal/util/snackbar_helper.dart';
 
-class DriverList extends StatelessWidget {
+class DriverList extends StatefulWidget {
   final List<Map<String, String?>> driversList;
   final bool isLoading;
+  final Function(Map<String, String?> driver) onDriverAccepted;
 
-  // Initialize the controller
+  const DriverList({
+    super.key,
+    required this.driversList,
+    required this.isLoading,
+    required this.onDriverAccepted,
+  });
+
+  @override
+  State<DriverList> createState() => _DriverListState();
+}
+
+class _DriverListState extends State<DriverList> {
   final BidPriceController bidPriceController = Get.put(
     BidPriceController(bidPriceService: BidPriceService(bidPriceRepository: BidPriceRepository())),
   );
 
-  DriverList({
-    super.key,
-    required this.driversList,
-    required this.isLoading,
-  });
+  late Timer _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      setState(() {
+        Get.find<TaxiHomeState>().fetchNearByTaxiDrivers();
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    if (widget.isLoading) {
       return const SizedBox(
         height: 100.0,
         child: Center(child: CircularProgressIndicator()),
       );
-    } else if (driversList.isEmpty) {
+    } else if (widget.driversList.isEmpty) {
       return const SizedBox(
         height: 100.0,
-        child: Center(child: Text('No nearby drivers found.')),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 10),
+              Text('Waiting Nearby Taxi Driver Response....'),
+            ],
+          ),
+        ),
       );
     } else {
       return Column(
@@ -45,12 +83,12 @@ class DriverList extends StatelessWidget {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: driversList.length,
+              itemCount: widget.driversList.length,
               itemBuilder: (BuildContext context, int index) {
-                final driver = driversList[index];
+                final driver = widget.driversList[index];
 
                 // Convert String? to int and double safely
-                int? driverId = int.tryParse(driver['driver_id'] ?? '');
+                int? driverId = int.tryParse(driver['taxi_driver_id'] ?? '');
                 int? travelId = int.tryParse(driver['travel_id'] ?? '');
                 double? price = double.tryParse(driver['price'] ?? '');
 
@@ -80,7 +118,7 @@ class DriverList extends StatelessWidget {
                                 message: "Your trip is accepted successfully",
                               );
                               // Hide driver list and mark locations on the map
-                              Get.find<TaxiHomeState>().updatePolylineAndMarker(driver);
+                              widget.onDriverAccepted(driver);
                             } else {
                               SnackbarHelper.showSnackbar(
                                 title: "Error",

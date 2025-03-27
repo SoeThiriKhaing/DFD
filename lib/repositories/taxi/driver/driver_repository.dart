@@ -49,6 +49,24 @@ class DriverRepository implements IDriverRepository {
   }
 
   @override
+  Future<DriverModel> getTaxiDriverByDriverId(int driverId) async {
+    final response = await ApiHelper.request(
+      endpoint: '${AppUrl.getTaxiDriverLocationById}/$driverId',
+      method: 'GET',
+    );
+
+    if (response != null) {
+      if (response['data'] is Map<String, dynamic>) {
+        debugPrint('Driver data: ${response['data']}');
+        return DriverModel.fromJson(response['data']); // ✅ Correctly parsing single object
+      } else if (response['data'] is List && response['data'].isEmpty) {
+        throw Exception('Driver not found');
+      }
+    }
+    throw Exception('Unexpected response format');
+  }
+
+  @override
   Future<void> updateDriverAvailability(int driverId, bool isAvailable) {
     
     throw UnimplementedError();

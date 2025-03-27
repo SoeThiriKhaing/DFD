@@ -26,10 +26,10 @@ class DriverLocationModel {
   // Convert JSON response to DriverLocation model
   factory DriverLocationModel.fromJson(Map<String, dynamic> json) {
     return DriverLocationModel(
-      driverId: json["driver_id"],
-      latitude: json["current_location"]["lat"],
-      longitude: json["current_location"]["long"],
-      isAvailable: json["is_available"],
+      driverId: json["driver_id"] ?? 0,
+      latitude: (json["current_location"]["lat"] ?? 0.0).toDouble(),
+      longitude: (json["current_location"]["long"] ?? 0.0).toDouble(),
+      isAvailable: json["is_available"] ?? false,
     );
   }
 

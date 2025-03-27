@@ -11,7 +11,7 @@ class DriverModel {
   final String carModel;
   final String carColour;
   final String licensePlate;
-  final String driverLicenseNo;
+  final String? driverLicenseNo;
   final String otherInfo;
   final UserModel? user;
 
@@ -26,7 +26,7 @@ class DriverModel {
     required this.carModel,
     required this.carColour,
     required this.licensePlate,
-    required this.driverLicenseNo,
+    this.driverLicenseNo,
     required this.otherInfo,
     this.user,
   });
@@ -45,7 +45,7 @@ class DriverModel {
       licensePlate: json['license_plate'] ?? '',
       driverLicenseNo: json['driver_license_number'] ?? '',
       otherInfo: json['other_info'] ?? '',
-      user: json['user'],
+      user: json['user'] != null ? UserModel.fromJson(json["user"]): null,
     );
   }
 

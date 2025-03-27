@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async'; // Import dart:async package
 import 'package:dailyfairdeal/common_calls/constant.dart';
 import 'package:http/http.dart' as http;
 import 'package:dailyfairdeal/controllers/taxi/bid_price/bid_price_controller.dart';
@@ -29,6 +30,8 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
   List<TravelModel> rideRequests = [];
   bool isLoading = true;
   String? errorMessage;
+  int notificationCount = 0; // Add notification count
+  Timer? _timer; // Add Timer variable
 
   @override
   void initState() {
@@ -44,6 +47,15 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
             TravelService(travelRepository: TravelRepository())));
     bidPriceController = Get.put(BidPriceController(bidPriceService: BidPriceService(bidPriceRepository: BidPriceRepository())));
     _fetchRideRequests();
+    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      _fetchRideRequests(); // Fetch ride requests every 3 seconds
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel(); // Cancel the timer
+    super.dispose();
   }
 
   Future<void> _fetchRideRequests() async {
@@ -57,6 +69,7 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
         setState(() {
           rideRequests = requests;
           isLoading = false;
+          notificationCount = requests.length; // Update notification count
         });
       }
     } catch (e) {

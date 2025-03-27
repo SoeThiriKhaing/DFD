@@ -32,7 +32,7 @@ class TaxiHomeScreenState extends State<TaxiHomeScreen> {
     _checkLocationPermission();
     _getDriverId();
       // Update driver location every 5 seconds
-    Timer.periodic(const Duration(seconds: 5), (timer) {
+    Timer.periodic(const Duration(seconds: 10), (timer) {
       updateDriverLocation();
     });
   }
@@ -52,30 +52,44 @@ class TaxiHomeScreenState extends State<TaxiHomeScreen> {
 
   Future<void> updateDriverLocation() async {
     try {
-      LatLng? currentLocation = await locationService.getCurrentLocation();
-      bool isAvailable = taxiController.isAvailable.value; // Get online status
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
 
-      // Create DriverLocation model instance
+      LatLng currentLocation = LatLng(position.latitude, position.longitude);
+
+      if (taxiDriverId == null) {
+        debugPrint("Error: Driver ID is null.");
+        return;
+      }
+
+      bool isAvailable = taxiController.isAvailable.value;
+
       DriverLocationModel driverLocation = DriverLocationModel(
         driverId: taxiDriverId!,
-        latitude: currentLocation!.latitude,
+        latitude: currentLocation.latitude,
         longitude: currentLocation.longitude,
         isAvailable: isAvailable,
       );
 
-      await driverLocationController.updateLocation(driverLocation);
+      debugPrint("Sending Driver Location: ${driverLocation.latitude}, ${driverLocation.longitude}");
 
-      if(mounted){
-         // Update the driver's location on the map
-        setState(() {
-          taxiController.currentPosition.value = LatLng(currentLocation.latitude, currentLocation.longitude);
-        });
-      } 
-       
+      int statusCode = await driverLocationController.updateLocation(driverLocation);
+
+      if (statusCode == 200) {
+        if (mounted) {
+          setState(() {
+            taxiController.currentPosition.value =
+                LatLng(currentLocation.latitude, currentLocation.longitude);
+          });
+        }
+      } else {
+        debugPrint("Error updating driver location: $statusCode");
+      }
     } catch (e) {
-      debugPrint("Error updating driver location: $e");
+      debugPrint("Exception updating driver location: $e");
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

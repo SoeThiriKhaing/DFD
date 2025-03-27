@@ -28,6 +28,9 @@ class DriverService {
     return repository.createDriver(driver);
   }
 
+   Future<DriverModel> fetchTaxiDriverByDriverId(int driverId) async {
+      return await repository.getTaxiDriverByDriverId(driverId);
+  }
 
 
 }

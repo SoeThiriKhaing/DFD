@@ -1,4 +1,3 @@
-
 import 'package:dailyfairdeal/models/user/user_model.dart';
 
 class TravelModel {
@@ -32,7 +31,7 @@ class TravelModel {
       destinationLatitude: double.tryParse(json['destination_location']['latitude'].toString()) ?? 0.0,
       destinationLongitude: double.tryParse(json['destination_location']['longitude'].toString()) ?? 0.0,
       status: json['status'],
-      user: UserModel.fromJson(json['user']),
+      user: json['user'] != null ? UserModel.fromJson(json['user']) : null,
     );
   }
 

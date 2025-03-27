@@ -1,4 +1,5 @@
 import 'package:dailyfairdeal/models/taxi/travel/travel_model.dart';
+import 'package:dailyfairdeal/models/taxi/travel/create_travel_model.dart';
 import 'package:dailyfairdeal/repositories/taxi/travel/travel_repository.dart';
 import 'package:flutter/material.dart';
 
@@ -7,7 +8,7 @@ class TravelService {
 
   TravelService({required this.travelRepository});
 
-  Future<TravelModel> requestTravel(TravelModel travel) {
+  Future<CreateTravelModel> requestTravel(TravelModel travel) {
     return travelRepository.createTravel(travel);
   }
 

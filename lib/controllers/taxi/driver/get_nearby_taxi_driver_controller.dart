@@ -1,13 +1,13 @@
-import 'package:dailyfairdeal/models/taxi/driver/nearby_taxi_driver_model.dart';
-import 'package:dailyfairdeal/services/taxi/driver/nearby_taxi_driver_service.dart';
+import 'package:dailyfairdeal/models/taxi/driver/get_nearby_taxi_driver_model.dart';
+import 'package:dailyfairdeal/services/taxi/driver/get_nearby_taxi_driver_service.dart';
 
-class NearByTaxiDriverController {
-  final NearByTaxiDriverService service;
+class GetNearByTaxiDriverController {
+  final GetNearByTaxiDriverService service;
 
-  NearByTaxiDriverController({required this.service});
+  GetNearByTaxiDriverController({required this.service});
 
-  Future<List<Map<String, String?>>> fetchNearbyDrivers() async {
-    List<NearbyTaxiDriverModel> drivers = await service.fetchNearbyDrivers(); // Ensure this returns a List
+  Future<List<Map<String, String?>>> fetchNearbyDrivers(int travelId) async {
+    List<GetNearbyTaxiDriverModel> drivers = await service.fetchNearbyDrivers(travelId); // Ensure this returns a List
 
     return drivers.map((driversList) {
       return {

@@ -8,4 +8,5 @@ abstract class IDriverRepository {
   Future<int> createDriver(DriverModel driver);
   Future<DriverModel?> getTaxiDriverByUserId(int userId);
   Future<bool> checkDriverExists(int userId); 
+  Future<DriverModel> getTaxiDriverByDriverId(int driverId);
 }

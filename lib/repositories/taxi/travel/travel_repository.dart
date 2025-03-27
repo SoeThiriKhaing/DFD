@@ -1,18 +1,31 @@
 import 'package:dailyfairdeal/interfaces/taxi/travel/i_travel_repository.dart';
 import 'package:dailyfairdeal/models/taxi/travel/travel_model.dart';
+import 'package:dailyfairdeal/models/taxi/travel/create_travel_model.dart';
 import 'package:dailyfairdeal/repositories/repo_api_call_services/api_helper.dart';
 import 'package:dailyfairdeal/util/appurl.dart';
 import 'package:flutter/material.dart';
 
 class TravelRepository implements ITravelRepository {
   @override
-  Future<TravelModel> createTravel(TravelModel travel) async {
-    await ApiHelper.request(
-      endpoint: AppUrl.createTravel,
-      method: "POST",
-      body: travel.toJson().map((key, value) => MapEntry(key, value.toString())),
-    );
-    return travel;
+  Future<CreateTravelModel> createTravel(TravelModel travel) async {
+    try {
+      final response = await ApiHelper.request(
+        endpoint: AppUrl.createTravel,
+        method: "POST",
+        body: travel.toJson().map((key, value) => MapEntry(key, value.toString())),
+      );
+
+      if (response is Map<String, dynamic>) {
+        CreateTravelModel myTravel = CreateTravelModel.fromJson(response);
+        debugPrint("Travel ID from Repository: ${myTravel.travel?.id}");
+        return myTravel;
+      } else {
+        throw Exception("Unexpected API response format");
+      }
+    } catch (e) {
+      debugPrint("API Request Error: $e");
+      throw Exception("Failed to create travel");
+    }
   }
 
   @override
