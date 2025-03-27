@@ -66,7 +66,7 @@ class _DriverListState extends State<DriverList> {
             children: [
               CircularProgressIndicator(),
               SizedBox(height: 10),
-              Text('Waiting Nearby Taxi Driver Response....'),
+              Text('Please Wait to Nearby Taxi Driver Response....'),
             ],
           ),
         ),

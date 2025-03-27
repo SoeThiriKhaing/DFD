@@ -49,7 +49,9 @@ class TaxiHomeState extends State<TaxiHome> {
   LatLng? currentLocation;
   bool isLoading = false;
   bool showDriverList = false;
+  bool showSelectedDriverInfo = false;
   bool showSearchFields = true;
+  Map<String, String?> selectedDriverInfo = {};
   List<NearbyDriverModel> nearbyDrivers = []; //To check the nearby drivers is exist or not if the user search the taxi
   List<Map<String, String?>> nearbyTaxiDriver = [];
   int? travelId;
@@ -60,7 +62,7 @@ class TaxiHomeState extends State<TaxiHome> {
   bool isSearchButtonEnabled = true;
   bool isCancelButtonEnabled = false;
 
-  late Timer _timer;
+  late Timer _findNearByTaxiDriverTimer;
 
   @override
   void initState() {
@@ -74,13 +76,13 @@ class TaxiHomeState extends State<TaxiHome> {
 
   @override
   void dispose() {
-    _timer.cancel();
+    _findNearByTaxiDriverTimer.cancel();
     locationUpdateTimer?.cancel();
     super.dispose();
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
+    _findNearByTaxiDriverTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
       setState(() {
 
       });
@@ -108,12 +110,12 @@ class TaxiHomeState extends State<TaxiHome> {
     try {
       List<Map<String, String?>> driversList = await controller.fetchNearbyDrivers(travelId!);
         nearbyTaxiDriver = driversList;
-        debugPrint("Near by Taxi Drivers Already Bid Price in the Taxi Home: $nearbyTaxiDriver");
     } catch (e) {
       debugPrint('Failed to fetch drivers: $e');
       nearbyTaxiDriver = [];
     }
   }
+
   Future<void> searchNearByTaxiDrivers() async {
     if (sourceLocation != null && destinationLocation != null) {
       setState(() {
@@ -157,29 +159,34 @@ class TaxiHomeState extends State<TaxiHome> {
     showSearchFields = false; // Hide search fields
     isSearchButtonEnabled = false;
     isCancelButtonEnabled = true;
+    showSelectedDriverInfo = true;
 
     String driverId = driver['taxi_driver_id']!;
+
+    selectedDriverInfo = driver; //Store the selected driver information to the global variable
 
     final response = await driverController.fetchTaxiDriverByDriverId(int.parse(driverId));
 
     if (response.id != null) {
       LatLng driverLocation = LatLng(response.latitude, response.longitude);
+      //LatLng riderLocation = sourceLocation!;
 
       setState(() {
         markers.add(
           Marker(
             markerId: MarkerId("driver_${driver['taxi_driver_id']}"),
             position: driverLocation,
-            infoWindow: InfoWindow(title: "Driver ${driver['driver_name']}"),
+            infoWindow: InfoWindow(title: "Driver: ${driver['driver_name']} Location"),
           ),
         );
 
         // Update source and destination locations dynamically
         sourceLocation = driverLocation; // Set driver as the new source
+        //destinationLocation = riderLocation;
       });
 
       // Call _getRoute() to dynamically fetch the route
-      await _getRoute();
+      await _getRoute(Colors.green);
 
       // Update the polyline from the rider to the driver every 5 seconds
       locationUpdateTimer?.cancel(); // Cancel the previous timer
@@ -201,7 +208,7 @@ class TaxiHomeState extends State<TaxiHome> {
         Marker(
           markerId: const MarkerId("source"),
           position: sourceLocation!,
-          infoWindow: const InfoWindow(title: "Source"),
+          infoWindow: const InfoWindow(title: "Your Source Location"),
         ),
       );
 
@@ -209,15 +216,15 @@ class TaxiHomeState extends State<TaxiHome> {
         Marker(
           markerId: const MarkerId("destination"),
           position: destinationLocation!,
-          infoWindow: const InfoWindow(title: "Destination"),
+          infoWindow: const InfoWindow(title: "Your Destination Location"),
         ),
       );
 
-      _getRoute();
+      _getRoute(Colors.blue);
     }
   }
 
-  Future<void> _getRoute() async {
+  Future<void> _getRoute(Color polylineColor) async {
     if (sourceLocation != null && destinationLocation != null) {
       final response = await http.get(
         Uri.parse(
@@ -232,12 +239,11 @@ class TaxiHomeState extends State<TaxiHome> {
           final List<LatLng> polylinePoints = _decodePolyline(points);
 
           setState(() {
-            polylines.clear();
             polylines.add(
               Polyline(
                 polylineId: const PolylineId("route"),
                 points: polylinePoints,
-                color: Colors.blue,
+                color: polylineColor,
                 width: 5,
               ),
             );
@@ -351,75 +357,97 @@ class TaxiHomeState extends State<TaxiHome> {
                   Row(
                     children: [
                       ElevatedButton(
-                        onPressed: isSearchButtonEnabled ? () async {
-                          if (sourceLocation == null) {
-                            SnackbarHelper.showSnackbar(
-                              title: 'Error',
-                              message: ErrorMessage.typeSource,
-                              backgroundColor: Colors.red,
-                            );
-                            return;
-                          }
-                          if (destinationLocation == null) {
-                            SnackbarHelper.showSnackbar(
-                              title: 'Error',
-                              message: ErrorMessage.typeDestination,
-                              backgroundColor: Colors.red,
-                            );
-                            return;
-                          }
-                          _setPolylineAndMarkers();
-                          if (sourceLocation != null && destinationLocation != null) {
-                            mapController?.animateCamera(
-                              CameraUpdate.newLatLngBounds(
-                                LatLngBounds(
-                                  southwest: LatLng(
-                                    sourceLocation!.latitude < destinationLocation!.latitude
-                                      ? sourceLocation!.latitude
-                                      : destinationLocation!.latitude,
-                                    sourceLocation!.longitude < destinationLocation!.longitude
-                                      ? sourceLocation!.longitude
-                                      : destinationLocation!.longitude,
-                                  ),
-                                  northeast: LatLng(
-                                    sourceLocation!.latitude > destinationLocation!.latitude
-                                      ? sourceLocation!.latitude
-                                      : destinationLocation!.latitude,
-                                    sourceLocation!.longitude > destinationLocation!.longitude
-                                      ? sourceLocation!.longitude
-                                      : destinationLocation!.longitude,
-                                  ),
-                                ),
-                                50.0,
-                              ),
-                            );
-                          }
-                          setState(() {
-                            isSearchButtonEnabled = false;
-                            showSearchFields = false;
-                            isCancelButtonEnabled = true;
-                          });
-                          await searchNearByTaxiDrivers();
-                        } : null,
-                        child: const Text('Search', style: TextStyle(fontSize: 12.0)), // Reduced font size
+                      onPressed: isSearchButtonEnabled ? () async {
+                        if (sourceLocation == null) {
+                        SnackbarHelper.showSnackbar(
+                          title: 'Error',
+                          message: ErrorMessage.typeSource,
+                          backgroundColor: Colors.red,
+                        );
+                        return;
+                        }
+                        if (destinationLocation == null) {
+                        SnackbarHelper.showSnackbar(
+                          title: 'Error',
+                          message: ErrorMessage.typeDestination,
+                          backgroundColor: Colors.red,
+                        );
+                        return;
+                        }
+                        _setPolylineAndMarkers();
+                        if (sourceLocation != null && destinationLocation != null) {
+                        mapController?.animateCamera(
+                          CameraUpdate.newLatLngBounds(
+                          LatLngBounds(
+                            southwest: LatLng(
+                            sourceLocation!.latitude < destinationLocation!.latitude
+                              ? sourceLocation!.latitude
+                              : destinationLocation!.latitude,
+                            sourceLocation!.longitude < destinationLocation!.longitude
+                              ? sourceLocation!.longitude
+                              : destinationLocation!.longitude,
+                            ),
+                            northeast: LatLng(
+                            sourceLocation!.latitude > destinationLocation!.latitude
+                              ? sourceLocation!.latitude
+                              : destinationLocation!.latitude,
+                            sourceLocation!.longitude > destinationLocation!.longitude
+                              ? sourceLocation!.longitude
+                              : destinationLocation!.longitude,
+                            ),
+                          ),
+                          50.0,
+                          ),
+                        );
+                        }
+                        setState(() {
+                        isSearchButtonEnabled = false;
+                        showSearchFields = false;
+                        isCancelButtonEnabled = true;
+                        });
+                        await searchNearByTaxiDrivers();
+                      } : null,
+                      child: const Text('Search', style: TextStyle(fontSize: 12.0)), // Reduced font size
                       ),
                       const SizedBox(width: 8.0),
                       ElevatedButton(
-                        onPressed: isCancelButtonEnabled ? () async{
-                          locationUpdateTimer?.cancel(); // Stop live tracking
-                          await travelController.deleteTravel(travelId!);
-                          setState(() {
-                            showSearchFields = true;
-                            showDriverList = false;
-                            isSearchButtonEnabled = true;
-                            isCancelButtonEnabled = false;
-                            sourceController.clear();
-                            destinationController.clear();
-                            polylines.clear();
-                            markers.clear();
-                          });
-                        } : null,
-                        child: const Text('Cancel', style: TextStyle(fontSize: 12.0)), // Reduced font size
+                      onPressed: isCancelButtonEnabled ? () async {
+                        final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                          title: const Text('Confirmation'),
+                          content: const Text('Are you sure you want to cancel the trip?'),
+                          actions: [
+                            TextButton(
+                            onPressed: () => Get.back(result: false),
+                            child: const Text('No'),
+                            ),
+                            TextButton(
+                            onPressed: () => Get.back(result: true),
+                            child: const Text('Yes'),
+                            ),
+                          ],
+                          );
+                        },
+                        );
+
+                        if (confirm == true) {
+                        locationUpdateTimer?.cancel(); // Stop live tracking
+                        await travelController.deleteTravel(travelId!);
+                        setState(() {
+                          showSearchFields = true;
+                          showDriverList = false;
+                          isSearchButtonEnabled = true;
+                          isCancelButtonEnabled = false;
+                          sourceController.clear();
+                          destinationController.clear();
+                          polylines.clear();
+                          markers.clear();
+                        });
+                        }
+                      } : null,
+                      child: const Text('Cancel', style: TextStyle(fontSize: 12.0)), // Reduced font size
                       ),
                     ],
                   ),
@@ -504,8 +532,56 @@ class TaxiHomeState extends State<TaxiHome> {
                 child: Center(child: Text('No nearby drivers found.')),
               ),
             ],
-          ]
-        ],
+          ],
+
+          //To Show Driver Information containing Name, License Plate, Phone Number, and Bid Price, and the feedback from the rider
+          if(showSelectedDriverInfo)
+            //Driver Information
+            Container(
+              color: Colors.white,
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  //Added Avatar for the driver
+                  const CircleAvatar(
+                    radius: 40.0,
+                    backgroundImage: AssetImage('assets/images/avatar.png'),
+                  ),
+                  const Text('Driver Information', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8.0),
+                  Row(
+                    children: [
+                      const Text('Name: ', style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold)),
+                      Text("${selectedDriverInfo['driver_name']}", style: const TextStyle(fontSize: 14.0)),
+                    ],
+                  ),
+                  const SizedBox(height: 4.0),
+                  Row(
+                    children: [
+                      const Text('License Plate: ', style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold)),
+                      Text("${selectedDriverInfo['license_plate']}", style: const TextStyle(fontSize: 14.0)),
+                    ],
+                  ),
+                  const SizedBox(height: 4.0),
+                  Row(
+                    children: [
+                      const Text('Phone Number: ', style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold)),
+                      Text("${selectedDriverInfo['driver_phone']}", style: const TextStyle(fontSize: 14.0)),
+                    ],
+                  ),
+                  const SizedBox(height: 4.0),
+                  Row(
+                    children: [
+                      const Text('Price: ', style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold)),
+                      Text("${selectedDriverInfo['price']} MMK", style: const TextStyle(fontSize: 14.0)),
+                    ],
+                  ),
+                ],
+              ),
+            )
+          
+        ]
       ),
     );
   }
