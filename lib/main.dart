@@ -8,6 +8,7 @@ import 'package:dailyfairdeal/screens/auth/to_register.dart';
 import 'package:dailyfairdeal/screens/dashboard/restaurant/restaurant_owner_dashboard.dart';
 import 'package:dailyfairdeal/screens/dashboard/restaurant/restaurant_setting/change_restaurant_image.dart';
 import 'package:dailyfairdeal/screens/dashboard/restaurant/restaurant_setting/profile_setting.dart';
+import 'package:dailyfairdeal/screens/dashboard/taxi_driver/rider_request.dart';
 import 'package:dailyfairdeal/screens/dashboard/taxi_driver/taxi_driver_dashboard.dart';
 import 'package:dailyfairdeal/screens/food/foodpage/food_page.dart';
 import 'package:dailyfairdeal/screens/home/main_screen.dart';
@@ -28,9 +29,19 @@ void main() async{
   var initializationSettingsAndroid = const AndroidInitializationSettings('@mipmap/dfd');
   var initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
   
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+    onDidReceiveNotificationResponse: (NotificationResponse response) {
+      handleNotificationClick(response.payload);
+    }
+  );
 
   runApp(const MyApp());
+}
+
+void handleNotificationClick(String? payload) {
+  if (payload == "open_ride_requests") {
+    Get.toNamed('/riderrequest');
+  }
 }
 
 
@@ -66,6 +77,7 @@ class MyApp extends StatelessWidget {
               page: () => const ChangeRestaurantImage()),
           GetPage(name: '/addcardscreen', page: () => const AddCardScreen()),
           GetPage(name: '/driverdashboard', page: () => const DriverDashboard()),
+          GetPage(name: '/riderrequest', page: () => const RideRequestsScreen()),
         ]);
   }
 }

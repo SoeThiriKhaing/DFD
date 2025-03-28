@@ -60,7 +60,8 @@ class DriverDashboardState extends State<DriverDashboard> {
       0, 
       "New Ride Request", 
       "From $userName. Pickup: $pickup, Destination: $destination.", 
-      notificationDetails
+      notificationDetails,
+      payload: "open_ride_requests",
     );
   }
 
@@ -86,7 +87,7 @@ class DriverDashboardState extends State<DriverDashboard> {
     setState(() {
       selectedIndex = index;
     });
-    Navigator.pop(context); // This closes the drawer
+    Get.back(); // This closes the drawer using GetX
   }
 
   Set<int> notifiedTravelIds = <int>{}; // To track already notified ride requests
