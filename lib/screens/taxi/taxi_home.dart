@@ -4,6 +4,7 @@ import 'package:dailyfairdeal/common_calls/constant.dart';
 import 'package:dailyfairdeal/controllers/taxi/driver/driver_controller.dart';
 import 'package:dailyfairdeal/controllers/taxi/driver/get_nearby_taxi_driver_controller.dart';
 import 'package:dailyfairdeal/controllers/taxi/travel/travel_controller.dart';
+import 'package:dailyfairdeal/main.dart';
 import 'package:dailyfairdeal/models/taxi/travel/create_travel_model.dart';
 import 'package:dailyfairdeal/models/taxi/travel/travel_model.dart';
 import 'package:dailyfairdeal/repositories/taxi/driver/driver_repository.dart';
@@ -34,7 +35,7 @@ class TaxiHome extends StatefulWidget {
   State<TaxiHome> createState() => TaxiHomeState();
 }
 
-class TaxiHomeState extends State<TaxiHome> {
+class TaxiHomeState extends State<TaxiHome> with RouteAware {
   final TextEditingController sourceController = TextEditingController();
   final TextEditingController destinationController = TextEditingController();
   final LocationService locationService = LocationService();
@@ -65,6 +66,40 @@ class TaxiHomeState extends State<TaxiHome> {
   late Timer _findNearByTaxiDriverTimer;
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute<dynamic>) {
+      routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void didPop() {
+    _deleteTrip(); // Call delete function when back button is pressed
+    super.didPop();
+  }
+
+  Future<void> _deleteTrip() async {
+    try {
+      await travelController.deleteTravel(travelId!);
+      setState(() {
+        showSearchFields = true;
+        showDriverList = false;
+        isSearchButtonEnabled = true;
+        isCancelButtonEnabled = false;
+        showSelectedDriverInfo = false;
+        sourceController.clear();
+        destinationController.clear();
+        polylines.clear();
+        markers.clear();
+      });
+    } catch (e) {
+      debugPrint("Failed to delete trip: $e");
+    }
+  }
+
+  @override
   void initState() {
     super.initState();
     _startTimer();
@@ -76,6 +111,7 @@ class TaxiHomeState extends State<TaxiHome> {
 
   @override
   void dispose() {
+    routeObserver.unsubscribe(this);
     _findNearByTaxiDriverTimer.cancel();
     locationUpdateTimer?.cancel();
     super.dispose();
@@ -431,21 +467,10 @@ class TaxiHomeState extends State<TaxiHome> {
                           );
                         },
                         );
-
+    
                         if (confirm == true) {
                         locationUpdateTimer?.cancel(); // Stop live tracking
-                        await travelController.deleteTravel(travelId!);
-                        setState(() {
-                          showSearchFields = true;
-                          showDriverList = false;
-                          isSearchButtonEnabled = true;
-                          isCancelButtonEnabled = false;
-                          showSelectedDriverInfo = false;
-                          sourceController.clear();
-                          destinationController.clear();
-                          polylines.clear();
-                          markers.clear();
-                        });
+                        _deleteTrip(); // Delete the trip
                         }
                       } : null,
                       child: const Text('Cancel', style: TextStyle(fontSize: 12.0)), // Reduced font size
@@ -534,7 +559,7 @@ class TaxiHomeState extends State<TaxiHome> {
               ),
             ],
           ],
-
+    
           //To Show Driver Information containing Name, License Plate, Phone Number, and Bid Price, and the feedback from the rider
           if(showSelectedDriverInfo)
             //Driver Information

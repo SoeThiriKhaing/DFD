@@ -22,6 +22,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   
@@ -52,6 +54,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+        navigatorObservers: [routeObserver],
         debugShowCheckedModeBanner: false,
         title: "DailyFairDeal",
         home: const SplashScreen(),
