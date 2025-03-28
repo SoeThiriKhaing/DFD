@@ -1,12 +1,10 @@
-import 'dart:convert';
 import 'dart:async'; // Import dart:async package
-import 'package:dailyfairdeal/common_calls/constant.dart';
-import 'package:http/http.dart' as http;
 import 'package:dailyfairdeal/controllers/taxi/bid_price/bid_price_controller.dart';
 import 'package:dailyfairdeal/controllers/taxi/travel/travel_controller.dart';
 import 'package:dailyfairdeal/models/taxi/travel/travel_model.dart';
 import 'package:dailyfairdeal/repositories/taxi/bid_price/bid_price_repository.dart';
 import 'package:dailyfairdeal/repositories/taxi/travel/travel_repository.dart';
+import 'package:dailyfairdeal/screens/dashboard/taxi_driver/get_address_from_latlong.dart';
 import 'package:dailyfairdeal/services/secure_storage.dart';
 import 'package:dailyfairdeal/services/taxi/bid_price/bid_price_service.dart';
 import 'package:dailyfairdeal/services/taxi/travel/travel_service.dart';
@@ -62,8 +60,8 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
     try {
       List<TravelModel> requests = await travelController.fetchRiderRequests(driverId);
       for (var request in requests) {
-        request.pickupAddress = await _getAddressFromLatLng(request.pickupLatitude, request.pickupLongitude);
-        request.destinationAddress = await _getAddressFromLatLng(request.destinationLatitude, request.destinationLongitude);
+        request.pickupAddress = await getAddressFromLatLng(request.pickupLatitude, request.pickupLongitude);
+        request.destinationAddress = await getAddressFromLatLng(request.destinationLatitude, request.destinationLongitude);
       }
       if (mounted) {
         setState(() {
@@ -79,29 +77,6 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
           isLoading = false;
         });
       }
-    }
-  }
-
-  Future<String> _getAddressFromLatLng(double lat, double lng) async {
-    final String url =
-        "https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=$googleAPIKey";
-
-    try {
-      final response = await http.get(Uri.parse(url));
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data["status"] == "OK" && data["results"].isNotEmpty) {
-          debugPrint("Address: $data");
-          return data["results"][0]["formatted_address"];
-        } else {
-          return "Unknown location";
-        }
-      } else {
-        return "Failed to fetch location";
-      }
-    } catch (e) {
-      return "Error: $e";
     }
   }
 

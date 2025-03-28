@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "969337502308",
+    "project_id": "daily-fair-deal-45ead",
+    "storage_bucket": "daily-fair-deal-45ead.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:969337502308:android:da851cf1251220f9e37d71",
+        "android_client_info": {
+          "package_name": "com.example.dailyfairdeal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJyt6vMtqLsWT6HXZX6EGh1Ot0UYXu_7c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

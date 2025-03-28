@@ -1,17 +1,20 @@
 import 'dart:async';
 import 'package:dailyfairdeal/controllers/taxi/travel/travel_controller.dart';
+import 'package:dailyfairdeal/main.dart';
 import 'package:dailyfairdeal/models/taxi/travel/travel_model.dart';
 import 'package:dailyfairdeal/repositories/taxi/travel/travel_repository.dart';
 import 'package:dailyfairdeal/screens/dashboard/taxi_driver/driver_profile.dart';
 import 'package:dailyfairdeal/screens/dashboard/taxi_driver/earning_summary.dart';
+import 'package:dailyfairdeal/screens/dashboard/taxi_driver/get_address_from_latlong.dart';
 import 'package:dailyfairdeal/screens/dashboard/taxi_driver/rider_request.dart';
 import 'package:dailyfairdeal/screens/dashboard/taxi_driver/taxi_driver_home.dart';
 import 'package:dailyfairdeal/screens/dashboard/taxi_driver/trip_history.dart';
-import 'package:dailyfairdeal/services/fcm/fcm_service.dart';
 import 'package:dailyfairdeal/services/taxi/travel/travel_service.dart';
 import 'package:dailyfairdeal/widget/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
 
 class DriverDashboard extends StatefulWidget {
   const DriverDashboard({super.key});
@@ -32,26 +35,38 @@ class DriverDashboardState extends State<DriverDashboard> {
   Timer? timer;
   
   @override
-  void initState(){
-    FCMService.setupFCM();
-
-    // Listen for new ride requests
-    FCMService.onRideRequestReceived = () {
-      _fetchRideRequestsCount();  // ✅ Update notification count when new request comes in
-    };
-
+  void initState() {
     super.initState();
+
     driverId = arguments['driverId'];
-    debugPrint("Driver ID in taxi driver dashboard is $driverId");
     _initialize();
   }
 
+  Future<void> showRideRequestNotification(String userName, String pickup, String destination) async {
+    var androidDetails = const AndroidNotificationDetails(
+      "ride_request_channel",
+      "Ride Requests",
+      channelDescription: "Notifications for new ride requests",
+      importance: Importance.high,   // Makes the notification more prominent
+      priority: Priority.high,       // Shows the notification on top
+      ticker: 'ticker',              // Optional: Adds a ticker message when the notification pops up
+      visibility: NotificationVisibility.public, // Ensures it's visible to the top screen
+      playSound: true,               // Optional: Play a sound when the notification pops up
+    );
+
+    var notificationDetails = NotificationDetails(android: androidDetails);
+
+    await flutterLocalNotificationsPlugin.show(
+      0, 
+      "New Ride Request", 
+      "From $userName. Pickup: $pickup, Destination: $destination.", 
+      notificationDetails
+    );
+  }
+
   Future<void> _initialize() async{  
-    _fetchRideRequestsCount();
-      timer = Timer.periodic(const Duration(seconds: 3), (timer) {
-        FCMService.onRideRequestReceived = () {
-          _fetchRideRequestsCount();  // ✅ Update notification count when new request comes in
-        };
+    timer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      fetchRideRequestsCount();   
     });
   }
 
@@ -74,12 +89,30 @@ class DriverDashboardState extends State<DriverDashboard> {
     Navigator.pop(context); // This closes the drawer
   }
 
-  Future<void> _fetchRideRequestsCount() async {
+  Set<int> notifiedTravelIds = <int>{}; // To track already notified ride requests
+
+  Future<void> fetchRideRequestsCount() async {
     try {
       List<TravelModel> requests = await travelController.fetchRiderRequests(driverId);
+
       if (mounted) {
+
+        for (var request in requests) {
+          int travelId = request.travelId!;
+          String userName = request.user!.name;
+          String pickupLocation = await getAddressFromLatLng(request.pickupLatitude, request.pickupLongitude);
+          String destinationLocation = await getAddressFromLatLng(request.destinationLatitude, request.destinationLongitude);
+
+          // Show notification only if the travelId has not been notified already
+          if (!notifiedTravelIds.contains(travelId)) {
+            showRideRequestNotification(userName, pickupLocation, destinationLocation);
+            notifiedTravelIds.add(travelId); // Mark as notified
+          }
+        }
+
+        // Update notification count properly
         setState(() {
-          notificationCount = requests.length;
+          notificationCount = requests.length; // Keep adding only new notifications
         });
       }
     } catch (e) {
@@ -91,8 +124,7 @@ class DriverDashboardState extends State<DriverDashboard> {
     }
   }
 
-
-   @override
+  @override
   void dispose() {
     // Cancel the timer when the screen is disposed (when navigating back)
     timer?.cancel();

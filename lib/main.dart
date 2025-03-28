@@ -14,17 +14,25 @@ import 'package:dailyfairdeal/screens/home/main_screen.dart';
 import 'package:dailyfairdeal/screens/payment/add_card_screen.dart';
 import 'package:dailyfairdeal/screens/profile/profile.dart';
 import 'package:dailyfairdeal/screens/taxi/taxi_home.dart';
-import 'package:dailyfairdeal/services/fcm/fcm_service.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  FCMService.setupFCM();
+  
+  // Initialize notifications
+  var initializationSettingsAndroid = const AndroidInitializationSettings('@mipmap/dfd');
+  var initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
+  
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
   runApp(const MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
