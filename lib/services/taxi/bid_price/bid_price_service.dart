@@ -10,8 +10,4 @@ class BidPriceService {
     return bidPriceRepository.submitBidPrice(travelId, driverId, price);
   }
 
-  Future<BidPriceModel> acceptDriver(int driverId, int travelId, double price) {
-    return bidPriceRepository.acceptDriver(driverId, travelId, price);
-  }
-
 }

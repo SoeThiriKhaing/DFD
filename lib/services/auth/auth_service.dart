@@ -18,4 +18,8 @@ class AuthService {
   Future<String> logout() async {
     return await authRepository.logout();
   }
+
+  Future<List<UserModel>> getUserInfoById(int userId) async{
+    return await authRepository.getUserInfoById(userId);
+  }
 }

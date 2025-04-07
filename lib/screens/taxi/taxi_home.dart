@@ -11,6 +11,7 @@ import 'package:dailyfairdeal/repositories/taxi/driver/driver_repository.dart';
 import 'package:dailyfairdeal/repositories/taxi/driver/get_nearby_taxi_driver_repository.dart';
 import 'package:dailyfairdeal/repositories/taxi/travel/travel_repository.dart';
 import 'package:dailyfairdeal/screens/taxi/widgets/auto_complete_text_field.dart';
+import 'package:dailyfairdeal/screens/taxi/widgets/decode_polyline.dart';
 import 'package:dailyfairdeal/screens/taxi/widgets/driver_list.dart';
 import 'package:dailyfairdeal/screens/taxi/widgets/map_view.dart';
 import 'package:dailyfairdeal/services/taxi/driver/driver_service.dart';
@@ -62,6 +63,8 @@ class TaxiHomeState extends State<TaxiHome> with RouteAware {
   final DriverController driverController = Get.put(DriverController(service: DriverService(repository: DriverRepository())));
   bool isSearchButtonEnabled = true;
   bool isCancelButtonEnabled = false;
+  String? status; //To store trip status when serach nearby taxi driver
+  bool showCompleteTrip = false; //To show the complete trip button
 
   late Timer _findNearByTaxiDriverTimer;
 
@@ -93,7 +96,20 @@ class TaxiHomeState extends State<TaxiHome> with RouteAware {
         destinationController.clear();
         polylines.clear();
         markers.clear();
+        travelId = null;
+        nearbyDrivers.clear();
+        nearbyTaxiDriver.clear();
+        showCompleteTrip = false;
+        sourceLocation = null;
+        destinationLocation = null;
+        currentLocation = null;
       });
+      Get.offNamed('/taxihome');
+      SnackbarHelper.showSnackbar(
+        title: 'Trip Cancelled',
+        message: 'Your trip has been cancelled successfully.',
+        backgroundColor: Colors.red,
+      );
     } catch (e) {
       debugPrint("Failed to delete trip: $e");
     }
@@ -167,7 +183,7 @@ class TaxiHomeState extends State<TaxiHome> with RouteAware {
         status: 'pending',
       );
         Map<String, dynamic> response = await travelController.createTravelRequest(travel);
-        String status = response['status'];
+        status = response['status'];
         int myTravelId = response['travelId'];
         nearbyDrivers = List<NearbyDriverModel>.from(response["nearbyDriverList"]);
         debugPrint("Travel ID in User Taxi Home: $myTravelId");
@@ -194,18 +210,29 @@ class TaxiHomeState extends State<TaxiHome> with RouteAware {
     showDriverList = false; // Hide driver list
     showSearchFields = false; // Hide search fields
     isSearchButtonEnabled = false;
-    isCancelButtonEnabled = true;
+    isCancelButtonEnabled = false;
     showSelectedDriverInfo = true;
+    showCompleteTrip = false;
 
     String driverId = driver['taxi_driver_id']!;
+    String travelId = driver['travel_id']!; // Get travelId from driver data
 
-    selectedDriverInfo = driver; //Store the selected driver information to the global variable
+    selectedDriverInfo = driver; // Store selected driver information globally
+
+    // Check if trip is complete before proceeding
+    bool isTripComplete = await travelController.checkTripComplete(int.parse(travelId));
+    if (isTripComplete) {
+      debugPrint("Trip is complete. Skipping polyline update.");
+      setState(() {
+        showCompleteTrip = true; // Show complete trip butto
+      });
+      return; // Exit function early
+    }
 
     final response = await driverController.fetchTaxiDriverByDriverId(int.parse(driverId));
 
     if (response.id != null) {
       LatLng driverLocation = LatLng(response.latitude, response.longitude);
-      //LatLng riderLocation = sourceLocation!;
 
       setState(() {
         markers.add(
@@ -218,16 +245,30 @@ class TaxiHomeState extends State<TaxiHome> with RouteAware {
 
         // Update source and destination locations dynamically
         sourceLocation = driverLocation; // Set driver as the new source
-        //destinationLocation = riderLocation;
       });
+
+      // Move camera to the new driver location smoothly
+      mapController?.animateCamera(
+        CameraUpdate.newLatLngZoom(driverLocation, 16),
+      );
 
       // Call _getRoute() to dynamically fetch the route
       await _getRoute(Colors.green);
 
       // Update the polyline from the rider to the driver every 5 seconds
-      locationUpdateTimer?.cancel(); // Cancel the previous timer
-      locationUpdateTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
-        updatePolylineAndMarker(driver);
+      locationUpdateTimer?.cancel(); // Cancel previous timer
+      locationUpdateTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
+        // Re-check trip status before updating, true = trip is complete, false = trip is still active
+        bool isTripStillActive = await travelController.checkTripComplete(int.parse(travelId));
+        if (!isTripStillActive) {
+          //if false, update the driver location
+          updatePolylineAndMarker(driver);
+        } else {
+          //if true, trip is complete
+          debugPrint("Trip is complete. Stopping updates.");
+          showCompleteTrip = true; // Show complete trip button
+          timer.cancel(); // Stop the periodic update
+        }
       });
     } else {
       debugPrint("Driver location is not available");
@@ -272,7 +313,7 @@ class TaxiHomeState extends State<TaxiHome> with RouteAware {
         final data = json.decode(response.body);
         if (data['routes'].isNotEmpty) {
           final points = data['routes'][0]['overview_polyline']['points'];
-          final List<LatLng> polylinePoints = _decodePolyline(points);
+          final List<LatLng> polylinePoints = decodePolyline(points);
 
           setState(() {
             polylines.add(
@@ -293,35 +334,21 @@ class TaxiHomeState extends State<TaxiHome> with RouteAware {
     }
   }
 
-  List<LatLng> _decodePolyline(String encoded) {
-    List<LatLng> polyline = [];
-    int index = 0, len = encoded.length;
-    int lat = 0, lng = 0;
-
-    while (index < len) {
-      int b, shift = 0, result = 0;
-      do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-      lat += dlat;
-
-      shift = 0;
-      result = 0;
-      do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-      lng += dlng;
-
-      polyline.add(LatLng(lat / 1E5, lng / 1E5));
+  Future <void> checkCompleteTrip(int tripId)async {
+    try {
+      bool response = await travelController.checkTripComplete(tripId);
+      if (response == true) {
+        debugPrint('Trip completed successfully');
+        setState(() {
+          showCompleteTrip = true;
+        });
+      } else {
+        debugPrint('Failed to check trip completion');
+        showCompleteTrip = false;
+      }
+    } catch (e) {
+      debugPrint('Error checking trip completion: $e');
     }
-
-    return polyline;
   }
 
   void _moveToCurrentLocation() {
@@ -437,9 +464,9 @@ class TaxiHomeState extends State<TaxiHome> with RouteAware {
                         );
                         }
                         setState(() {
-                        isSearchButtonEnabled = false;
-                        showSearchFields = false;
-                        isCancelButtonEnabled = true;
+                          isSearchButtonEnabled = false;
+                          showSearchFields = false;
+                          isCancelButtonEnabled = true;
                         });
                         await searchNearByTaxiDrivers();
                       } : null,
@@ -547,7 +574,20 @@ class TaxiHomeState extends State<TaxiHome> with RouteAware {
                   driversList: nearbyTaxiDriver,
                   isLoading: isLoading,
                   onDriverAccepted: (driver) {
-                    updatePolylineAndMarker(driver);
+                    setState(() {
+                      isLoading = true; // Show loading indicator while waiting for driver response
+                    });
+
+                    // Simulate waiting for driver response
+                    Future.delayed(const Duration(seconds: 3), () {
+                      setState(() {
+                        isLoading = false; // Hide loading indicator after response
+                      });
+                      // If the driver accepts, update polyline and marker
+                      updatePolylineAndMarker(driver);
+                      travelId = int.tryParse(driver['travel_id'] ?? '');
+                      checkCompleteTrip(travelId!);
+                    });
                   },
                 ),
               ),
@@ -604,6 +644,42 @@ class TaxiHomeState extends State<TaxiHome> with RouteAware {
                       Text("${selectedDriverInfo['price']} MMK", style: const TextStyle(fontSize: 14.0)),
                     ],
                   ),
+                  if(showCompleteTrip)
+                    const SizedBox(height: 8.0),
+                    //Button for Complete the Trip
+                    ElevatedButton(
+                      onPressed: () {
+                        //Clear all the data
+                        setState(() {
+                          showSearchFields = true;
+                          showDriverList = false;
+                          isSearchButtonEnabled = true;
+                          isCancelButtonEnabled = false;
+                          showSelectedDriverInfo = false;
+                          sourceController.clear();
+                          destinationController.clear();
+                          sourceLocation = null;
+                          destinationLocation = null;
+                          currentLocation = null;
+                          polylines.clear();
+                          markers.clear();
+                          showCompleteTrip = false;
+                          sourceController.clear();
+                          destinationController.clear();
+                          travelId = null;
+                          nearbyDrivers.clear();
+                          nearbyTaxiDriver.clear();
+                          selectedDriverInfo.clear();
+                        });
+                        SnackbarHelper.showSnackbar(
+                          title: 'Trip Completed',
+                          message: 'Thank you for using our service!',
+                          backgroundColor: Colors.green,
+                        );
+                        Get.offNamed('/taxihome');
+                      },
+                      child: const Text('Complete Trip', style: TextStyle(fontSize: 12.0)), // Reduced font size
+                    ),
                 ],
               ),
             )

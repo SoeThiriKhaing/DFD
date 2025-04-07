@@ -8,8 +8,11 @@ import 'package:dailyfairdeal/screens/auth/to_register.dart';
 import 'package:dailyfairdeal/screens/dashboard/restaurant/restaurant_owner_dashboard.dart';
 import 'package:dailyfairdeal/screens/dashboard/restaurant/restaurant_setting/change_restaurant_image.dart';
 import 'package:dailyfairdeal/screens/dashboard/restaurant/restaurant_setting/profile_setting.dart';
-import 'package:dailyfairdeal/screens/dashboard/taxi_driver/rider_request.dart';
-import 'package:dailyfairdeal/screens/dashboard/taxi_driver/taxi_driver_dashboard.dart';
+import 'package:dailyfairdeal/screens/dashboard/taxi_driver/driver_profile.dart';
+import 'package:dailyfairdeal/screens/dashboard/taxi_driver/earnings.dart';
+import 'package:dailyfairdeal/screens/dashboard/taxi_driver/ride_history.dart';
+import 'package:dailyfairdeal/screens/dashboard/taxi_driver/ride_request.dart';
+import 'package:dailyfairdeal/screens/dashboard/taxi_driver/driver_home.dart';
 import 'package:dailyfairdeal/screens/food/foodpage/food_page.dart';
 import 'package:dailyfairdeal/screens/home/main_screen.dart';
 import 'package:dailyfairdeal/screens/payment/add_card_screen.dart';
@@ -23,6 +26,7 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,10 +46,9 @@ void main() async{
 
 void handleNotificationClick(String? payload) {
   if (payload == "open_ride_requests") {
-    Get.toNamed('/riderrequest');
+    Get.toNamed('/riderequest');
   }
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -57,6 +60,7 @@ class MyApp extends StatelessWidget {
         navigatorObservers: [routeObserver],
         debugShowCheckedModeBanner: false,
         title: "DailyFairDeal",
+        navigatorKey: navigatorKey,
         home: const SplashScreen(),
         getPages: [
           GetPage(name: '/', page: () => const SplashScreen()),
@@ -79,8 +83,12 @@ class MyApp extends StatelessWidget {
               name: '/changerestaurantimage',
               page: () => const ChangeRestaurantImage()),
           GetPage(name: '/addcardscreen', page: () => const AddCardScreen()),
-          GetPage(name: '/driverdashboard', page: () => const DriverDashboard()),
-          GetPage(name: '/riderrequest', page: () => const RideRequestsScreen()),
+          GetPage(name: '/taxi_driver_home', page:()=> const TaxiHomeScreen()),
+
+          GetPage(name: '/riderequest', page: () => const RideRequest()),
+          GetPage(name: '/ride_history', page: () => const RideHistory()),
+          GetPage(name: '/earnings', page: () => const Earnings()),
+           GetPage(name: '/driver_profile', page: () => const DriverProfile()),
         ]);
   }
 }

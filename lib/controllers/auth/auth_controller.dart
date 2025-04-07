@@ -125,4 +125,15 @@ class AuthController{
       debugPrint("Logout Error: $e");
     }
   }
+
+  Future<List<Map<String, String?>>> getUserInfoById(int userId) async{
+    List<UserModel> user = await authService.getUserInfoById(userId);
+    return user.map((userList) {
+      return {
+        'name': userList.name,
+        'email': userList.email,
+        'phone': userList.phone,
+      };
+    }).toList();
+  }
 }

@@ -70,7 +70,7 @@ class AppUrl {
   static String submitBidPrice = "$baseUrl/biddings";
 
   //Accept Driver by the Rider
-  static String acceptDriver = "$baseUrl/accept_drivers";
+  static String acceptDriverByRider = "$baseUrl/accept_drivers";
 
   //Get Bid Price by Travel Id
   static String getBidPriceByTravelId="$baseUrl/biddings";
@@ -85,9 +85,23 @@ class AppUrl {
   static String createTravel = "$baseUrl/travels";
   static String updateTravle = "$baseUrl/travels";
   static String deleteTravel = "$baseUrl/travels";
-  static String getTravel = "$baseUrl/travels";
+  static String getTravelById = "$baseUrl/travels";
 
-  //Driver Notification
-
+  //Get Rider Request Notification from Taxi Driver
   static String getNoti = "$baseUrl/driver";
+
+  //Get Rider Accepted Notification from taxi driver
+  static String getRiderAccepted = "$baseUrl/driver/acceptedUserNoti";
+
+  //Driver accept travel to rider
+  static String acceptedByDriver = "$baseUrl/driver_accept_to_user";
+
+  //Get user info by id
+  static String getUserInfoById ="$baseUrl/users";
+
+  //Travel Complete
+  static String travelComplete = "$baseUrl/travel";
+
+  //Check Trip Complete by Travel ID
+  static String checkTripComplete = "$baseUrl/user";
 }

@@ -1,10 +1,11 @@
 import 'dart:async';
+import 'package:dailyfairdeal/controllers/taxi/driver/accept_driver_rider_controller.dart';
+import 'package:dailyfairdeal/models/taxi/driver/accept_driver_ride_model.dart';
+import 'package:dailyfairdeal/repositories/taxi/driver/accept_driver_ride_repository.dart';
 import 'package:dailyfairdeal/screens/taxi/taxi_home.dart';
+import 'package:dailyfairdeal/services/taxi/driver/accept_driver_ride_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:dailyfairdeal/controllers/taxi/bid_price/bid_price_controller.dart';
-import 'package:dailyfairdeal/repositories/taxi/bid_price/bid_price_repository.dart';
-import 'package:dailyfairdeal/services/taxi/bid_price/bid_price_service.dart';
 import 'package:dailyfairdeal/util/snackbar_helper.dart';
 
 class DriverList extends StatefulWidget {
@@ -24,8 +25,8 @@ class DriverList extends StatefulWidget {
 }
 
 class _DriverListState extends State<DriverList> {
-  final BidPriceController bidPriceController = Get.put(
-    BidPriceController(bidPriceService: BidPriceService(bidPriceRepository: BidPriceRepository())),
+  final AcceptDriverRideController acceptDriverByRiderController = Get.put(
+    AcceptDriverRideController(service: AcceptDriverRideService(repository: AcceptDriverRideRepository())),
   );
 
   late Timer _timer;
@@ -111,14 +112,20 @@ class _DriverListState extends State<DriverList> {
                   trailing: ElevatedButton(
                     onPressed: (driverId != null && travelId != null && price != null)
                         ? () async {
-                            bool success = await bidPriceController.acceptDriver(driverId, travelId, price);
-                            if (success) {
+                            AcceptDriverRideModel response = await acceptDriverByRiderController.acceptDriver(driverId, travelId, price);
+                            if (response.bidPriceInfo != null) {
                               SnackbarHelper.showSnackbar(
                                 title: "Success",
                                 message: "Your trip is accepted successfully",
                               );
                               // Hide driver list and mark locations on the map
                               widget.onDriverAccepted(driver);
+                            } else if (response.bidPriceInfo == null){
+                              SnackbarHelper.showSnackbar(
+                                title: "Driver Unavailable",
+                                message: "The driver is busy and has already taken another trip. Please choose another driver.",
+                                backgroundColor: Colors.red,
+                              );
                             } else {
                               SnackbarHelper.showSnackbar(
                                 title: "Error",
@@ -162,7 +169,7 @@ class _DriverListState extends State<DriverList> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Get.back(),
               child: const Text("Close"),
             ),
           ],

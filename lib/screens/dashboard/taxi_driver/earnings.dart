@@ -1,12 +1,18 @@
+import 'package:dailyfairdeal/screens/dashboard/taxi_driver/driver_dashboard.dart';
 import 'package:flutter/material.dart';
 
-class EarningsSummaryScreen extends StatelessWidget {
-  const EarningsSummaryScreen({super.key});
+class Earnings extends StatefulWidget {
+  const Earnings({super.key});
 
   @override
+  State<Earnings> createState() => _EarningsState();
+}
+
+class _EarningsState extends State<Earnings> {
+  @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
+    return const DriverDashboard(
+      child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

@@ -49,7 +49,7 @@ class _ProfileState extends State<Profile> {
       DriverModel? driver = await driverController.fetchTaxiDriverByUserId(userId!);
       if (driver?.id != null) {
         saveDriverId(driver!.id.toString()); // Save to the secure storage
-        Get.toNamed("/driverdashboard", arguments: {"driverId": driver.id});
+        Get.toNamed("/taxi_driver_home", arguments: {"driverId": driver.id});
       } else {
         SnackbarHelper.showSnackbar(
           title: "Error",

@@ -14,15 +14,4 @@ class BidPriceRepository implements IBidPriceRepository {
       fromJson: (data) => BidPriceModel.fromJson(data),
     );
   }
-
-  @override
-  Future<BidPriceModel> acceptDriver(int driverId, int  travelId, double price) async {
-    final requestBody = {"taxi_driver_id": driverId, "travel_id": travelId, "price": price};
-    return await ApiHelper.request<BidPriceModel>(
-      endpoint: AppUrl.acceptDriver,
-      method: "POST",
-      body: requestBody,
-      fromJson: (data) => BidPriceModel.fromJson(data),
-    );
-  }
 }

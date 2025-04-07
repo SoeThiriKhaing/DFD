@@ -1,4 +1,4 @@
-import 'dart:async'; // Import dart:async package
+import 'dart:async';
 import 'package:dailyfairdeal/controllers/taxi/bid_price/bid_price_controller.dart';
 import 'package:dailyfairdeal/controllers/taxi/travel/travel_controller.dart';
 import 'package:dailyfairdeal/models/taxi/travel/travel_model.dart';
@@ -12,17 +12,17 @@ import 'package:dailyfairdeal/util/snackbar_helper.dart';
 import 'package:dailyfairdeal/widget/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'driver_dashboard.dart';
 
-class RideRequestsScreen extends StatefulWidget {
-  
-  const RideRequestsScreen({super.key});
+class RideRequest extends StatefulWidget {
+  const RideRequest({super.key});
 
   @override
-  RideRequestsScreenState createState() => RideRequestsScreenState();
+  State<RideRequest> createState() => _RideRequestState();
 }
 
-class RideRequestsScreenState extends State<RideRequestsScreen> {
-  late int driverId;
+class _RideRequestState extends State<RideRequest> {
+   late int driverId;
   late TravelController travelController;
   late BidPriceController bidPriceController;
   List<TravelModel> rideRequests = [];
@@ -48,12 +48,6 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
       _fetchRideRequests(); // Fetch ride requests every 3 seconds
     });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel(); // Cancel the timer
-    super.dispose();
   }
 
   Future<void> _fetchRideRequests() async {
@@ -97,7 +91,7 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                Get.back();
               },
               child: const Text("Cancel"),
             ),
@@ -107,7 +101,7 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
                 double? driverBidPrice = double.tryParse(bidPrice);
                 if (driverBidPrice != null) {
                   _submitBidPrice(travelId, driverId, driverBidPrice);
-                  Navigator.pop(context);
+                  Get.back();
                 }else {
                   debugPrint("Invalid bid price: $bidPrice");
                 }
@@ -135,9 +129,15 @@ class RideRequestsScreenState extends State<RideRequestsScreen> {
   }
 
   @override
+  void dispose() {
+    _timer?.cancel(); // Cancel the timer
+    super.dispose();
+  }
+  
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: isLoading
+    return DriverDashboard(
+      child: isLoading
           ? const Center(child: CircularProgressIndicator())
           : errorMessage != null
               ? Center(

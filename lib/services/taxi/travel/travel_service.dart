@@ -12,7 +12,7 @@ class TravelService {
     return travelRepository.createTravel(travel);
   }
 
-  //To show notification from the driver dashboard
+  //To show rider request notification from the driver dashboard
   Future<List<TravelModel>> getRiderRequests(int driverId) async {
     try {
       List<TravelModel> rideRequests =
@@ -31,6 +31,37 @@ class TravelService {
       await travelRepository.deleteTravel(travelId);
     } catch (e) {
       debugPrint('Error occurred in delete travel: $e');
+    }
+  }
+
+   //To show rider accepted notification from the driver dashboard
+  Future<List<TravelModel>> getRiderAccepted(int driverId) async {
+    try {
+      List<TravelModel> riderAccepted =
+          await travelRepository.fetchRiderAccepted(driverId);
+      debugPrint("${riderAccepted.length} rider is accepted successfully");
+      return riderAccepted;
+    } catch (e) {
+      debugPrint("Error fetching rider accepted: $e");
+      return [];
+    }
+  }
+
+  Future<bool> travelComplete(int travelId) async {
+    try {
+      return await travelRepository.travelComplete(travelId);
+    } catch (e) {
+      debugPrint('Error occurred in travel complete service: $e');
+      return false;
+    }
+  }
+
+  Future<bool> checkTripComplete(int travelId) async {
+    try {
+      return await travelRepository.checkTripComplete(travelId);
+    } catch (e) {
+      debugPrint('Error occurred in check travel complete service: $e');
+      return false;
     }
   }
 

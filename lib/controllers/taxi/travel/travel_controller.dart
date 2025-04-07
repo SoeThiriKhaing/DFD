@@ -30,7 +30,7 @@ class TravelController {
   }
 
 
-  //To show the notifaction in the Driver Dashboard
+  //To show the rider request notifaction in the Driver Dashboard
   Future<List<TravelModel>> fetchRiderRequests(int driverId) async {
     return await travelService.getRiderRequests(driverId);
   }
@@ -41,6 +41,29 @@ class TravelController {
       await travelService.deleteTravel(travelId);
     } catch (e) {
       debugPrint('Error occurred in delete travel: $e');
+    }
+  }
+
+  //To show the rider accepted notifaction in the Driver Dashboard
+  Future<List<TravelModel>> fetchRiderAccepted(int driverId) async {
+    return await travelService.getRiderAccepted(driverId);
+  }
+
+  Future<bool> travelComplete(int travelId) async {
+    try {
+      return await travelService.travelComplete(travelId);
+    } catch (e) {
+      debugPrint('Error occurred in travel complete controller: $e');
+      return false;
+    }
+  }
+
+  Future<bool> checkTripComplete(int travelId) async {
+    try {
+      return await travelService.checkTripComplete(travelId);
+    } catch (e) {
+      debugPrint('Error occurred in check travel complete controller: $e');
+      return false;
     }
   }
 

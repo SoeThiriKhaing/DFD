@@ -42,6 +42,20 @@ Future<String?> getDriverId() async {
   return await storage.read(key: 'driverId');
 }
 
+// Save notified travel accept IDs (to prevent duplicate notifications)
+Future<void> saveNotifiedTravelIds(Set<int> travelIds) async {
+  await storage.write(key: 'notifiedTravelIds', value: travelIds.join(','));
+}
+
+// Retrieve notified travel accept IDs
+Future<Set<int>> getNotifiedTravelIds() async {
+  String? storedIds = await storage.read(key: 'notifiedTravelIds');
+  if (storedIds == null || storedIds.isEmpty) {
+    return {};
+  }
+  return storedIds.split(',').map(int.parse).toSet();
+}
+
 //Clear all secure storage
 Future<void> clearSecureStorage() async {
   await storage.deleteAll();

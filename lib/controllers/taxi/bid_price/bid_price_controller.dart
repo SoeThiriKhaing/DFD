@@ -16,14 +16,4 @@ class BidPriceController {
     }
   }
 
-  Future<bool> acceptDriver(int driverId, int travelId, double price) async {
-    try {
-      await bidPriceService.acceptDriver(driverId, travelId, price);
-      return true;
-    } catch (e) {
-      debugPrint('Error occurred in submit Bid Price: $e');
-      return false;
-    }
-  }
-
 }

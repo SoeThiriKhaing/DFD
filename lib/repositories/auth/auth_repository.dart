@@ -2,6 +2,7 @@ import 'package:dailyfairdeal/repositories/repo_api_call_services/api_helper.dar
 import 'package:dailyfairdeal/interfaces/auth/i_auth_repository.dart';
 import 'package:dailyfairdeal/models/user/user_model.dart';
 import 'package:dailyfairdeal/util/appurl.dart';
+import 'package:flutter/material.dart';
 
 class AuthRepository implements IAuthRepository {
   @override
@@ -34,5 +35,18 @@ class AuthRepository implements IAuthRepository {
     );
 
     return response;
+  }
+  
+  @override
+  Future<List<UserModel>> getUserInfoById(int userId) async {
+    final user = await ApiHelper.request<UserModel>(
+      endpoint: "${AppUrl.getUserInfoById}/$userId",
+      method: "GET",
+      fromJson: (data) {
+        debugPrint('Raw data from API: $data'); // Debug print to log the data
+        return UserModel.fromJson(data);
+      },
+    );
+    return [user]; // Wrap the result in a list
   }
 }

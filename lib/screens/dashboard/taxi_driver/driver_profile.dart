@@ -1,75 +1,94 @@
+import 'package:dailyfairdeal/controllers/taxi/driver/driver_controller.dart';
+import 'package:dailyfairdeal/models/taxi/driver/driver_model.dart';
+import 'package:dailyfairdeal/repositories/taxi/driver/driver_repository.dart';
+import 'package:dailyfairdeal/screens/dashboard/taxi_driver/driver_dashboard.dart';
+import 'package:dailyfairdeal/services/secure_storage.dart';
+import 'package:dailyfairdeal/services/taxi/driver/driver_service.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:get/get.dart';
 
-class ProfileScreen extends StatelessWidget {
-  final String driverId = "77"; // Replace with actual driver ID
+class DriverProfile extends StatefulWidget {
+  const DriverProfile({super.key});
 
-  const ProfileScreen({super.key});
+  @override
+  State<DriverProfile> createState() => _DriverProfileState();
+}
 
-  Future<void> _deleteAccount(BuildContext context) async {
-    final url =
-        Uri.parse("http://api.dailyfeardeal.com/api/taxi-drivers/$driverId");
+class _DriverProfileState extends State<DriverProfile> {
+  int? driverId;
+  String? driverName;
+  String? driverPhone;
+  String? driverEmail;
+  String? vehicle;
+  String? licenseNo;
 
-    try {
-      final response = await http.delete(url);
+  DriverController driverController = Get.put(DriverController(service: DriverService(repository: DriverRepository())));
 
-      if (response.statusCode == 200) {
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Account deleted successfully.")),
-        );
+  @override
+  void initState() {
+    super.initState();
+    _initializeDriverData();
+  }
 
-        // Navigate to login or home screen (update accordingly)
-        Navigator.pop(context);
-      } else {
-        // Handle error response
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content:
-                  Text("Failed to delete account: ${response.statusCode}")),
-        );
-      }
-    } catch (e) {
-      // Handle network errors
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error deleting account: $e")),
-      );
+  Future<void> _initializeDriverData() async {
+    await _getDriverId();
+    if (driverId != null) {
+      await getDriverInfo(driverId!);
     }
   }
 
+  Future<void> _getDriverId() async {
+    String? taxiDriverId = await getDriverId(); // Fetch from Secure Storage
+    if (taxiDriverId != null) {
+      setState(() {
+        driverId = int.tryParse(taxiDriverId);
+      });
+    }
+  }
+
+  Future<void> getDriverInfo(int driverId) async {
+    DriverModel driver = await driverController.fetchTaxiDriverByDriverId(driverId);
+    setState(() {
+      driverName = driver.user?.name ?? "Driver Name";
+      driverEmail = driver.user?.email ?? "driver@gmail.com";
+      driverPhone = driver.user?.phone;
+      vehicle = driver.carModel;
+      licenseNo = driver.licensePlate;
+    });
+  }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
+    return DriverDashboard(
+      child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 50),
-
+            const SizedBox(height: 20),
             // Profile Image
-            const CircleAvatar(
-              radius: 60,
-              backgroundImage: AssetImage("assets/driver.jpg"),
+            const Center(
+              child: CircleAvatar(
+                radius: 80,
+                backgroundImage: AssetImage("assets/images/driver.png"),
+              ),
             ),
             const SizedBox(height: 15),
-
             // Driver Name
-            const Text(
-              "John Doe",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            Text(
+              driverName ?? "Loading..",
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
 
             // Driver Details
             const SizedBox(height: 10),
-            const Text("📞 Phone: +123 456 7890",
-                style: TextStyle(fontSize: 16)),
-            const Text("✉️ Email: johndoe@email.com",
-                style: TextStyle(fontSize: 16)),
-            const Text("🚗 Vehicle: Toyota Prius",
-                style: TextStyle(fontSize: 16)),
-            const Text("📄 License No: ABC123456",
-                style: TextStyle(fontSize: 16)),
+            Text("📞 Phone: ${driverPhone ?? 'Loading...'}",
+                style: const TextStyle(fontSize: 16)),
+            Text("✉️ Email: ${driverEmail ?? 'Loading...'}",
+                style: const TextStyle(fontSize: 16)),
+            Text("🚗 Vehicle: ${vehicle ?? 'Loading...'}",
+                style: const TextStyle(fontSize: 16)),
+            Text("📄 License No: ${licenseNo ?? 'Loading...'}",
+                style: const TextStyle(fontSize: 16)),
 
             const SizedBox(height: 20),
 
@@ -85,7 +104,7 @@ class ProfileScreen extends StatelessWidget {
 
             // Delete Account Button
             TextButton(
-              onPressed: () => _deleteAccount(context),
+              onPressed: (){},
               child: const Text(
                 "Delete Account",
                 style: TextStyle(color: Colors.red, fontSize: 16),

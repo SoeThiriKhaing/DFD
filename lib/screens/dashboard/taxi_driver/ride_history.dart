@@ -1,11 +1,18 @@
+import 'package:dailyfairdeal/screens/dashboard/taxi_driver/driver_dashboard.dart';
 import 'package:flutter/material.dart';
 
-class TripHistoryScreen extends StatelessWidget {
-  const TripHistoryScreen({super.key});
+class RideHistory extends StatefulWidget {
+  const RideHistory({super.key});
+
+  @override
+  State<RideHistory> createState() => _RideHistoryState();
+}
+
+class _RideHistoryState extends State<RideHistory> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: ListView.builder(
+    return DriverDashboard(
+      child: ListView.builder(
         itemCount: 10,
         itemBuilder: (context, index) {
           return Card(

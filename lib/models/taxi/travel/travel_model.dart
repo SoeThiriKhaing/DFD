@@ -10,6 +10,8 @@ class TravelModel {
   final UserModel? user;
   String? pickupAddress;
   String? destinationAddress;
+  final String? createdAt;
+  final String? updatedAt;
 
   TravelModel({
     this.travelId,
@@ -21,19 +23,36 @@ class TravelModel {
     this.user,
     this.pickupAddress,
     this.destinationAddress,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory TravelModel.fromJson(Map<String, dynamic> json) {
     return TravelModel(
-      travelId: json['travel_id'],
-      pickupLatitude: double.tryParse(json['pickup_location']['latitude'].toString()) ?? 0.0,
-      pickupLongitude: double.tryParse(json['pickup_location']['longitude'].toString()) ?? 0.0,
-      destinationLatitude: double.tryParse(json['destination_location']['latitude'].toString()) ?? 0.0,
-      destinationLongitude: double.tryParse(json['destination_location']['longitude'].toString()) ?? 0.0,
-      status: json['status'],
+      travelId: json['travel_id'] as int?,
+      pickupLatitude: double.tryParse(
+            (json['pickup_location']?['latitude'] ?? json['pickup']?['latitude'] ?? '').toString(),
+          ) ??
+          0.0,
+      pickupLongitude: double.tryParse(
+            (json['pickup_location']?['longitude'] ?? json['pickup']?['longitude'] ?? '').toString(),
+          ) ??
+          0.0,
+      destinationLatitude: double.tryParse(
+            (json['destination_location']?['latitude'] ?? json['destination']?['latitude'] ?? '').toString(),
+          ) ??
+          0.0,
+      destinationLongitude: double.tryParse(
+            (json['destination_location']?['longitude'] ?? json['destination']?['longitude'] ?? '').toString(),
+          ) ??
+          0.0,
+      status: json['status']?.toString() ?? "unknown",
+      createdAt: json['created_at']?.toString() ?? "",
+      updatedAt: json['updated_at']?.toString() ?? "",
       user: json['user'] != null ? UserModel.fromJson(json['user']) : null,
     );
   }
+
 
   Map<String, dynamic> toJson() {
     return {
