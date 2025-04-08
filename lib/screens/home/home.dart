@@ -92,8 +92,10 @@ class _HomeState extends State<Home> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // buildCard("Taxi", Icons.car_crash, AppColor.primaryColor,
+                  //     '/taxihome'),
                   buildCard("Taxi", Icons.car_crash, AppColor.primaryColor,
-                      '/taxihome'),
+                      '/taxi_home_screen'),
                   buildCard("Food", Icons.food_bank_rounded,
                       AppColor.primaryColor, '/foodcategory'),
                   buildCard("Mall", Icons.shop, AppColor.primaryColor,

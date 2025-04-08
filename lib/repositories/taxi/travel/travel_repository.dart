@@ -80,22 +80,34 @@ class TravelRepository implements ITravelRepository {
       method: "GET",
     );
 
-    if (response is Map<String, dynamic> && response.containsKey('data')) {
-      final status = response['data']['status'];
-      debugPrint("Trip status: $status");
+    try {
+      if (response is Map<String, dynamic>) {
+        final data = response['data'];
 
-      if (status == "completed") {
-        debugPrint("Travel completed successfully");
-        return true;
+        // If data is a list and empty, no status info is available
+        if (data is List && data.isEmpty) {
+          debugPrint("No accepted driver status found for travel ID $travelId");
+          return false;
+        }
+
+        // If data is a map and contains a 'status' field
+        if (data is Map<String, dynamic> && data.containsKey('status')) {
+          final status = data['status'];
+          debugPrint("Trip status: $status");
+
+          return status == "completed";
+        } else {
+          debugPrint("Unexpected 'data' structure: $data");
+          return false;
+        }
       } else {
-        debugPrint("Travel is not yet completed");
+        debugPrint("Invalid response format: $response");
         return false;
       }
-    } else {
-      debugPrint("Failed to retrieve travel status");
+    } catch (e) {
+      debugPrint("Exception in checkTripComplete: $e");
       return false;
     }
   }
-
 
 }

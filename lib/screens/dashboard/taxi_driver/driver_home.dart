@@ -300,6 +300,7 @@ class TaxiHomeScreenState extends State<TaxiHomeScreen> {
                   });
                 });
                 await fetchRideDetails(travelId);
+                Get.back(); // Close the dialog
                 setState(() {
                   isLoading = false; // Hide loading indicator
                 });
