@@ -56,8 +56,15 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: AppColor.primaryColor,
-        leading: const Icon(Icons.shop),
-        title: Text("Hello, $userName", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),),
+        leading: const Icon(
+          Icons.person,
+          size: 30.0,
+          color: Colors.black,
+        ),
+        title: Text(
+          "Hello, $userName",
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(

@@ -30,7 +30,8 @@ class TaxiHomeSearchFields extends StatelessWidget {
                   onPlaceSelected: (Prediction prediction) {
                     controller.setSourceLocation(prediction);
                   },
-                  prefixIcon: const Icon(Icons.my_location, color: AppColor.primaryColor),
+                  prefixIcon: const Icon(Icons.my_location,
+                      color: AppColor.primaryColor),
                 ),
                 const SizedBox(height: 6.0),
                 AutoCompleteTextField(
@@ -40,65 +41,96 @@ class TaxiHomeSearchFields extends StatelessWidget {
                   onPlaceSelected: (Prediction prediction) {
                     controller.setDestinationLocation(prediction);
                   },
-                  prefixIcon: const Icon(Icons.location_on_sharp, color: AppColor.primaryColor),
+                  prefixIcon: const Icon(Icons.location_on_sharp,
+                      color: AppColor.primaryColor),
+                ),
+                const SizedBox(
+                  height: 10.0,
                 ),
                 Row(
                   children: [
-                    ElevatedButton(
-                      //onPressed: controller.isSearchButtonEnabled ? controller.clickSearchButton : null,
-                       onPressed: controller.isSearchButtonEnabled ? () async {
-                          if (controller.sourceLocation == null) {
-                          SnackbarHelper.showSnackbar(
-                            title: 'Error',
-                            message: ErrorMessage.typeSource,
-                            backgroundColor: Colors.red,
-                          );
-                          return;
-                          }
-                          if (controller.destinationLocation == null) {
-                          SnackbarHelper.showSnackbar(
-                            title: 'Error',
-                            message: ErrorMessage.typeDestination,
-                            backgroundColor: Colors.red,
-                          );
-                          return;
-                          }
-            
-                          controller.clickSearchButton();
-                          controller.startSearchingForDrivers();
-                          
-                        } : null,
-                      child: const Text('Search', style: TextStyle(fontSize: 12.0)),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColor.primaryColor,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0))),
+                        //onPressed: controller.isSearchButtonEnabled ? controller.clickSearchButton : null,
+                        onPressed: controller.isSearchButtonEnabled
+                            ? () async {
+                                if (controller.sourceLocation == null) {
+                                  SnackbarHelper.showSnackbar(
+                                    title: 'Error',
+                                    message: ErrorMessage.typeSource,
+                                    backgroundColor: Colors.red,
+                                  );
+                                  return;
+                                }
+                                if (controller.destinationLocation == null) {
+                                  SnackbarHelper.showSnackbar(
+                                    title: 'Error',
+                                    message: ErrorMessage.typeDestination,
+                                    backgroundColor: Colors.red,
+                                  );
+                                  return;
+                                }
+
+                                controller.clickSearchButton();
+                                controller.startSearchingForDrivers();
+                              }
+                            : null,
+                        child: const Text('Search',
+                            style: TextStyle(
+                                fontSize: 14.0,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold)),
+                      ),
                     ),
                     const SizedBox(width: 8.0),
-                    ElevatedButton(
-                      //onPressed: controller.isCancelButtonEnabled ? () => controller.deleteTrip(0) : null,
-                      onPressed: controller.isCancelButtonEnabled ? () async {
-                        final confirm = await showDialog<bool>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                          title: const Text('Confirmation'),
-                          content: const Text('Are you sure you want to cancel the trip?'),
-                          actions: [
-                            TextButton(
-                            onPressed: () => Get.back(result: false),
-                            child: const Text('No'),
-                            ),
-                            TextButton(
-                            onPressed: () => Get.back(result: true),
-                            child: const Text('Yes'),
-                            ),
-                          ],
-                          );
-                        },
-                        );
-            
-                        if (confirm == true) {
-                          controller.deleteTrip();
-                        }
-                      } : null,
-                      child: const Text('Cancel', style: TextStyle(fontSize: 12.0)),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0)),
+                        ),
+                        //onPressed: controller.isCancelButtonEnabled ? () => controller.deleteTrip(0) : null,
+                        onPressed: controller.isCancelButtonEnabled
+                            ? () async {
+                                final confirm = await showDialog<bool>(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text('Confirmation'),
+                                      content: const Text(
+                                          'Are you sure you want to cancel the trip?'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Get.back(result: false),
+                                          child: const Text('No'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () =>
+                                              Get.back(result: true),
+                                          child: const Text('Yes'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+
+                                if (confirm == true) {
+                                  controller.deleteTrip();
+                                }
+                              }
+                            : null,
+                        child: const Text('Cancel',
+                            style: TextStyle(
+                                fontSize: 14.0,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold)),
+                      ),
                     ),
                   ],
                 ),
@@ -113,8 +145,10 @@ class TaxiHomeSearchFields extends StatelessWidget {
                 width: double.infinity,
                 height: 30.0,
                 child: Marquee(
-                  text: 'From: ${controller.sourceController.text.length > 20 ? '${controller.sourceController.text.substring(0, 20)}...' : controller.sourceController.text} To: ${controller.destinationController.text.length > 20 ? '${controller.destinationController.text.substring(0, 20)}...' : controller.destinationController.text}',
-                  style: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.w500),
+                  text:
+                      'From: ${controller.sourceController.text.length > 20 ? '${controller.sourceController.text.substring(0, 20)}...' : controller.sourceController.text} To: ${controller.destinationController.text.length > 20 ? '${controller.destinationController.text.substring(0, 20)}...' : controller.destinationController.text}',
+                  style: const TextStyle(
+                      fontSize: 14.0, fontWeight: FontWeight.w500),
                   scrollAxis: Axis.horizontal,
                   blankSpace: 20.0,
                   velocity: 30.0,
@@ -128,15 +162,12 @@ class TaxiHomeSearchFields extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.arrow_downward),
                 onPressed: () {
-
                   controller.setShowSearchFields(true);
-                  
                 },
               ),
             ],
           ),
       ],
     );
-    
   }
 }

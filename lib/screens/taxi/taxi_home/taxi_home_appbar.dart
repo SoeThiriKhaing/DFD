@@ -10,7 +10,7 @@ class TaxiHomeAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       title: Text('Taxi Booking', style: AppWidget.appBarTextStyle()),
       backgroundColor: AppColor.primaryColor,
-      centerTitle: true,
+      //centerTitle: true,
     );
   }
 

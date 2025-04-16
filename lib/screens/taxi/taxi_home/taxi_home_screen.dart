@@ -12,7 +12,8 @@ class TaxiHomeUserScreen extends StatefulWidget {
   State<TaxiHomeUserScreen> createState() => _TaxiHomeUserScreenState();
 }
 
-class _TaxiHomeUserScreenState extends State<TaxiHomeUserScreen> with RouteAware {
+class _TaxiHomeUserScreenState extends State<TaxiHomeUserScreen>
+    with RouteAware {
   TaxiHomeController controller = TaxiHomeController();
   @override
   void initState() {
@@ -48,6 +49,7 @@ class _TaxiHomeUserScreenState extends State<TaxiHomeUserScreen> with RouteAware
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
+      backgroundColor: Colors.white,
       appBar: TaxiHomeAppBar(),
       body: TaxiHomeBody(),
     );

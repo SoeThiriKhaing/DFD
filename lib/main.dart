@@ -11,7 +11,7 @@ import 'package:dailyfairdeal/screens/dashboard/restaurant/restaurant_setting/pr
 import 'package:dailyfairdeal/screens/dashboard/taxi_driver/driver_profile.dart';
 import 'package:dailyfairdeal/screens/dashboard/taxi_driver/earnings.dart';
 import 'package:dailyfairdeal/screens/dashboard/taxi_driver/ride_history.dart';
-import 'package:dailyfairdeal/screens/dashboard/taxi_driver/ride_request.dart';
+import 'package:dailyfairdeal/screens/dashboard/taxi_driver/rider_request/ride_request.dart';
 import 'package:dailyfairdeal/screens/dashboard/taxi_driver/driver_home.dart';
 import 'package:dailyfairdeal/screens/food/foodpage/food_page.dart';
 import 'package:dailyfairdeal/screens/home/main_screen.dart';
